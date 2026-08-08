@@ -85,6 +85,9 @@ class UncheckedLowLevelCallRule(Rule):
     )
 
     def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if source.ast:
+            yield from self._scan_ast(source)
+            return
         for match in LOW_LEVEL_CALL_RE.finditer(source.masked):
             prefix = _statement_prefix(source.masked, match.start())
             if "=" in prefix or re.search(r"\b(require|assert)\s*\(", prefix):
@@ -94,6 +97,43 @@ class UncheckedLowLevelCallRule(Rule):
                 source,
                 match.start(),
                 metadata={"call_kind": match.group("kind"), "target": target},
+            )
+            if finding:
+                yield finding
+
+    def _scan_ast(self, source: SoliditySource) -> Iterable[Finding]:
+        assert source.ast is not None
+        for node, parent in _walk_ast(source.ast):
+            if node.get("nodeType") != "FunctionCall" or not parent:
+                continue
+            if parent.get("nodeType") != "ExpressionStatement":
+                continue
+            member = _called_member(node)
+            if not member or member.get("memberName") not in {
+                "call",
+                "send",
+                "staticcall",
+                "delegatecall",
+            }:
+                continue
+            source_range = source.ast_range(node)
+            if not source_range:
+                continue
+            target_node = member.get("expression")
+            target_range = source.ast_range(target_node) if isinstance(target_node, dict) else None
+            target = (
+                source.text[target_range[0] : target_range[1]]
+                if target_range
+                else "<expression>"
+            )
+            finding = self.finding(
+                source,
+                source_range[0],
+                metadata={
+                    "call_kind": str(member.get("memberName")),
+                    "target": target.strip(),
+                    "evidence": "compiler-ast",
+                },
             )
             if finding:
                 yield finding
@@ -219,6 +259,108 @@ class WeakRandomnessRule(Rule):
                 yield finding
 
 
+class PackedEncodingCollisionRule(Rule):
+    info = RuleInfo(
+        rule_id="SOL007",
+        severity=Severity.MEDIUM,
+        title="Hash uses ambiguous packed encoding",
+        description=(
+            "abi.encodePacked combines multiple dynamic values without boundaries, so distinct "
+            "inputs can produce the same byte sequence and hash."
+        ),
+        recommendation=(
+            "Use abi.encode, include explicit lengths or separators, or hash each dynamic value "
+            "before combining them."
+        ),
+        confidence="high",
+    )
+
+    def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if not source.ast:
+            return
+        for node, parent in _walk_ast(source.ast):
+            if node.get("nodeType") != "FunctionCall" or not parent:
+                continue
+            member = _called_member(node)
+            if not member or member.get("memberName") != "encodePacked":
+                continue
+            owner = member.get("expression")
+            if not isinstance(owner, dict) or owner.get("name") != "abi":
+                continue
+            if not _is_hash_call(parent):
+                continue
+            arguments = node.get("arguments", [])
+            if not isinstance(arguments, list):
+                continue
+            dynamic_types = [
+                type_name
+                for argument in arguments
+                if isinstance(argument, dict)
+                and (type_name := _type_name(argument))
+                and _is_dynamic_packed_type(type_name)
+            ]
+            if len(dynamic_types) < 2:
+                continue
+            source_range = source.ast_range(node)
+            if not source_range:
+                continue
+            finding = self.finding(
+                source,
+                source_range[0],
+                metadata={
+                    "dynamic_argument_types": dynamic_types,
+                    "evidence": "compiler-ast",
+                },
+            )
+            if finding:
+                yield finding
+
+
+def _walk_ast(
+    node: dict[str, object], parent: dict[str, object] | None = None
+) -> Iterable[tuple[dict[str, object], dict[str, object] | None]]:
+    yield node, parent
+    for value in node.values():
+        if isinstance(value, dict) and "nodeType" in value:
+            yield from _walk_ast(value, node)
+        elif isinstance(value, list):
+            for child in value:
+                if isinstance(child, dict) and "nodeType" in child:
+                    yield from _walk_ast(child, node)
+
+
+def _called_member(node: dict[str, object]) -> dict[str, object] | None:
+    expression = node.get("expression")
+    while isinstance(expression, dict) and expression.get("nodeType") == "FunctionCallOptions":
+        expression = expression.get("expression")
+    if isinstance(expression, dict) and expression.get("nodeType") == "MemberAccess":
+        return expression
+    return None
+
+
+def _is_hash_call(node: dict[str, object]) -> bool:
+    if node.get("nodeType") != "FunctionCall":
+        return False
+    expression = node.get("expression")
+    return isinstance(expression, dict) and expression.get("name") in {"keccak256", "sha256"}
+
+
+def _type_name(node: dict[str, object]) -> str | None:
+    descriptions = node.get("typeDescriptions")
+    if not isinstance(descriptions, dict):
+        return None
+    value = descriptions.get("typeString")
+    return value if isinstance(value, str) else None
+
+
+def _is_dynamic_packed_type(type_name: str) -> bool:
+    normalized = type_name.strip()
+    return bool(
+        re.match(r"^(?:string|bytes)(?:\s|$)", normalized)
+        or re.search(r"\[\](?:\s|$)", normalized)
+    )
+
+
 DEFAULT_RULES: tuple[Rule, ...] = (
     TxOriginRule(),
     UncheckedLowLevelCallRule(),
@@ -226,4 +368,5 @@ DEFAULT_RULES: tuple[Rule, ...] = (
     SelfDestructRule(),
     ReentrancyRule(),
     WeakRandomnessRule(),
+    PackedEncodingCollisionRule(),
 )

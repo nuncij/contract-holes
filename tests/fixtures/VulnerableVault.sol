@@ -31,5 +31,12 @@ contract VulnerableVault {
     function draw() external view returns (uint256) {
         return uint256(keccak256(abi.encodePacked(block.timestamp, msg.sender)));
     }
-}
 
+    function ambiguousHash(string calldata first, string calldata second)
+        external
+        pure
+        returns (bytes32)
+    {
+        return keccak256(abi.encodePacked(first, second));
+    }
+}

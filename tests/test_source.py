@@ -25,7 +25,15 @@ class MaskingTests(unittest.TestCase):
         source = SoliditySource(Path("Inline.sol"), "one\ntwo\n")
         self.assertEqual(source.location(4), (2, 1))
 
+    def test_solc_byte_offsets_are_mapped_across_unicode(self) -> None:
+        text = "// ž\ncontract Unicode {}"
+        contract_start = text.index("contract")
+        byte_start = len(text[:contract_start].encode("utf-8"))
+        node = {"nodeType": "SourceUnit", "src": f"{byte_start}:8:0", "nodes": []}
+        source = SoliditySource(Path("Unicode.sol"), text, ast=node)
+
+        self.assertEqual(source.ast_range(node), (contract_start, contract_start + 8))
+
 
 if __name__ == "__main__":
     unittest.main()
-

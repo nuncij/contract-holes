@@ -14,6 +14,7 @@ It currently detects:
 | `SOL004` | High | `selfdestruct` usage |
 | `SOL005` | High | Persistent state mutation after an external interaction |
 | `SOL006` | Medium | Block properties hashed as a source of randomness |
+| `SOL007` | Medium | Multiple dynamic values in a packed hash encoding (compiler AST) |
 
 These are review signals, not proofs. Findings include confidence and evidence;
 the scanner deliberately does not claim that a clean report means a contract is
@@ -43,6 +44,31 @@ holes contracts/ --format sarif > holes.sarif
 holes contracts/ --minimum-severity medium --fail-on high
 ```
 
+Add `--compile` to validate the project with Foundry and enable rules that need
+solc types and AST structure:
+
+```bash
+holes contracts/ --compile
+holes contracts/ --compile --offline
+```
+
+Compilation happens in an isolated temporary directory, so the scanner does not
+modify the project's Foundry cache or artifacts. Foundry may download a matching
+solc version unless `--offline` is used.
+
+For supported findings, the scanner can also write a standalone Foundry test
+that reproduces the underlying vulnerability primitive:
+
+```bash
+holes contracts/ --compile --generate-proofs test/holes
+forge test --match-path 'test/holes/*.t.sol'
+```
+
+Automatic proofs currently cover `SOL007`. They demonstrate the collision but
+do not claim protocol impact; that still requires checking how the contract uses
+the hash. Generated files are deterministic, and the scanner refuses to
+overwrite a proof that was manually changed.
+
 Directories named `lib`, `vendor`, `node_modules`, `out`, `cache`, and
 `artifacts` are skipped unless `--include-dependencies` is supplied.
 
@@ -67,9 +93,11 @@ The complete suite uses Python's standard library:
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
-The parser masks comments and string contents while preserving byte offsets,
-then identifies contract and function regions. Rules return structured findings;
-reporters render the same findings as terminal text, JSON, or SARIF 2.1.0.
+The fallback parser masks comments and string contents while preserving offsets,
+then identifies contract and function regions. With `--compile`, solc source maps,
+exact state declarations, function boundaries, and expression types take
+precedence. Rules return structured findings; reporters render the same findings
+as terminal text, JSON, or SARIF 2.1.0.
 
 ## Roadmap
 
@@ -80,4 +108,3 @@ rank findings, explain impact, and draft proofs without being the sole source of
 a security claim.
 
 Only scan contracts you own or are authorized to assess.
-

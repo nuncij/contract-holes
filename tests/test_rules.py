@@ -35,6 +35,48 @@ class RuleTests(unittest.TestCase):
         findings = self.scanner.scan_source(source)
         self.assertIn("SOL002", {finding.rule_id for finding in findings})
 
+    def test_ast_detects_ambiguous_packed_hash(self) -> None:
+        text = (
+            "contract C { function h(string memory a, string memory b) external pure "
+            "returns (bytes32) { return keccak256(abi.encodePacked(a, b)); } }"
+        )
+        packed_start = text.index("abi.encodePacked")
+        packed_length = len("abi.encodePacked(a, b)")
+        dynamic_argument = lambda name: {
+            "nodeType": "Identifier",
+            "name": name,
+            "typeDescriptions": {"typeString": "string memory"},
+        }
+        packed_call = {
+            "nodeType": "FunctionCall",
+            "src": f"{packed_start}:{packed_length}:0",
+            "expression": {
+                "nodeType": "MemberAccess",
+                "memberName": "encodePacked",
+                "expression": {"nodeType": "Identifier", "name": "abi"},
+            },
+            "arguments": [dynamic_argument("a"), dynamic_argument("b")],
+        }
+        ast = {
+            "nodeType": "SourceUnit",
+            "nodes": [
+                {
+                    "nodeType": "FunctionCall",
+                    "expression": {"nodeType": "Identifier", "name": "keccak256"},
+                    "arguments": [packed_call],
+                }
+            ],
+        }
+        source = SoliditySource(Path("Packed.sol"), text, ast=ast)
+
+        findings = self.scanner.scan_source(source)
+        packed = next(finding for finding in findings if finding.rule_id == "SOL007")
+        self.assertEqual(
+            packed.metadata["dynamic_argument_types"],
+            ["string memory", "string memory"],
+        )
+        self.assertEqual(packed.metadata["evidence"], "compiler-ast")
+
     def test_safe_fixture_has_no_findings(self) -> None:
         source = SoliditySource.from_path(FIXTURES / "SafeVault.sol")
         self.assertEqual(self.scanner.scan_source(source), [])

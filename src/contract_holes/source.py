@@ -106,18 +106,26 @@ class FunctionRegion:
 
 
 class SoliditySource:
-    def __init__(self, path: Path, text: str):
+    def __init__(self, path: Path, text: str, ast: dict[str, object] | None = None):
         self.path = path
         self.text = text
         self.masked = mask_comments_and_strings(text)
+        self.ast = ast
         self._line_starts = [0]
         self._line_starts.extend(index + 1 for index, char in enumerate(text) if char == "\n")
-        self.contracts = self._find_contracts()
-        self.functions = self._find_functions()
+        self._byte_boundaries = _byte_boundaries(text) if ast else ()
+        if ast:
+            self.contracts = self._find_ast_contracts(ast)
+            self.functions = self._find_ast_functions(ast)
+        else:
+            self.contracts = self._find_contracts()
+            self.functions = self._find_functions()
 
     @classmethod
-    def from_path(cls, path: Path) -> "SoliditySource":
-        return cls(path, path.read_text(encoding="utf-8"))
+    def from_path(
+        cls, path: Path, ast: dict[str, object] | None = None
+    ) -> "SoliditySource":
+        return cls(path, path.read_text(encoding="utf-8"), ast=ast)
 
     def location(self, offset: int) -> tuple[int, int]:
         import bisect
@@ -146,6 +154,109 @@ class SoliditySource:
             (function for function in self.functions if function.body_start <= offset <= function.body_end),
             None,
         )
+
+    def ast_range(self, node: dict[str, object]) -> tuple[int, int] | None:
+        if not self._byte_boundaries:
+            return None
+        value = node.get("src")
+        if not isinstance(value, str):
+            return None
+        pieces = value.split(":", 2)
+        if len(pieces) < 2:
+            return None
+        try:
+            byte_start, byte_length = int(pieces[0]), int(pieces[1])
+        except ValueError:
+            return None
+        return (
+            _byte_to_character(self._byte_boundaries, byte_start),
+            _byte_to_character(self._byte_boundaries, byte_start + byte_length),
+        )
+
+    def _find_ast_contracts(self, ast: dict[str, object]) -> tuple[ContractRegion, ...]:
+        contracts: list[ContractRegion] = []
+        nodes = ast.get("nodes", [])
+        if not isinstance(nodes, list):
+            return self._find_contracts()
+        for node in nodes:
+            if not isinstance(node, dict) or node.get("nodeType") != "ContractDefinition":
+                continue
+            source_range = self.ast_range(node)
+            if not source_range:
+                continue
+            start, end = source_range
+            opening = self.masked.find("{", start, end)
+            closing = matching_brace(self.masked, opening) if opening >= 0 else None
+            if closing is None:
+                continue
+            child_nodes = node.get("nodes", [])
+            state_variables = {
+                str(child.get("name"))
+                for child in child_nodes
+                if isinstance(child, dict)
+                and child.get("nodeType") == "VariableDeclaration"
+                and child.get("stateVariable") is True
+                and child.get("name")
+            }
+            contracts.append(
+                ContractRegion(
+                    name=str(node.get("name", "<anonymous>")),
+                    kind=str(node.get("contractKind", "contract")),
+                    start=start,
+                    body_start=opening + 1,
+                    body_end=closing,
+                    state_variables=frozenset(state_variables),
+                )
+            )
+        return tuple(contracts) or self._find_contracts()
+
+    def _find_ast_functions(self, ast: dict[str, object]) -> tuple[FunctionRegion, ...]:
+        functions: list[FunctionRegion] = []
+        nodes = ast.get("nodes", [])
+        if not isinstance(nodes, list):
+            return self._find_functions()
+        for contract_node in nodes:
+            if not isinstance(contract_node, dict) or contract_node.get("nodeType") != "ContractDefinition":
+                continue
+            contract_range = self.ast_range(contract_node)
+            contract = next(
+                (
+                    item
+                    for item in self.contracts
+                    if contract_range and item.start == contract_range[0]
+                ),
+                None,
+            )
+            child_nodes = contract_node.get("nodes", [])
+            if not isinstance(child_nodes, list):
+                continue
+            for node in child_nodes:
+                if not isinstance(node, dict) or node.get("nodeType") != "FunctionDefinition":
+                    continue
+                body = node.get("body")
+                source_range = self.ast_range(node)
+                body_range = self.ast_range(body) if isinstance(body, dict) else None
+                if not source_range or not body_range:
+                    continue
+                start, _ = source_range
+                body_ast_start, body_ast_end = body_range
+                opening = self.masked.find("{", body_ast_start, body_ast_end)
+                closing = matching_brace(self.masked, opening) if opening >= 0 else None
+                if closing is None:
+                    continue
+                kind = str(node.get("kind", "function"))
+                name = str(node.get("name") or kind)
+                functions.append(
+                    FunctionRegion(
+                        name=name,
+                        start=start,
+                        body_start=opening + 1,
+                        body_end=closing,
+                        header=self.masked[start:opening],
+                        contract=contract,
+                    )
+                )
+        return tuple(functions) or self._find_functions()
 
     def _find_contracts(self) -> tuple[ContractRegion, ...]:
         contracts: list[ContractRegion] = []
@@ -240,3 +351,21 @@ def _state_variables(masked: str, start: int, end: int) -> set[str]:
                 if candidate not in {"public", "private", "internal", "constant", "immutable"}:
                     variables.add(candidate)
     return variables
+
+
+def _byte_boundaries(text: str) -> tuple[int, ...]:
+    """Map UTF-8 byte offsets used by solc back to Python character offsets."""
+    boundaries = [0]
+    for character_index, character in enumerate(text):
+        width = len(character.encode("utf-8"))
+        boundaries.extend([character_index] * (width - 1))
+        boundaries.append(character_index + 1)
+    return tuple(boundaries)
+
+
+def _byte_to_character(boundaries: tuple[int, ...], byte_offset: int) -> int:
+    if byte_offset <= 0:
+        return 0
+    if byte_offset >= len(boundaries):
+        return boundaries[-1]
+    return boundaries[byte_offset]

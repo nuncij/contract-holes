@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable, Sequence
 from pathlib import Path
 
+from .compiler import CompilerError, ForgeCompiler
 from .models import Finding, Severity
 from .rules import DEFAULT_RULES, Rule
 from .source import SoliditySource
@@ -18,8 +19,13 @@ class ScanError(RuntimeError):
 
 
 class Scanner:
-    def __init__(self, rules: Sequence[Rule] = DEFAULT_RULES):
+    def __init__(
+        self,
+        rules: Sequence[Rule] = DEFAULT_RULES,
+        compiler: ForgeCompiler | None = None,
+    ):
         self.rules = tuple(rules)
+        self.compiler = compiler or ForgeCompiler()
 
     def scan_source(self, source: SoliditySource) -> list[Finding]:
         findings = [finding for rule in self.rules for finding in rule.scan(source)]
@@ -31,12 +37,20 @@ class Scanner:
         *,
         minimum_severity: Severity = Severity.INFO,
         include_dependencies: bool = False,
+        compile_sources: bool = False,
+        compiler_offline: bool = False,
     ) -> tuple[list[Finding], int]:
         files = discover_sources(paths, include_dependencies=include_dependencies)
+        asts: dict[Path, dict[str, object]] = {}
+        if compile_sources:
+            try:
+                asts = self.compiler.compile(files, offline=compiler_offline).asts
+            except CompilerError as exc:
+                raise ScanError(str(exc)) from exc
         findings: list[Finding] = []
         for path in files:
             try:
-                source = SoliditySource.from_path(path)
+                source = SoliditySource.from_path(path, ast=asts.get(path.resolve()))
             except (OSError, UnicodeError) as exc:
                 raise ScanError(f"could not read {path}: {exc}") from exc
             findings.extend(

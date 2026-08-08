@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
+from pathlib import Path
 import sys
 
 from . import __version__
 from .models import Severity
+from .proofs import ProofGenerationError, generate_foundry_proofs
 from .reporters import json_report, sarif_report, text_report
 from .scanner import ScanError, Scanner
 
@@ -41,18 +43,40 @@ def parser() -> argparse.ArgumentParser:
         action="store_true",
         help="include lib, vendor, node_modules, and generated artifact directories",
     )
+    result.add_argument(
+        "--compile",
+        action="store_true",
+        help="compile with Foundry and enable type-aware AST rules",
+    )
+    result.add_argument(
+        "--offline",
+        action="store_true",
+        help="prevent Foundry from downloading missing compiler versions (requires --compile)",
+    )
+    result.add_argument(
+        "--generate-proofs",
+        metavar="DIRECTORY",
+        help="write runnable Foundry proof tests for supported findings (requires --compile)",
+    )
     result.add_argument("--no-color", action="store_true", help="disable ANSI colors")
     return result
 
 
 def main(argv: Sequence[str] | None = None) -> int:
-    args = parser().parse_args(argv)
+    argument_parser = parser()
+    args = argument_parser.parse_args(argv)
+    if args.offline and not args.compile:
+        argument_parser.error("--offline requires --compile")
+    if args.generate_proofs and not args.compile:
+        argument_parser.error("--generate-proofs requires --compile")
     scanner = Scanner()
     try:
         findings, files_scanned = scanner.scan_paths(
             args.paths,
             minimum_severity=Severity.parse(args.minimum_severity),
             include_dependencies=args.include_dependencies,
+            compile_sources=args.compile,
+            compiler_offline=args.offline,
         )
     except ScanError as exc:
         print(f"holes: error: {exc}", file=sys.stderr)
@@ -70,9 +94,22 @@ def main(argv: Sequence[str] | None = None) -> int:
         )
     print(output)
 
+    if args.generate_proofs:
+        try:
+            proofs = generate_foundry_proofs(findings, Path(args.generate_proofs))
+        except ProofGenerationError as exc:
+            print(f"holes: error: {exc}", file=sys.stderr)
+            return 2
+        if proofs:
+            print(
+                f"holes: wrote {len(proofs)} Foundry proof test(s) to {args.generate_proofs}",
+                file=sys.stderr,
+            )
+        else:
+            print("holes: no findings have an automatic proof generator", file=sys.stderr)
+
     if args.fail_on:
         threshold = Severity.parse(args.fail_on)
         if any(finding.severity >= threshold for finding in findings):
             return 1
     return 0
-
