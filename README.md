@@ -318,7 +318,8 @@ Project status and future work are tracked explicitly:
 - [Security policy](SECURITY.md) — supported versions, private reporting, and
   coordinated disclosure targets.
 
-The project is at `1.0.0`; M0 through M6 are complete. The compiler index,
+The latest release is `1.0.0`; M0 through M6 are complete and M7 Bounty Hunter
+Mode is planned for `1.1.0`. The compiler index,
 inheritance resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,
 deterministic inspection JSON, and repeatable benchmark are complete. `SOL008` traces
@@ -395,10 +396,12 @@ as terminal text, JSON, or SARIF 2.1.0.
 
 ## Roadmap
 
-The concise roadmap is M2 cross-contract analysis, M3 high-value detectors, M4
-dynamic verification, M5 team/CI workflow, and M6 audit-ready `1.0.0`. See the
-[development plan](docs/DEVELOPMENT_PLAN.md) for release gates and
-[TASKS.md](TASKS.md) for the ordered backlog.
+M0 through M6 produced the signed audit-ready `1.0.0` release. M7 targets a
+human-controlled bounty research workflow with pinned authorized scope,
+candidate triage, isolated local proofs, private report drafts, historical
+validation, and an explicit approval gate. It will not submit reports or touch
+live networks. See the [M7 Bounty Hunter Mode plan](docs/BOUNTY_HUNTER_PLAN.md),
+[development plan](docs/DEVELOPMENT_PLAN.md), and [TASKS.md](TASKS.md).
 
 Only scan contracts you own or are authorized to assess. Start untrusted code in
 source-only mode and read the [secure-use guide](docs/SECURE_USE.md) before

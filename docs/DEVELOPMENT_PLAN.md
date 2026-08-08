@@ -2,8 +2,8 @@
 
 Last updated: 2026-08-08  
 Current release: `1.0.0`
-Current milestone: **M6 — Audit-ready release (`1.0.0`) — COMPLETE**
-Next: **None — the planned 1.0 milestones are complete.**
+Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — PLANNED**
+Next: **BOUNTY-001 — profile schema, command contract, and workspace model.**
 
 ## Product goal
 
@@ -34,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 137 Python tests; frozen JSON/SARIF schemas and 64 audit labels plus CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 151 Python tests; frozen JSON/SARIF schemas and 64 audit labels plus CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -230,6 +230,8 @@ Solidity project
   -> executable proofs where generation is reliable
   -> text / JSON / SARIF / CI policy
   -> optional AI correlation and explanation            [later]
+  -> pinned bounty scope and candidate workspace         [M7: planned]
+  -> local proof, private report, and human approval     [M7: planned]
 ```
 
 Source-only mode remains important for fast scans and partially broken projects.
@@ -247,6 +249,7 @@ back after the user explicitly requests compilation.
 | M4 — Dynamic verification | `0.5.0` | Complete | Reentrancy probes, transaction-sequence fuzzing, protocol invariants, isolated runner |
 | M5 — Team and CI workflow | `0.6.0` | Complete | Configuration, baselines, catalog, CI, limits, address provenance, evidence-bound AI triage |
 | M6 — Audit-ready release | `1.0.0` | Complete | Benchmarked accuracy, stable schemas, compatibility policy, security docs, reproducible signed release evidence |
+| M7 — Bounty Hunter Mode | `1.1.0` | Planned | Authorized scope profiles, candidate triage, isolated local proofs, private reports, and historical validation |
 
 ### M2 — Cross-contract analysis (`0.3.0`)
 
@@ -321,6 +324,40 @@ and public-command coverage are regression tested.
 Initial quality targets for supported vulnerability classes are at least 80%
 precision for high-confidence findings, no unlabelled silent analysis failures,
 and deterministic output across repeated scans of the same revision.
+
+### M7 — Bounty Hunter Mode (`1.1.0`)
+
+Turn the scanner into a human-controlled bounty research assistant. M7 begins
+with an approved, revision-pinned scope; preserves immutable scanner evidence;
+separates human review decisions; generates local-only proof workspaces; and
+produces private report drafts that require explicit approval before local
+export.
+
+Automatic platform submission, live-network exploit execution, payout
+prediction, and automatic confirmation are out of scope. Program rules and
+human judgment remain authoritative.
+
+Release gate:
+
+- incomplete, stale, tampered, or out-of-scope profiles fail closed;
+- normal bounty commands are offline and cannot submit or disclose findings;
+- observations, review decisions, proof results, and reports remain separately
+  attributable and bound to source hashes;
+- proof workspaces default to isolated local execution without inherited RPC or
+  wallet configuration;
+- at least ten disclosed historical cases from five independent projects are
+  evaluated, including supported and explicitly out-of-model root causes;
+- at least three independent historical vulnerabilities in supported classes
+  produce useful investigation evidence;
+- one authorized end-to-end pilot is completed without requiring submission or
+  live-network interaction;
+- limitations and measured historical results are published without treating
+  the synthetic regression corpus as real-world accuracy.
+
+The complete architecture, safety boundaries, delivery phases, evaluation
+design, and deferred decisions are in the
+[M7 Bounty Hunter Mode plan](BOUNTY_HUNTER_PLAN.md). Dependency-ordered work is
+tracked in [TASKS.md](../TASKS.md).
 
 ## Engineering rules
 

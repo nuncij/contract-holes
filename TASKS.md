@@ -6,14 +6,13 @@ marked **IN PROGRESS**.
 
 Current release: `1.0.0`
 
-Current milestone: **M6 — Audit-ready release (`1.0.0`) — COMPLETE**
+Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — PLANNED**
 
-Current position: M0 through M6 are complete. The audit-ready 1.0 release has
-stable schemas, measured detector regression accuracy, supported toolchain ranges,
-security/governance documentation, reproducible artifacts, and signed release
-evidence.
+Current position: M0 through M6 and the signed audit-ready 1.0 release are
+complete. M7 has an approved development plan but no implementation work is
+complete yet.
 
-Next: **None — the planned 1.0.0 milestones are complete.**
+Next: **BOUNTY-001 — profile schema, command contract, and workspace model.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -192,6 +191,245 @@ counterexamples, and document conditions that require manual review.
 - [x] **SECURITY-001** — Add threat model, secure-use guidance, and disclosure policy — P0 — **COMPLETE**.
 - [x] **DOCS-001** — Complete install, rule, CI, proof, and contributor documentation — P0 — **COMPLETE**.
 - [x] **RELEASE-001** — Produce reproducible package artifacts and a signed release checklist — P0 — **COMPLETE**.
+
+## M7 — Bounty Hunter Mode (`1.1.0`)
+
+The complete architecture, phase gates, product boundaries, and validation
+strategy are defined in the
+[M7 Bounty Hunter Mode plan](docs/BOUNTY_HUNTER_PLAN.md). M7 is a local research
+assistant with mandatory human approval. Automatic submission, live-network
+exploit execution, automatic confirmation, and payout prediction are out of
+scope.
+
+Work in dependency order.
+
+### [ ] BOUNTY-001 — Profile schema, command contract, and workspace model — P0 — **NEXT**
+
+Define the versioned bounty profile, private local workspace, and public CLI
+contract before implementing later workflow stages.
+
+Acceptance criteria:
+
+- a versioned TOML schema records program identity, rules URL, review date,
+  source location, immutable revision/content identity, in-scope paths and
+  impacts, restrictions, and an explicit authorization acknowledgement;
+- incomplete authorization, mutable source identity, unknown keys, or ambiguous
+  scope fails validation;
+- workspace records are placed outside the target tree, use relative paths and
+  atomic writes, and never overwrite existing user files silently;
+- the provisional `holes bounty` command family, JSON envelopes, exit statuses,
+  and compatibility policy are documented and snapshot tested;
+- there is no submission, upload, email, transaction, or remote-RPC command;
+- ordinary scanner commands and frozen `1.0` output schemas remain unchanged.
+
+Depends on: `CONFIG-001`, `SCHEMA-001`, `SECURITY-001`.
+
+### [ ] BOUNTY-002 — Pinned source provenance and default-deny scope — P0
+
+Resolve approved source identity and ensure the scanner consumes only declared
+in-scope content.
+
+Acceptance criteria:
+
+- local Git targets require an exact commit and clean/reproducible source
+  identity; non-Git input requires a deterministic content manifest;
+- every scanned file maps to an approved relative path and recorded digest;
+- scope checks cover explicit files, directories, imports, remappings,
+  dependencies, generated sources, path traversal, and symlink escapes;
+- stale revisions, changed bytes, missing assets, and out-of-scope compiler
+  source units fail closed with specific diagnostics;
+- the source manifest binds scanner version, profile digest, source revision,
+  file digests, and compiler provenance;
+- acquisition, when separately requested, remains distinct from offline scope
+  validation and scanning.
+
+Depends on: `BOUNTY-001`, `ADDRESS-001`.
+
+### [ ] BOUNTY-003 — Offline and private-workspace safety controls — P0
+
+Harden bounty commands for untrusted targets and confidential reports.
+
+Acceptance criteria:
+
+- scan, triage, proof, report, approval, and export paths perform no network
+  operation by default and never send transactions;
+- inherited RPC, wallet, explorer, cloud, CI, and common credential variables
+  are removed from native subprocess environments;
+- target build scripts, tests, plugins, hooks, and deployment scripts are not
+  executed implicitly;
+- private records use restrictive permissions where supported and are covered
+  by recommended ignore patterns;
+- shareable output redacts secrets, credential-bearing URLs, temporary paths,
+  and local absolute paths;
+- adversarial tests cover malicious profiles, source trees, Foundry settings,
+  symlinks, oversized inputs, timeouts, and attempted environment leakage;
+- the threat model and secure-use guide document residual risk and operator
+  responsibilities.
+
+Depends on: `BOUNTY-001`, expands with `BOUNTY-002` and `BOUNTY-006`.
+
+### [ ] BOUNTY-004 — Stable candidates and human review state — P0
+
+Store immutable scanner observations separately from explicit reviewer
+decisions.
+
+Acceptance criteria:
+
+- candidate IDs bind the target revision, profile, scanner version, rule, and
+  finding fingerprint and are stable across identical runs;
+- re-scans preserve resolved/rejected history without mutating observations;
+- supported states are `new`, `investigating`, `rejected`, `confirmed`, and
+  `approved`, with a tested transition table;
+- `rejected` requires a reason, `confirmed` requires reviewer reasoning and an
+  impact statement, and `approved` requires scope revalidation plus a complete
+  report checklist;
+- no scanner, proof, ranking, or AI result can automatically enter `confirmed`
+  or `approved`;
+- review records retain timestamps and reviewer-supplied identity without
+  embedding secrets or source contents unnecessarily;
+- text and versioned JSON inspection are deterministic and auditable.
+
+Depends on: `BOUNTY-002`, `AI-001` only as an optional explanatory input.
+
+### [ ] BOUNTY-005 — Explainable review-priority ranking — P1
+
+Order candidates for investigation without claiming exploitability, bounty
+severity, or expected payout.
+
+Acceptance criteria:
+
+- ranking uses only versioned, inspectable signals such as detector severity,
+  confidence, evidence completeness, reachability, proof availability, and
+  supported-class metadata;
+- each score exposes component values and stable reason codes;
+- deterministic tie-breaking produces identical order for identical inputs;
+- program impact categories may be displayed but do not silently replace
+  scanner severity or prove impact;
+- missing or unknown facts lower confidence or remain explicit rather than being
+  treated as safe;
+- tests prevent ranking labels from being rendered as confirmed vulnerabilities,
+  payout estimates, or submission recommendations.
+
+Depends on: `BOUNTY-004`, existing rule catalog and evidence paths.
+
+### [ ] BOUNTY-006 — Isolated local proof workspace — P0
+
+Generate a candidate-specific Foundry workspace for locally reproducing a
+primitive or project impact when the reviewer can provide the required setup.
+
+Acceptance criteria:
+
+- proof manifests bind candidate, target, source, compiler, generated files,
+  reviewer-supplied setup, and result hashes;
+- generated projects are separate from both target and bounty workspaces and do
+  not modify the source checkout;
+- offline local execution is the default and inherited RPC/wallet settings are
+  removed;
+- deployment, actor, balance, oracle, fork, timing, calldata, and invariant
+  requirements remain explicit unknowns until supplied;
+- a primitive proof is never labelled as protocol impact without a separate
+  impact assertion and successful result;
+- failure, timeout, tampering, unsupported setup, and inconclusive outcomes are
+  structured states that cannot confirm a candidate;
+- remote forks, if considered in a future task, require a new threat-model review
+  and explicit design approval; they are not part of M7's default workflow.
+
+Depends on: `BOUNTY-003`, `BOUNTY-004`, `PROOF-003`, `RUNNER-001`.
+
+### [ ] BOUNTY-007 — Private report, approval, and local export — P0
+
+Render a complete bounty-report draft and require human approval before creating
+shareable local output.
+
+Acceptance criteria:
+
+- Markdown and versioned JSON reports contain target/source identity, in-scope
+  impact, summary, technical details, preconditions, evidence, reproduction,
+  proof results, remediation, limitations, and unresolved questions;
+- unconfirmed observations are visibly labelled as hypotheses;
+- report content is bound to profile, candidate, source, proof, and review
+  digests and becomes stale when any input changes;
+- approval requires a confirmed candidate, current scope validation, complete
+  checklist, reviewer identity, and explicit acknowledgement that program rules
+  were rechecked;
+- export writes to an explicit local destination without overwrite and performs
+  no submission, upload, email, disclosure, chain, or remote-platform action;
+- private and shareable renderers are tested for secret and absolute-path
+  redaction;
+- secure-use documentation explains manual submission and coordinated
+  disclosure responsibilities.
+
+Depends on: `BOUNTY-004`, `BOUNTY-006` when a proof is required.
+
+### [ ] BOUNTY-008 — Historical disclosed-vulnerability corpus — P0
+
+Measure usefulness on real, already-public cases without turning the checked-in
+synthetic regression score into a market claim.
+
+Acceptance criteria:
+
+- the manifest contains at least ten disclosed cases from at least five
+  independent projects with immutable source, disclosure, root-cause, date,
+  license/provenance, and supported/out-of-model labels;
+- third-party source is checked in only when redistribution is permitted;
+  otherwise a reproducible fetch/verification manifest is used;
+- labels and supported-class decisions are written before scanner results are
+  evaluated, with calibration and holdout subsets kept distinct;
+- metrics include candidate precision, supported-class recall, investigation
+  count, rejected candidates, evidence completeness, and out-of-model cases;
+- at least three independent historical vulnerabilities in supported classes
+  must produce useful investigation evidence for the M7 product claim to pass;
+- raw results and limitations are versioned and reproducible without requiring
+  live-network writes or funded credentials;
+- failure to meet the product claim is reported as a go/no-go result, not hidden
+  by changing labels or fixtures.
+
+Depends on: can begin after `BOUNTY-001`; evaluation completes after
+`BOUNTY-005` and may exercise `BOUNTY-006`.
+
+### [ ] BOUNTY-009 — Authorized end-to-end pilot — P1
+
+Exercise the complete local workflow against one explicitly authorized target
+without requiring a bounty submission.
+
+Acceptance criteria:
+
+- the operator records the program rules, exact source revision, scope,
+  restrictions, review date, and authorization acknowledgement;
+- profile validation, scope scan, candidate triage, proof decision, report draft,
+  approval decision, and local export are exercised and logged;
+- findings are handled privately and no target is contacted or disclosed by the
+  tool;
+- no live-network transaction, public-testnet execution, or automatic platform
+  interaction occurs;
+- workflow time, candidate counts, review decisions, friction, and safety
+  failures are recorded without publishing confidential details;
+- any real report submission remains a separate manual user decision governed by
+  the selected program.
+
+Depends on: `BOUNTY-002` through `BOUNTY-008`.
+
+### [ ] BOUNTY-010 — Documentation and signed `1.1.0` release — P0
+
+Stabilize the bounty workflow only after its safety and historical-evaluation
+gates pass.
+
+Acceptance criteria:
+
+- installation, CLI, profile schema, workspace lifecycle, proof workflow,
+  report/approval flow, threat model, secure use, and evaluation are documented;
+- compatibility and migration policy distinguishes frozen `1.0` scanner output
+  from new versioned bounty records;
+- all unit, integration, adversarial, reproducibility, documentation, and
+  historical-corpus tests pass from a clean checkout;
+- build artifacts are reproducible and smoke-tested in a fresh environment;
+- changelog, task tracker, development plan, release checklist, checksums, and
+  signed tag are complete;
+- release messaging says research assistant, requires human validation, and
+  makes no payout, completeness, audit-equivalence, or automatic-submission
+  claim.
+
+Depends on: `BOUNTY-001` through `BOUNTY-009`.
 
 ## Definition of done for every task
 
