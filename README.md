@@ -92,6 +92,23 @@ CLI paths and corresponding flags override configured values. Unknown keys,
 rule IDs, severities, and contradictory compiler settings fail clearly. See
 [configuration](docs/CONFIGURATION.md) for the complete schema and precedence.
 
+## Baselines and new-finding CI
+
+Create a reviewed fingerprint baseline, then gate only findings introduced after
+that snapshot:
+
+```bash
+holes --write-baseline .holes-baseline.json
+holes --baseline .holes-baseline.json --fail-on high --format sarif
+```
+
+Baseline mode reports only new findings and fails only when a new finding meets
+`--fail-on`. JSON also includes new, existing, and resolved counts. Fingerprints
+use paths relative to the baseline file, so a baseline stored at the repository
+root is portable across checkouts. Creating refuses to overwrite; after review,
+refresh explicitly with `--update-baseline`. Baselines contain locations and
+fingerprints, not source excerpts. See [baseline workflow](docs/BASELINES.md).
+
 ## Inspecting compiler analysis
 
 Developers can inspect the compiler-backed model separately from security
@@ -228,7 +245,7 @@ minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
 complete, including user-supplied per-step invariants. The next task is
-`BASELINE-001`, new-finding-only CI comparisons.
+`CATALOG-001`, the human-readable rule catalog command.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

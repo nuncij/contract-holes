@@ -51,12 +51,18 @@ def text_report(findings: list[Finding], files_scanned: int, *, color: bool = Fa
     return "\n\n".join(blocks)
 
 
-def json_report(findings: list[Finding], files_scanned: int) -> str:
+def json_report(
+    findings: list[Finding],
+    files_scanned: int,
+    *,
+    baseline: dict[str, object] | None = None,
+) -> str:
     payload = {
         "schema_version": "1.0",
         "files_scanned": files_scanned,
         "finding_count": len(findings),
         "findings": [finding.to_dict() for finding in findings],
+        **({"baseline": baseline} if baseline is not None else {}),
     }
     return json.dumps(payload, indent=2, sort_keys=True)
 

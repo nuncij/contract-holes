@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.5.0`
 Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
-Next: **BASELINE-001 — New-finding-only CI comparisons**
+Next: **CATALOG-001 — Human-readable rule catalog command**
 
 ## Product goal
 
@@ -32,9 +32,9 @@ The scanner is successful when it:
 | Rules | Thirteen registered rules, `SOL001` through `SOL013` |
 | Proofs | Runnable `SOL007` proof; `SOL005` probe, sequence fuzzing, invariants, requirement manifests, and isolated runner |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
-| Workflow | `.holes.toml`, severity/CI policy, suppressions, inspection, benchmarks, and timeout-bounded proof execution |
+| Workflow | `.holes.toml`, new-finding baselines, severity/CI policy, suppressions, inspection, benchmarks, and proof execution |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 100 Python tests; configuration, offline M2/M3 corpora, benchmark, inspection, and isolated Forge execution tested |
+| Verification | 106 Python tests; configuration/baselines, offline M2/M3 corpora, benchmark, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -184,6 +184,13 @@ rules, per-rule severity overrides, and compiler/offline behavior. Relative path
 resolve from the configuration file, explicit CLI values win, and unknown or
 contradictory settings fail instead of being ignored. The schema and precedence
 are documented in [CONFIGURATION.md](CONFIGURATION.md).
+
+Versioned fingerprint baselines support new-finding-only reports and CI failure
+thresholds. Fingerprints normalize finding paths relative to the baseline file,
+making a repository-root snapshot portable. Comparison reports new, existing,
+and resolved counts; baseline creation refuses overwrite, while explicit updates
+use an atomic replace. Stored entries omit source excerpts and absolute project
+paths. The workflow is documented in [BASELINES.md](BASELINES.md).
 
 ## Analysis architecture
 

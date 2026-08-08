@@ -8,6 +8,12 @@ import sys
 
 from . import __version__
 from .benchmark import BenchmarkError, benchmark_exit_status, benchmark_paths
+from .baseline import (
+    BaselineError,
+    compare_baseline,
+    load_baseline,
+    write_baseline,
+)
 from .config import (
     ConfigError,
     HolesConfig,
@@ -72,6 +78,22 @@ def parser() -> argparse.ArgumentParser:
         metavar="LEVEL",
         choices=tuple(item.name.lower() for item in Severity),
         help="exit with status 1 if a finding at or above this severity exists",
+    )
+    baseline_group = result.add_mutually_exclusive_group()
+    baseline_group.add_argument(
+        "--baseline",
+        metavar="FILE",
+        help="report and gate only findings absent from FILE",
+    )
+    baseline_group.add_argument(
+        "--write-baseline",
+        metavar="FILE",
+        help="create a new fingerprint baseline and refuse to overwrite",
+    )
+    baseline_group.add_argument(
+        "--update-baseline",
+        metavar="FILE",
+        help="replace FILE with fingerprints from the current scan",
     )
     dependency_group = result.add_mutually_exclusive_group()
     dependency_group.add_argument(
@@ -294,8 +316,42 @@ def main(argv: Sequence[str] | None = None) -> int:
         print(f"holes: error: {exc}", file=sys.stderr)
         return 2
 
+    baseline_summary: dict[str, object] | None = None
+    try:
+        if args.baseline:
+            baseline = load_baseline(args.baseline)
+            comparison = compare_baseline(findings, baseline, args.baseline)
+            findings = list(comparison.new_findings)
+            summary = comparison.summary()
+            baseline_summary = {"path": str(Path(args.baseline)), **summary}
+            print(
+                "holes: baseline comparison: "
+                f"{summary['new']} new, {summary['existing']} existing, "
+                f"{summary['resolved']} resolved",
+                file=sys.stderr,
+            )
+        elif args.write_baseline or args.update_baseline:
+            baseline_path = args.write_baseline or args.update_baseline
+            payload = write_baseline(
+                findings,
+                baseline_path,
+                overwrite=bool(args.update_baseline),
+            )
+            print(
+                f"holes: wrote {len(payload['findings'])} fingerprint(s) to "
+                f"{baseline_path}",
+                file=sys.stderr,
+            )
+    except BaselineError as exc:
+        print(f"holes: error: {exc}", file=sys.stderr)
+        return 2
+
     if args.format == "json":
-        output = json_report(findings, files_scanned)
+        output = json_report(
+            findings,
+            files_scanned,
+            baseline=baseline_summary,
+        )
     elif args.format == "sarif":
         output = sarif_report(findings, scanner.rule_infos)
     else:
