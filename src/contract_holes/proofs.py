@@ -187,6 +187,53 @@ contract {contract_name}_Probe {{
     }}
 }}
 
+// Generic sequence driver for project-specific Foundry tests. Every target call
+// originates from this executor. Use a project adapter when distinct actors,
+// time/blocks, token funding, or protocol-specific setup must be modelled.
+contract {contract_name}_SequenceExecutor {{
+    uint256 public constant MAX_SEQUENCE_STEPS = 32;
+
+    uint256 public lastExecuted;
+    uint256 public lastSucceeded;
+    bytes32 public lastResultDigest;
+
+    function runSequence(
+        address target_,
+        bytes[] calldata calls_,
+        uint256[] calldata values_,
+        bool stopOnRevert_
+    ) external payable returns (uint256 executed, uint256 succeeded, bytes32 digest) {{
+        require(target_.code.length != 0, "target has no code");
+        require(calls_.length == values_.length, "sequence length mismatch");
+        require(calls_.length <= MAX_SEQUENCE_STEPS, "sequence too long");
+
+        uint256 requiredValue;
+        for (uint256 index; index < values_.length; ++index) {{
+            requiredValue += values_[index];
+        }}
+        require(msg.value == requiredValue, "supply exact sequence value");
+
+        digest = keccak256(abi.encode(target_, calls_.length));
+        for (uint256 index; index < calls_.length; ++index) {{
+            (bool success, bytes memory returnData) = target_.call{{
+                value: values_[index]
+            }}(calls_[index]);
+            ++executed;
+            if (success) ++succeeded;
+            digest = keccak256(
+                abi.encode(digest, index, success, keccak256(returnData))
+            );
+            if (!success && stopOnRevert_) break;
+        }}
+
+        lastExecuted = executed;
+        lastSucceeded = succeeded;
+        lastResultDigest = digest;
+    }}
+
+    receive() external payable {{}}
+}}
+
 contract {contract_name}_VulnerableModel {{
     uint256 public credit = 1;
     uint256 public withdrawals;
@@ -197,6 +244,10 @@ contract {contract_name}_VulnerableModel {{
         (bool callbackSucceeded, ) = msg.sender.call("");
         require(callbackSucceeded, "callback failed");
         credit = 0;
+    }}
+
+    function reset(uint256 nextCredit) external {{
+        credit = nextCredit;
     }}
 }}
 
@@ -213,6 +264,31 @@ contract {contract_name} {{
         require(probe.attempted(), "target should invoke the probe");
         require(probe.reentrySucceeded(), "reentrant call should succeed");
         require(model.withdrawals() == 2, "expected two nested executions");
+    }}
+
+    function testFuzz_SOL005_transactionSequence(bytes calldata commands) external {{
+        {contract_name}_SequenceExecutor executor =
+            new {contract_name}_SequenceExecutor();
+        {contract_name}_VulnerableModel model =
+            new {contract_name}_VulnerableModel();
+        uint256 steps = commands.length;
+        if (steps > executor.MAX_SEQUENCE_STEPS()) {{
+            steps = executor.MAX_SEQUENCE_STEPS();
+        }}
+        bytes[] memory calls = new bytes[](steps);
+        uint256[] memory values = new uint256[](steps);
+
+        for (uint256 index; index < steps; ++index) {{
+            uint8 command = uint8(commands[index]);
+            calls[index] = command % 2 == 0
+                ? abi.encodeWithSignature("reset(uint256)", uint256(command) + 1)
+                : abi.encodeWithSignature("withdraw()");
+        }}
+
+        (uint256 executed, , ) = executor.runSequence(
+            address(model), calls, values, false
+        );
+        require(executed == steps, "executor should process every command");
     }}
 }}
 """

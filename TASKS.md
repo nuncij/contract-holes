@@ -10,7 +10,7 @@ Current milestone: **M4 — Dynamic verification (`0.5.0`)**
 Current position: M0 through M3 are complete, including the versioned `m3-1`
 positive and safe corpus.
 
-Next: **FUZZ-001**
+Next: **INVARIANT-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -166,8 +166,8 @@ counterexamples, and document conditions that require manual review.
 ## M4 — Dynamic verification (`0.5.0`)
 
 - [x] **PROOF-002** — Generate a configurable `SOL005` reentrancy probe — P0 — **COMPLETE**.
-- [ ] **FUZZ-001** — Generate calldata-driven Foundry transaction sequences — P0 — **NEXT**.
-- [ ] **INVARIANT-001** — Define user-supplied protocol invariants and assertion output — P0.
+- [x] **FUZZ-001** — Generate calldata-driven Foundry transaction sequences — P0 — **COMPLETE**.
+- [ ] **INVARIANT-001** — Define user-supplied protocol invariants and assertion output — P0 — **NEXT**.
 - [ ] **PROOF-003** — Record compiler, chain/fork, constructor, and setup requirements — P1.
 - [ ] **RUNNER-001** — Execute proofs in isolated Foundry directories with timeouts — P0.
 

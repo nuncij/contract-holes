@@ -71,6 +71,10 @@ class ProofTests(unittest.TestCase):
             self.assertIn("function run(", content)
             self.assertIn("bytes calldata reentryCalldata_", content)
             self.assertIn("test_SOL005_reentrancyPrimitive", content)
+            self.assertIn("function runSequence(", content)
+            self.assertIn("bytes[] calldata calls_", content)
+            self.assertIn("MAX_SEQUENCE_STEPS = 32", content)
+            self.assertIn("testFuzz_SOL005_transactionSequence", content)
             self.assertIn("entry Vault.withdraw", content)
             self.assertIn("later write Vault._record.balances", content)
             self.assertIn("not by itself proof of protocol impact", content)
@@ -102,7 +106,7 @@ solc_version = "0.8.25"
                 timeout=30,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("1 passed", result.stdout)
+            self.assertIn("2 passed", result.stdout)
 
     def test_generation_is_idempotent_but_does_not_overwrite_changes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

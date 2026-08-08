@@ -127,6 +127,13 @@ impact assertions still need project-specific configuration. Generated files
 are deterministic, and the scanner refuses to overwrite a manually changed
 artifact.
 
+The `SOL005` artifact also contains a bounded transaction-sequence executor and
+a dependency-free Foundry `testFuzz` entrypoint. A project test can provide up to
+32 calldata/value steps, choose whether execution stops on a revert, and assert
+against the recorded executed/succeeded counts and result digest. Calls originate
+from the executor; multiple actors, time changes, token funding, and protocol
+setup require a project adapter.
+
 Directories named `lib`, `vendor`, `node_modules`, `out`, `cache`, and
 `artifacts` are skipped unless `--include-dependencies` is supplied.
 
@@ -167,8 +174,8 @@ typed ERC-20 returns and requested-amount credits after inbound transfers.
 `SOL013` checks stale oracle use, direct AMM spot-price use, and ineffective
 minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
-`SOL005` reentrancy probes are also complete; the next task is `FUZZ-001`,
-calldata-driven Foundry transaction sequences.
+`SOL005` reentrancy probes and calldata-driven transaction sequences are also
+complete; the next task is `INVARIANT-001`, user-defined protocol assertions.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

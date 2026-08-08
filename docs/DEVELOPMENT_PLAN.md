@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.4.0`
 Current milestone: **M4 — Dynamic verification (`0.5.0`)**
-Next: **FUZZ-001 — Calldata-driven Foundry transaction sequences**
+Next: **INVARIANT-001 — User-supplied protocol invariants and assertions**
 
 ## Product goal
 
@@ -149,6 +149,13 @@ entry and reentry calldata, and separate ETH values at runtime so reviewers can
 wire it into project-specific deployment and setup. Generated comments retain
 the finding's entry, interaction, state-write function, and state variable, and
 explicitly avoid claiming protocol impact.
+
+The same generated artifact includes a generic sequence executor and Foundry
+fuzz entrypoint. Reviewers can supply up to 32 calldata/value pairs, continue or
+stop after a reverted step, and inspect executed/succeeded counts plus a stable
+result digest. Target calls share the executor as their caller; distinct actors,
+block/time changes, token funding, and other protocol state transitions belong
+in a project-specific adapter.
 
 ## Analysis architecture
 
