@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.2.0`  
 Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**  
-Next task: **DEBUG-001 — Analysis inspection command**
+Next task: **BENCH-001 — Performance and correctness baseline**
 
 ## Product goal
 
@@ -31,10 +31,10 @@ The scanner is successful when it:
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
 | Rules | Seven registered rules, `SOL001` through `SOL007` |
 | Proofs | Runnable Foundry proof for `SOL007` |
-| Output | Terminal text, JSON, and SARIF 2.1.0 |
+| Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity filtering, CI exit thresholds, suppressions, dependency exclusions |
 | Project model | Shared AST, inheritance, call, and conservative intra-procedural value-flow facts |
-| Verification | 44 Python tests; 16-source offline M2 corpus, safe pairs, and Forge proof tested |
+| Verification | 48 Python tests; 16-source offline M2 corpus, safe pairs, inspection, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -55,8 +55,9 @@ authorization conditions, user-controlled values, external returns, and value
 transfers. `SOL005` composes those facts across internal calls into an ordered
 path and recognizes named and state-lock reentrancy guards. A versioned Foundry
 corpus now locks down positive and negative behavior for imports, libraries,
-overrides, diamond inheritance, recursion, and modifiers. All M2 P0 tasks are
-complete; developer inspection and benchmarking remain as P1 work.
+overrides, diamond inheritance, recursion, and modifiers. All M2 P0 tasks and
+the deterministic analysis-inspection command are complete; benchmarking remains
+as the final M2 P1 task.
 
 ## Analysis architecture
 
@@ -73,6 +74,7 @@ Solidity project
   -> interprocedural reentrancy evidence                 [M2: complete]
   -> deterministic security rules
   -> structured findings with evidence paths
+  -> filtered compiler-analysis inspection JSON
   -> executable proofs where generation is reliable
   -> text / JSON / SARIF / CI policy
   -> optional AI correlation and explanation            [later]

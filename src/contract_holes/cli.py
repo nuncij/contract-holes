@@ -2,10 +2,12 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
+import json
 from pathlib import Path
 import sys
 
 from . import __version__
+from .inspector import InspectionError, InspectionFilters, inspect_paths
 from .models import Severity
 from .proofs import ProofGenerationError, generate_foundry_proofs
 from .reporters import json_report, sarif_report, text_report
@@ -16,6 +18,7 @@ def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(
         prog="holes",
         description="Scan Solidity contracts for evidence of security vulnerabilities.",
+        epilog="Use 'holes inspect PATH ...' for compiler analysis JSON.",
     )
     result.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     result.add_argument("paths", nargs="+", help="Solidity files or directories to scan")
@@ -62,9 +65,55 @@ def parser() -> argparse.ArgumentParser:
     return result
 
 
+def inspection_parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(
+        prog="holes inspect",
+        description="Compile and inspect deterministic Solidity analysis state as JSON.",
+    )
+    result.add_argument("paths", nargs="+", help="Solidity files or directories to inspect")
+    result.add_argument(
+        "--file",
+        dest="file_filters",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="include source paths ending with PATH (repeatable)",
+    )
+    result.add_argument(
+        "--contract",
+        dest="contract_filters",
+        action="append",
+        default=[],
+        metavar="NAME",
+        help="include exactly named contracts (repeatable)",
+    )
+    result.add_argument(
+        "--function",
+        dest="function_filters",
+        action="append",
+        default=[],
+        metavar="NAME",
+        help="include NAME or Contract.NAME callables (repeatable)",
+    )
+    result.add_argument(
+        "--include-dependencies",
+        action="store_true",
+        help="include dependency directories as explicit inspection targets",
+    )
+    result.add_argument(
+        "--offline",
+        action="store_true",
+        help="prevent Foundry from downloading missing compiler versions",
+    )
+    return result
+
+
 def main(argv: Sequence[str] | None = None) -> int:
+    arguments = list(argv) if argv is not None else sys.argv[1:]
+    if arguments and arguments[0] == "inspect":
+        return _inspect_main(arguments[1:])
     argument_parser = parser()
-    args = argument_parser.parse_args(argv)
+    args = argument_parser.parse_args(arguments)
     if args.offline and not args.compile:
         argument_parser.error("--offline requires --compile")
     if args.generate_proofs and not args.compile:
@@ -112,4 +161,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         threshold = Severity.parse(args.fail_on)
         if any(finding.severity >= threshold for finding in findings):
             return 1
+    return 0
+
+
+def _inspect_main(argv: Sequence[str]) -> int:
+    argument_parser = inspection_parser()
+    args = argument_parser.parse_args(argv)
+    filters = InspectionFilters.create(
+        files=args.file_filters,
+        contracts=args.contract_filters,
+        functions=args.function_filters,
+    )
+    try:
+        payload = inspect_paths(
+            args.paths,
+            include_dependencies=args.include_dependencies,
+            offline=args.offline,
+            filters=filters,
+        )
+    except InspectionError as exc:
+        print(f"holes inspect: error: {exc}", file=sys.stderr)
+        return 2
+    print(json.dumps(payload, indent=2, sort_keys=True))
     return 0

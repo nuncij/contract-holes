@@ -4,6 +4,7 @@ import shutil
 import unittest
 
 from contract_holes.compiler import ForgeCompiler
+from contract_holes.inspector import InspectionError, InspectionFilters, ProjectInspector
 from contract_holes.project import Node, ProjectIndex
 from contract_holes.scanner import Scanner, discover_sources
 
@@ -167,6 +168,63 @@ class M2CorpusCompilerTests(unittest.TestCase):
             "modifier", {edge.kind for edge in self.index.call_graph.edges_from(guarded)}
         )
         self.assertIn(guarded_key, self.index.reentrancy.guarded_functions)
+
+    def test_inspection_filters_are_deterministic_and_source_free(self) -> None:
+        filters = InspectionFilters.create(
+            files=["src/overrides/OverrideVulnerable.sol"],
+            contracts=["OverrideVulnerable"],
+            functions=["withdraw"],
+        )
+        inspector = ProjectInspector(
+            self.index,
+            root=CORPUS_ROOT,
+            compiler_versions=self.compilation.compiler_versions,
+            filters=filters,
+        )
+
+        first = inspector.to_dict()
+        second = inspector.to_dict()
+        self.assertEqual(first, second)
+        self.assertEqual(
+            first["summary"],
+            {
+                "sources": 1,
+                "contracts": 1,
+                "functions": 1,
+                "modifiers": 0,
+                "call_edges": 2,
+                "facts": 6,
+                "guarded_functions": 0,
+                "reentrancy_issues": 1,
+            },
+        )
+        self.assertEqual(
+            {edge["kind"] for edge in first["call_graph"]["edges"]},
+            {"internal", "super"},
+        )
+        self.assertEqual(
+            first["reentrancy"]["issues"][0]["entry_function"],
+            "OverrideVulnerable.withdraw",
+        )
+        rendered = json.dumps(first, sort_keys=True)
+        self.assertNotIn("SPDX-License-Identifier", rendered)
+        self.assertNotIn("recipient.call{value: amount}", rendered)
+
+        missing_filters = (
+            InspectionFilters.create(files=["Missing.sol"]),
+            InspectionFilters.create(contracts=["MissingContract"]),
+            InspectionFilters.create(functions=["missingFunction"]),
+        )
+        for missing in missing_filters:
+            with self.subTest(filters=missing):
+                with self.assertRaisesRegex(
+                    InspectionError, "matched no compiler nodes"
+                ):
+                    ProjectInspector(
+                        self.index,
+                        root=CORPUS_ROOT,
+                        filters=missing,
+                    )
 
     def _finding_projection(self, finding) -> dict[str, object]:
         metadata = finding.metadata

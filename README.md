@@ -56,6 +56,27 @@ Compilation happens in an isolated temporary directory, so the scanner does not
 modify the project's Foundry cache or artifacts. Foundry may download a matching
 solc version unless `--offline` is used.
 
+## Inspecting compiler analysis
+
+Developers can inspect the compiler-backed model separately from security
+findings:
+
+```bash
+holes inspect contracts/ --offline
+holes inspect contracts/ --file Vault.sol --contract Vault --function withdraw
+```
+
+The command emits deterministic JSON containing project-index summaries,
+inheritance, callable nodes, call edges, data-flow facts, guard recognition, and
+reentrancy traces. `--file`, `--contract`, and `--function` are repeatable;
+different filter types combine, while repeated values of one type are alternatives.
+File filters match source-path suffixes, contract names are exact, and functions
+accept either `withdraw` or `Vault.withdraw`.
+
+Inspection always compiles with Foundry and writes JSON only to standard output.
+The compiler build remains isolated in a temporary directory, and the payload
+does not contain Solidity source contents.
+
 For supported findings, the scanner can also write a standalone Foundry test
 that reproduces the underlying vulnerability primitive:
 
@@ -97,9 +118,10 @@ Project status and future work are tracked explicitly:
 The project is currently at `0.2.0`. M0 and M1 are complete; all M2 P0 analysis
 and corpus tasks are complete. The compiler index, inheritance resolver, call
 graph, reusable data-flow facts, interprocedural `SOL005` analysis, and versioned
-multi-file corpus (`AST-001` through `TEST-002`) are complete. The next task is
-`DEBUG-001`: expose these analysis layers through a deterministic inspection
-command for developers.
+multi-file corpus (`AST-001` through `TEST-002`) are complete. `DEBUG-001` also
+provides deterministic, filtered inspection JSON for every analysis layer. The
+next task is `BENCH-001`: establish a repeatable performance and correctness
+baseline for M2.
 
 The complete suite uses Python's standard library:
 

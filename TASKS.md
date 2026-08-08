@@ -9,7 +9,7 @@ Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**
 
 Current position: M0 and M1 are complete; all M2 P0 analysis and corpus tasks are complete.
 
-Next task: **DEBUG-001**
+Next task: **BENCH-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -121,7 +121,7 @@ Acceptance criteria:
 
 Depends on: can begin with `AST-001`; completes with `RULE-005-V2`.
 
-### [ ] DEBUG-001 — Analysis inspection command — P1 — **NEXT**
+### [x] DEBUG-001 — Analysis inspection command — P1 — **COMPLETE**
 
 Expose project-index, inheritance, call-edge, and fact summaries for developers
 without mixing them into security findings.
@@ -135,7 +135,7 @@ Acceptance criteria:
 
 Depends on: `AST-001`, expands with later FLOW tasks.
 
-### [ ] BENCH-001 — Performance and correctness baseline — P1
+### [ ] BENCH-001 — Performance and correctness baseline — P1 — **NEXT**
 
 Record scan duration, peak memory, compiler duration, and finding counts for a
 small checked-in corpus.
