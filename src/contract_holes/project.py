@@ -34,6 +34,19 @@ class SourceSpan:
 
 
 @dataclass(frozen=True, slots=True)
+class ReferenceResolution:
+    status: str
+    reference_id: int | None
+    key: NodeKey | None
+    node: dict[str, object] | None
+    reason: str | None = None
+
+    @property
+    def resolved(self) -> bool:
+        return self.status == "resolved" and self.node is not None
+
+
+@dataclass(frozen=True, slots=True)
 class IndexedSource:
     path: Path
     compilation_id: str
@@ -79,6 +92,9 @@ class ProjectIndex:
         self._node_sources_by_object: dict[int, IndexedSource] = {}
         self._parents_by_object: dict[int, Node | None] = {}
         self._build()
+        from .inheritance import InheritanceResolver
+
+        self.inheritance = InheritanceResolver(self)
 
     def source_for_path(self, path: Path | str) -> IndexedSource | None:
         candidates = self.sources_by_path.get(Path(path).resolve(), ())
@@ -96,16 +112,70 @@ class ProjectIndex:
     def parent(self, node: Node) -> Node | None:
         return self._parents_by_object.get(id(node))
 
+    def enclosing_node(self, node: Node, node_type: str) -> Node | None:
+        current = self.parent(node)
+        while current is not None:
+            if current.get("nodeType") == node_type:
+                return current
+            current = self.parent(current)
+        return None
+
+    def node_for_key(self, key: NodeKey) -> Node | None:
+        return self.nodes_by_id.get(key)
+
     def resolve_reference(
         self, node: Node, field: str = "referencedDeclaration"
     ) -> Node | None:
+        return self.resolve_reference_detail(node, field).node
+
+    def resolve_reference_detail(
+        self, node: Node, field: str = "referencedDeclaration"
+    ) -> ReferenceResolution:
         reference = node.get(field)
-        if not isinstance(reference, int) or reference < 0:
-            return None
-        source = self.source_for_node(node)
+        if not isinstance(reference, int):
+            return ReferenceResolution(
+                status="missing",
+                reference_id=None,
+                key=None,
+                node=None,
+                reason=f"field {field!r} has no numeric declaration reference",
+            )
+        return self.resolve_id(node, reference)
+
+    def resolve_id(self, context_node: Node, reference_id: int) -> ReferenceResolution:
+        if reference_id < 0:
+            return ReferenceResolution(
+                status="builtin",
+                reference_id=reference_id,
+                key=None,
+                node=None,
+                reason="negative solc IDs refer to built-in or generated declarations",
+            )
+        source = self.source_for_node(context_node)
         if source is None:
-            return None
-        return self.nodes_by_id.get(NodeKey(source.compilation_id, reference))
+            return ReferenceResolution(
+                status="unknown-context",
+                reference_id=reference_id,
+                key=None,
+                node=None,
+                reason="AST node is not part of this project index",
+            )
+        key = NodeKey(source.compilation_id, reference_id)
+        target = self.nodes_by_id.get(key)
+        if target is None:
+            return ReferenceResolution(
+                status="unresolved",
+                reference_id=reference_id,
+                key=key,
+                node=None,
+                reason="referenced AST node is absent from compiler build-info",
+            )
+        return ReferenceResolution(
+            status="resolved",
+            reference_id=reference_id,
+            key=key,
+            node=target,
+        )
 
     def source_span(self, node: Node) -> SourceSpan | None:
         parsed = _parse_src(node.get("src"))

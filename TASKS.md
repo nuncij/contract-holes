@@ -9,7 +9,7 @@ Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**
 
 Current position: M0 and M1 are complete; M2 implementation is underway.
 
-Next task: **AST-002**
+Next task: **FLOW-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -50,7 +50,7 @@ Acceptance criteria:
 
 Depends on: `COMP-002`.
 
-### [ ] AST-002 — Inheritance and symbol resolution — P0 — **NEXT**
+### [x] AST-002 — Inheritance and symbol resolution — P0 — **COMPLETE**
 
 Use `linearizedBaseContracts` to resolve inherited state variables, functions,
 modifiers, overrides, and `super` targets.
@@ -65,7 +65,7 @@ Acceptance criteria:
 
 Depends on: `AST-001`.
 
-### [ ] FLOW-001 — Internal call graph — P0
+### [ ] FLOW-001 — Internal call graph — P0 — **NEXT**
 
 Create function-to-function edges for direct internal calls, inherited calls,
 `super`, library calls, and known `this` calls.

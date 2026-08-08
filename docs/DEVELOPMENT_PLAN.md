@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.2.0`  
 Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**  
-Next task: **AST-002 — Inheritance and symbol resolution**
+Next task: **FLOW-001 — Internal call graph**
 
 ## Product goal
 
@@ -33,8 +33,8 @@ The scanner is successful when it:
 | Proofs | Runnable Foundry proof for `SOL007` |
 | Output | Terminal text, JSON, and SARIF 2.1.0 |
 | Workflow | Severity filtering, CI exit thresholds, suppressions, dependency exclusions |
-| Project model | Shared, compilation-namespaced source/node/declaration index with reference lookup |
-| Verification | 27 Python tests; real multi-source solc indexing and generated Forge proof tested |
+| Project model | Shared AST index plus inheritance, state, modifier, override, and `super` resolution |
+| Verification | 30 Python tests; real multi-source inheritance and generated Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -49,9 +49,10 @@ The scanner is successful when it:
 | `SOL006` weak randomness | Source heuristic | Does not trace the random value to a value-bearing decision |
 | `SOL007` packed hash collision | Compiler evidence plus primitive proof | Does not trace the hash to authorization, signatures, or identifiers |
 
-The project-wide compiler index now connects source units and declarations.
-The largest remaining gap is semantic resolution: inherited state, overrides,
-modifiers, calls, and data flow are not yet projected into reusable facts.
+The project-wide compiler index and inheritance layer now connect source units,
+declarations, inherited state, overrides, modifiers, and `super` calls. The
+largest remaining gap is behavioral resolution: function calls and data flow are
+not yet projected into reusable facts.
 
 ## Analysis architecture
 
@@ -62,8 +63,9 @@ Solidity project
   -> source discovery and masking
   -> optional Foundry/solc compilation
   -> project index (source units, AST IDs, references)   [M2: complete]
-  -> inheritance and symbol resolution                   [M2: next]
-  -> call graph and data-flow facts                      [M2]
+  -> inheritance and symbol resolution                   [M2: complete]
+  -> internal call graph                                 [M2: next]
+  -> data-flow facts                                     [M2]
   -> deterministic security rules
   -> structured findings with evidence paths
   -> executable proofs where generation is reliable
