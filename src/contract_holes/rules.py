@@ -3,6 +3,7 @@ from __future__ import annotations
 from collections.abc import Iterable
 import re
 
+from .authorization import AuthorizationIssue
 from .models import Finding, RuleInfo, Severity
 from .reentrancy import ReentrancyIssue
 from .source import FunctionRegion, SoliditySource
@@ -509,6 +510,88 @@ class UserControlledCallTargetRule(Rule):
         return span.start if span is not None else None
 
 
+class ExposedPrivilegedStateRule(Rule):
+    info = RuleInfo(
+        rule_id="SOL009",
+        severity=Severity.HIGH,
+        title="Privileged state write lacks dominating authorization",
+        description=(
+            "An externally reachable path updates ownership, administration, upgrade, role, "
+            "pause, operator, treasury, or fee-control state without a preceding authorization check."
+        ),
+        recommendation=(
+            "Require an explicit owner or role check before the write, preferably through a "
+            "well-reviewed authorization modifier that covers the complete state transition."
+        ),
+        confidence="medium",
+    )
+
+    def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if source.project_index is None:
+            return
+        analysis = source.project_index.authorization
+        current_path = source.path.resolve()
+        for issue in analysis.issues:
+            entry = source.project_index.node_for_key(issue.entry)
+            entry_source = (
+                source.project_index.source_for_node(entry) if entry is not None else None
+            )
+            if entry_source is None or entry_source.path.resolve() != current_path:
+                continue
+            anchor = self._finding_anchor(source, issue)
+            if anchor is None:
+                continue
+            state_variable = analysis.state_variable_name(issue.state_write)
+            sink_function = analysis.function_name(issue.state_write.function)
+            finding = self.finding(
+                source,
+                anchor,
+                message=(
+                    f"External entry {analysis.function_name(issue.entry)} reaches a write "
+                    f"to privileged state {state_variable!r} in {sink_function} without "
+                    "dominating authorization."
+                ),
+                metadata={
+                    "evidence": "compiler-authorization-reachability",
+                    "entry_function": analysis.function_name(issue.entry),
+                    "state_write_function": sink_function,
+                    "state_variable": state_variable,
+                    "trace": [analysis.event_dict(event) for event in issue.trace],
+                    "manual_review": (
+                        "Confirm whether the state variable is security-sensitive and whether "
+                        "authorization is enforced by an unmodelled dispatcher, inherited "
+                        "fallback, or protocol invariant."
+                    ),
+                },
+            )
+            if finding:
+                yield finding
+
+    @staticmethod
+    def _finding_anchor(
+        source: SoliditySource, issue: AuthorizationIssue
+    ) -> int | None:
+        current_path = source.path.resolve()
+        if (
+            issue.state_write.span is not None
+            and issue.state_write.span.path.resolve() == current_path
+        ):
+            return issue.state_write.span.start
+        for event in issue.trace:
+            if (
+                event.kind == "call"
+                and event.function == issue.entry
+                and event.span is not None
+                and event.span.path.resolve() == current_path
+            ):
+                return event.span.start
+        project = source.project_index
+        assert project is not None
+        entry = project.node_for_key(issue.entry)
+        span = project.source_span(entry) if entry is not None else None
+        return span.start if span is not None else None
+
+
 def _walk_ast(
     node: dict[str, object], parent: dict[str, object] | None = None
 ) -> Iterable[tuple[dict[str, object], dict[str, object] | None]]:
@@ -563,4 +646,5 @@ DEFAULT_RULES: tuple[Rule, ...] = (
     WeakRandomnessRule(),
     PackedEncodingCollisionRule(),
     UserControlledCallTargetRule(),
+    ExposedPrivilegedStateRule(),
 )

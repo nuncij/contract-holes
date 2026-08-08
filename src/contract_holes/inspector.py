@@ -161,6 +161,11 @@ class ProjectInspector:
             for issue in self.project.target_taint.issues
             if issue.entry in selected
         ]
+        authorization_issues = [
+            self._authorization_issue_dict(issue)
+            for issue in self.project.authorization.issues
+            if issue.entry in selected
+        ]
         return {
             "schema_version": "1.0",
             "project_root": str(self.root),
@@ -180,6 +185,7 @@ class ProjectInspector:
                 "guarded_functions": len(guarded),
                 "reentrancy_issues": len(issues),
                 "target_taint_issues": len(target_issues),
+                "authorization_issues": len(authorization_issues),
             },
             "project_index": {"sources": sources, "contracts": contracts},
             "inheritance": contracts,
@@ -190,6 +196,7 @@ class ProjectInspector:
                 "issues": issues,
             },
             "target_taint": {"issues": target_issues},
+            "authorization": {"issues": authorization_issues},
         }
 
     def _matches_source(self, path: Path) -> bool:
@@ -393,6 +400,21 @@ class ProjectInspector:
             "call_kind": issue.sink.metadata.get("edge_kind"),
             "target": issue.sink.metadata.get("receiver"),
             "taints": list(issue.taints),
+            "trace": trace,
+        }
+
+    def _authorization_issue_dict(self, issue) -> dict[str, object]:
+        analysis = self.project.authorization
+        trace: list[dict[str, object]] = []
+        for event in issue.trace:
+            item = analysis.event_dict(event)
+            if item.get("path") is not None:
+                item["path"] = self._path(Path(str(item["path"])))
+            trace.append(item)
+        return {
+            "entry_function": analysis.function_name(issue.entry),
+            "state_write_function": analysis.function_name(issue.state_write.function),
+            "state_variable": analysis.state_variable_name(issue.state_write),
             "trace": trace,
         }
 

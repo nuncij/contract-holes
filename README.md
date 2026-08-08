@@ -16,6 +16,7 @@ It currently detects:
 | `SOL006` | Medium | Block properties hashed as a source of randomness |
 | `SOL007` | Medium | Multiple dynamic values in a packed hash encoding (compiler AST) |
 | `SOL008` | High | User-controlled value reaches an external or `delegatecall` target |
+| `SOL009` | High | Externally reachable privileged state write lacks dominating authorization |
 
 These are review signals, not proofs. Findings include confidence and evidence;
 the scanner deliberately does not claim that a clean report means a contract is
@@ -68,8 +69,9 @@ holes inspect contracts/ --file Vault.sol --contract Vault --function withdraw
 ```
 
 The command emits deterministic JSON containing project-index summaries,
-inheritance, callable nodes, call edges, data-flow facts, guard recognition, and
-reentrancy traces. `--file`, `--contract`, and `--function` are repeatable;
+inheritance, callable nodes, call edges, data-flow facts, guard recognition,
+reentrancy traces, target taint, and authorization reachability. `--file`,
+`--contract`, and `--function` are repeatable;
 different filter types combine, while repeated values of one type are alternatives.
 File filters match source-path suffixes, contract names are exact, and functions
 accept either `withdraw` or `Vault.withdraw`.
@@ -141,10 +143,17 @@ Project status and future work are tracked explicitly:
 The project is currently at `0.3.0`. M0, M1, and M2 are complete. The compiler
 index, inheritance resolver, call graph, reusable data-flow facts,
 interprocedural `SOL005` analysis, versioned multi-file corpus, deterministic
-inspection JSON, and repeatable benchmark are complete. `SOL008` now traces
-externally controlled call destinations across aliases and internal helpers. The
-next task is `RULE-009`: authorization reachability and exposed privileged state
-changes.
+inspection JSON, and repeatable benchmark are complete. `SOL008` traces
+externally controlled call destinations across aliases and internal helpers.
+`SOL009` traces externally reachable ownership, administration, upgrade, role,
+pause, operator, treasury, and fee-control writes and requires preceding
+authorization. The next task is `RULE-010`: signature replay and domain-separation
+hazards.
+
+`SOL009` requires compiler mode. Its privileged-state classification and branch
+ordering are conservative, so findings can require review for custom authorization
+frameworks and project-specific state semantics. A clean scan is not evidence
+that every privileged operation was classified.
 
 The complete suite uses Python's standard library:
 

@@ -197,6 +197,7 @@ class M2CorpusCompilerTests(unittest.TestCase):
                 "guarded_functions": 0,
                 "reentrancy_issues": 1,
                 "target_taint_issues": 0,
+                "authorization_issues": 0,
             },
         )
         self.assertEqual(

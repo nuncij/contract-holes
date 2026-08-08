@@ -1,6 +1,7 @@
 """Evidence-first Solidity vulnerability scanner."""
 
 from .models import Finding, Severity
+from .authorization import AuthorizationAnalysis
 from .callgraph import CallGraph
 from .dataflow import DataFlowAnalysis
 from .inheritance import InheritanceResolver
@@ -11,6 +12,7 @@ from .target_taint import CallTargetAnalysis
 
 __all__ = [
     "Finding",
+    "AuthorizationAnalysis",
     "CallGraph",
     "CallTargetAnalysis",
     "DataFlowAnalysis",

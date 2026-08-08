@@ -1,0 +1,36 @@
+{
+  "schema_version": "1.0",
+  "rule_id": "SOL009",
+  "evidence": "compiler-authorization-reachability",
+  "expected_findings": [
+    {
+      "entry_function": "AuthorizationVulnerable.authorizeAfterWrite",
+      "state_variable": "treasury",
+      "trace_kinds": ["entry", "write"]
+    },
+    {
+      "entry_function": "AuthorizationVulnerable.changeOwner",
+      "state_variable": "owner",
+      "trace_kinds": ["entry", "write"]
+    },
+    {
+      "entry_function": "AuthorizationVulnerable.conditionalOwner",
+      "state_variable": "owner",
+      "trace_kinds": ["entry", "authorization", "write"]
+    },
+    {
+      "entry_function": "AuthorizationVulnerable.upgrade",
+      "state_variable": "implementation",
+      "trace_kinds": ["entry", "call", "write"]
+    }
+  ],
+  "expected_clean_entries": [
+    "AuthorizationSafe.changeOwner",
+    "AuthorizationSafe.deposit",
+    "AuthorizationSafe.setAdmin",
+    "AuthorizationSafe.setTreasury",
+    "AuthorizationSafe.upgrade",
+    "AuthorizationSafe.upgradeViaHelper",
+    "AuthorizationVulnerable.deposit"
+  ]
+}

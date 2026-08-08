@@ -102,6 +102,9 @@ class ProjectIndex:
         from .dataflow import DataFlowAnalysis
 
         self.data_flow = DataFlowAnalysis(self)
+        from .authorization import AuthorizationAnalysis
+
+        self.authorization = AuthorizationAnalysis(self)
         from .target_taint import CallTargetAnalysis
 
         self.target_taint = CallTargetAnalysis(self)
