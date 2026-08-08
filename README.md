@@ -9,7 +9,7 @@ It currently detects:
 | Rule | Severity | Signal |
 | --- | --- | --- |
 | `SOL001` | High | `tx.origin` authorization risk |
-| `SOL002` | Medium | Ignored return value from `.call` or `.send` |
+| `SOL002` | Medium | Ignored low-level call return value |
 | `SOL003` | High | `delegatecall` trust boundary |
 | `SOL004` | High | `selfdestruct` usage |
 | `SOL005` | High | Persistent state mutation after an external interaction |
@@ -87,6 +87,17 @@ code.
 
 ## Development
 
+Project status and future work are tracked explicitly:
+
+- [Development plan](docs/DEVELOPMENT_PLAN.md) — architecture, current capability,
+  rule maturity, milestones, and release gates.
+- [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
+  completed work, and the single next task.
+
+The project is currently at `0.2.0`. M0 and M1 are complete; M2 has not started.
+The next task is `AST-001`, a project-wide compiler index needed for inheritance,
+call-graph, and data-flow analysis.
+
 The complete suite uses Python's standard library:
 
 ```bash
@@ -101,10 +112,9 @@ as terminal text, JSON, or SARIF 2.1.0.
 
 ## Roadmap
 
-The next useful layers are compiler AST/source maps, inheritance-aware data flow,
-Foundry-generated exploit tests, transaction-sequence fuzzing, and protocol
-invariants. AI belongs after those deterministic stages: it can correlate paths,
-rank findings, explain impact, and draft proofs without being the sole source of
-a security claim.
+The concise roadmap is M2 cross-contract analysis, M3 high-value detectors, M4
+dynamic verification, M5 team/CI workflow, and M6 audit-ready `1.0.0`. See the
+[development plan](docs/DEVELOPMENT_PLAN.md) for release gates and
+[TASKS.md](TASKS.md) for the ordered backlog.
 
 Only scan contracts you own or are authorized to assess.
