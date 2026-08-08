@@ -4,6 +4,7 @@ from collections.abc import Iterable
 import re
 
 from .models import Finding, RuleInfo, Severity
+from .reentrancy import ReentrancyIssue
 from .source import FunctionRegion, SoliditySource
 
 
@@ -222,6 +223,9 @@ class ReentrancyRule(Rule):
     )
 
     def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if source.project_index is not None:
+            yield from self._scan_data_flow(source)
+            return
         for function in source.functions:
             if not function.contract or not function.contract.state_variables:
                 continue
@@ -246,11 +250,83 @@ class ReentrancyRule(Rule):
                         "function": function.name,
                         "state_variable": variable,
                         "mutation_line": mutation_line,
+                        "evidence": "source-heuristic",
                     },
                 )
                 if finding:
                     yield finding
                 break
+
+    def _scan_data_flow(self, source: SoliditySource) -> Iterable[Finding]:
+        assert source.project_index is not None
+        analysis = source.project_index.reentrancy
+        current_path = source.path.resolve()
+        for issue in analysis.issues:
+            entry = source.project_index.node_for_key(issue.entry)
+            entry_source = (
+                source.project_index.source_for_node(entry) if entry is not None else None
+            )
+            if entry_source is None or entry_source.path.resolve() != current_path:
+                continue
+            anchor = self._finding_anchor(source, issue)
+            if anchor is None:
+                continue
+            state_variable = analysis.state_variable_name(issue.state_write)
+            interaction_name = analysis.function_name(issue.interaction.function)
+            write_name = analysis.function_name(issue.state_write.function)
+            interaction_line = (
+                issue.interaction.span.line if issue.interaction.span is not None else None
+            )
+            mutation_line = (
+                issue.state_write.span.line if issue.state_write.span is not None else None
+            )
+            finding = self.finding(
+                source,
+                anchor,
+                message=(
+                    f"External interaction in {interaction_name} occurs before "
+                    f"state variable {state_variable!r} is updated in {write_name}."
+                ),
+                metadata={
+                    "evidence": "compiler-interprocedural-data-flow",
+                    "entry_function": analysis.function_name(issue.entry),
+                    "interaction_function": interaction_name,
+                    "state_write_function": write_name,
+                    "state_variable": state_variable,
+                    "interaction_line": interaction_line,
+                    "mutation_line": mutation_line,
+                    "trace": [analysis.event_dict(event) for event in issue.trace],
+                },
+            )
+            if finding:
+                yield finding
+
+    @staticmethod
+    def _finding_anchor(
+        source: SoliditySource, issue: ReentrancyIssue
+    ) -> int | None:
+        current_path = source.path.resolve()
+        interaction = issue.interaction
+        if (
+            interaction.span is not None
+            and interaction.span.path.resolve() == current_path
+        ):
+            return interaction.span.start
+        for event in issue.trace:
+            if (
+                event.kind == "call"
+                and event.function == issue.entry
+                and event.span is not None
+                and event.span.path.resolve() == current_path
+            ):
+                return event.span.start
+        entry_node = source.project_index.node_for_key(issue.entry)
+        entry_span = (
+            source.project_index.source_span(entry_node)
+            if entry_node is not None
+            else None
+        )
+        return entry_span.start if entry_span is not None else None
 
     @staticmethod
     def _first_mutation(text: str, function: FunctionRegion) -> tuple[str, int] | None:

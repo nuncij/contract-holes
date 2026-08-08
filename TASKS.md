@@ -9,7 +9,7 @@ Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**
 
 Current position: M0 and M1 are complete; M2 implementation is underway.
 
-Next task: **RULE-005-V2**
+Next task: **TEST-002**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -94,7 +94,7 @@ Acceptance criteria:
 
 Depends on: `AST-001`, `FLOW-001`.
 
-### [ ] RULE-005-V2 — Interprocedural reentrancy analysis — P0 — **NEXT**
+### [x] RULE-005-V2 — Interprocedural reentrancy analysis — P0 — **COMPLETE**
 
 Replace the current source-order heuristic when compiler facts are available.
 
@@ -108,7 +108,7 @@ Acceptance criteria:
 
 Depends on: `AST-002`, `FLOW-001`, `FLOW-002`.
 
-### [ ] TEST-002 — Multi-file analysis corpus — P0
+### [ ] TEST-002 — Multi-file analysis corpus — P0 — **NEXT**
 
 Create versioned positive and negative fixtures for every M2 primitive.
 

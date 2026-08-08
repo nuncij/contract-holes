@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.2.0`  
 Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**  
-Next task: **RULE-005-V2 — Interprocedural reentrancy analysis**
+Next task: **TEST-002 — Multi-file analysis corpus**
 
 ## Product goal
 
@@ -34,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, JSON, and SARIF 2.1.0 |
 | Workflow | Severity filtering, CI exit thresholds, suppressions, dependency exclusions |
 | Project model | Shared AST, inheritance, call, and conservative intra-procedural value-flow facts |
-| Verification | 37 Python tests; real compiler data-flow findings, inheritance, and Forge proof tested |
+| Verification | 41 Python tests; real compiler reentrancy findings, safe negative, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -45,15 +45,16 @@ The scanner is successful when it:
 | `SOL002` unchecked call | Compiler evidence when available | Does not track an assigned success value to its later use |
 | `SOL003` `delegatecall` | Source signal | Does not yet determine whether the target is user-controlled or trusted |
 | `SOL004` `selfdestruct` | Direct evidence | Protocol impact still depends on the call path and deployment assumptions |
-| `SOL005` reentrancy ordering | Intra-contract heuristic | No inherited state, interprocedural path, or executable proof yet |
+| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence | Branch paths remain conservative; no executable proof yet |
 | `SOL006` weak randomness | Source heuristic | Does not trace the random value to a value-bearing decision |
 | `SOL007` packed hash collision | Compiler evidence plus primitive proof | Does not trace the hash to authorization, signatures, or identifiers |
 
 The project-wide index, inheritance layer, call graph, and data-flow engine now
 connect source units, inherited symbols, calls, reads, writes, aliases,
 authorization conditions, user-controlled values, external returns, and value
-transfers. The largest remaining M2 gap is composing those facts across internal
-calls into an ordered vulnerability path.
+transfers. `SOL005` composes those facts across internal calls into an ordered
+path and recognizes named and state-lock reentrancy guards. The largest remaining
+M2 gap is a versioned multi-file positive and negative analysis corpus.
 
 ## Analysis architecture
 
@@ -67,7 +68,7 @@ Solidity project
   -> inheritance and symbol resolution                   [M2: complete]
   -> internal call graph                                 [M2: complete]
   -> data-flow facts                                     [M2: complete]
-  -> interprocedural reentrancy evidence                 [M2: next]
+  -> interprocedural reentrancy evidence                 [M2: complete]
   -> deterministic security rules
   -> structured findings with evidence paths
   -> executable proofs where generation is reliable

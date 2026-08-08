@@ -5,6 +5,7 @@ from .callgraph import CallGraph
 from .dataflow import DataFlowAnalysis
 from .inheritance import InheritanceResolver
 from .project import ProjectIndex
+from .reentrancy import ReentrancyAnalysis
 from .scanner import Scanner
 
 __all__ = [
@@ -13,6 +14,7 @@ __all__ = [
     "DataFlowAnalysis",
     "InheritanceResolver",
     "ProjectIndex",
+    "ReentrancyAnalysis",
     "Scanner",
     "Severity",
 ]

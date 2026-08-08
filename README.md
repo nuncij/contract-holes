@@ -95,10 +95,10 @@ Project status and future work are tracked explicitly:
   completed work, and the single next task.
 
 The project is currently at `0.2.0`. M0 and M1 are complete; M2 is underway.
-The compiler index, inheritance resolver, call graph, and reusable data-flow
-facts (`AST-001` through `FLOW-002`) are complete. The next task is
-`RULE-005-V2`: compose those facts across internal calls into ordered reentrancy
-evidence while recognizing inherited state and common guards.
+The compiler index, inheritance resolver, call graph, reusable data-flow facts,
+and interprocedural `SOL005` analysis (`AST-001` through `RULE-005-V2`) are
+complete. The next task is `TEST-002`: turn the focused compiler tests into a
+versioned multi-file positive and negative analysis corpus.
 
 The complete suite uses Python's standard library:
 

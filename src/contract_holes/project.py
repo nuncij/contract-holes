@@ -102,6 +102,9 @@ class ProjectIndex:
         from .dataflow import DataFlowAnalysis
 
         self.data_flow = DataFlowAnalysis(self)
+        from .reentrancy import ReentrancyAnalysis
+
+        self.reentrancy = ReentrancyAnalysis(self)
 
     def source_for_path(self, path: Path | str) -> IndexedSource | None:
         candidates = self.sources_by_path.get(Path(path).resolve(), ())

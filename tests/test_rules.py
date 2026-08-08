@@ -20,6 +20,7 @@ class RuleTests(unittest.TestCase):
         self.assertEqual(set(by_rule), {"SOL001", "SOL002", "SOL003", "SOL004", "SOL005", "SOL006"})
         self.assertEqual(by_rule["SOL005"].metadata["state_variable"], "balances")
         self.assertEqual(by_rule["SOL005"].metadata["function"], "withdraw")
+        self.assertEqual(by_rule["SOL005"].metadata["evidence"], "source-heuristic")
         unchecked_kinds = {
             finding.metadata["call_kind"]
             for finding in findings
