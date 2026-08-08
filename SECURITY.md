@@ -2,15 +2,14 @@
 
 ## Supported versions
 
-Until 1.0.0 is released, security fixes are made on `main`; pre-1.0 snapshots do
-not receive separate maintenance releases. After 1.0.0, the latest 1.x release
-and `main` receive security fixes. Unsupported versions should be upgraded before
-a report is investigated.
+The latest 1.x release and `main` receive security fixes. Pre-1.0 snapshots do
+not receive separate maintenance releases. Unsupported versions should be
+upgraded before a report is investigated.
 
 | Version | Security fixes |
 | --- | --- |
 | `main` | Yes |
-| Latest `1.x` after release | Yes |
+| Latest `1.x` | Yes |
 | `0.x` snapshots | No separate backports |
 
 ## Report a vulnerability privately

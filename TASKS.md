@@ -1,17 +1,19 @@
 # Contract Holes Task Tracker
 
 This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
-Keep one task marked **NEXT** and at most one task marked **IN PROGRESS**.
+Keep one task marked **NEXT** while queued work exists and at most one task
+marked **IN PROGRESS**.
 
-Current release: `1.0.0` release candidate
+Current release: `1.0.0`
 
-Current milestone: **M6 — Audit-ready release (`1.0.0`)**
+Current milestone: **M6 — Audit-ready release (`1.0.0`) — COMPLETE**
 
-Current position: M0 through M5 are complete, including team configuration,
-baseline-aware CI, explicit resource limits, verified-source provenance, and
-evidence-bound AI annotations.
+Current position: M0 through M6 are complete. The audit-ready 1.0 release has
+stable schemas, measured detector regression accuracy, supported toolchain ranges,
+security/governance documentation, reproducible artifacts, and signed release
+evidence.
 
-Next: **RELEASE-001**
+Next: **None — the planned 1.0.0 milestones are complete.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -189,7 +191,7 @@ counterexamples, and document conditions that require manual review.
 - [x] **COMPAT-001** — Publish supported Python, Solidity, EVM, and Foundry ranges — P0 — **COMPLETE**.
 - [x] **SECURITY-001** — Add threat model, secure-use guidance, and disclosure policy — P0 — **COMPLETE**.
 - [x] **DOCS-001** — Complete install, rule, CI, proof, and contributor documentation — P0 — **COMPLETE**.
-- [ ] **RELEASE-001** — Produce reproducible package artifacts and a signed release checklist — P0 — **IN PROGRESS / NEXT**.
+- [x] **RELEASE-001** — Produce reproducible package artifacts and a signed release checklist — P0 — **COMPLETE**.
 
 ## Definition of done for every task
 

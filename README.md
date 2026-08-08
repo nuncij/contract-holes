@@ -318,8 +318,8 @@ Project status and future work are tracked explicitly:
 - [Security policy](SECURITY.md) — supported versions, private reporting, and
   coordinated disclosure targets.
 
-The project is at the `1.0.0` release-candidate stage. M0 through M5 are
-complete. The compiler index, inheritance resolver, call graph, reusable
+The project is at `1.0.0`; M0 through M6 are complete. The compiler index,
+inheritance resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,
 deterministic inspection JSON, and repeatable benchmark are complete. `SOL008` traces
 externally controlled call destinations across aliases and internal helpers.
@@ -338,9 +338,10 @@ complete, including user-supplied per-step invariants. Scan resource limits are
 now explicit and configurable. Verified-source ingestion records chain/address
 provenance, and optional AI annotations are constrained to deterministic evidence.
 The frozen output schemas, per-rule evaluation corpus, supported toolchain policy,
-security boundaries, and complete user/contributor documentation are ready.
-`RELEASE-001` is building and signing the reproducible 1.0 artifact set; see the
-[release process](docs/RELEASING.md) and [changelog](CHANGELOG.md).
+security boundaries, complete user/contributor documentation, reproducible
+artifacts, and signed release evidence are ready. See the
+[release process](docs/RELEASING.md), [signed checklist](release/1.0.0-checklist.md),
+and [changelog](CHANGELOG.md).
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

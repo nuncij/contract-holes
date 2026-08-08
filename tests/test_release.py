@@ -69,7 +69,8 @@ class ReleaseTests(unittest.TestCase):
             "gpg --verify",
         ):
             self.assertIn(requirement, process)
-        self.assertIn("maintainer signature pending", checklist)
+        self.assertIn("approved signed local release", checklist)
+        self.assertIn("6A60 6D37 A243 C52A", checklist)
         self.assertIn("independent_builds", tool)
         self.assertIn("_smoke_test_wheel", tool)
         self.assertIn("_normalize_sdist", tool)

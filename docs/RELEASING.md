@@ -58,7 +58,9 @@ git commit -m "Sign the 1.0.0 release checklist"
 ```
 
 Do not generate an ad-hoc signing identity during release. Publish the signer's
-fingerprint through a channel users already trust.
+fingerprint through a channel users already trust. The 1.0 release also includes
+the armored public key at `release/1.0.0-signing-key.asc`; importing that file
+does not by itself establish trust, so compare its fingerprint out of band.
 
 ## 4. Build and reproduce
 

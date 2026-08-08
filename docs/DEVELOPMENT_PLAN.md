@@ -1,9 +1,9 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-08  
-Current release: `1.0.0` release candidate
-Current milestone: **M6 — Audit-ready release (`1.0.0`)**
-Next: **RELEASE-001 — Reproducible artifacts and 1.0 release checklist**
+Current release: `1.0.0`
+Current milestone: **M6 — Audit-ready release (`1.0.0`) — COMPLETE**
+Next: **None — the planned 1.0 milestones are complete.**
 
 ## Product goal
 
@@ -25,7 +25,7 @@ The scanner is successful when it:
 | Area | Current state |
 | --- | --- |
 | Repository | Local Git repository on `main`, with task-scoped implementation commits |
-| Release | `1.0.0` release candidate |
+| Release | `1.0.0` |
 | Inputs | Solidity files/directories or Etherscan V2 verified source by chain/address |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
@@ -246,7 +246,7 @@ back after the user explicitly requests compilation.
 | M3 — High-value detectors | `0.4.0` | Complete | Access control, call-target taint, signatures, proxies/upgrades, token assumptions, market integrity |
 | M4 — Dynamic verification | `0.5.0` | Complete | Reentrancy probes, transaction-sequence fuzzing, protocol invariants, isolated runner |
 | M5 — Team and CI workflow | `0.6.0` | Complete | Configuration, baselines, catalog, CI, limits, address provenance, evidence-bound AI triage |
-| M6 — Audit-ready release | `1.0.0` | **Current** | Benchmarked accuracy, stable schemas, compatibility policy, security docs |
+| M6 — Audit-ready release | `1.0.0` | Complete | Benchmarked accuracy, stable schemas, compatibility policy, security docs, reproducible signed release evidence |
 
 ### M2 — Cross-contract analysis (`0.3.0`)
 
