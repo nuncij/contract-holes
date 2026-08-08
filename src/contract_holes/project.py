@@ -99,6 +99,9 @@ class ProjectIndex:
         from .callgraph import CallGraph
 
         self.call_graph = CallGraph(self)
+        from .dataflow import DataFlowAnalysis
+
+        self.data_flow = DataFlowAnalysis(self)
 
     def source_for_path(self, path: Path | str) -> IndexedSource | None:
         candidates = self.sources_by_path.get(Path(path).resolve(), ())

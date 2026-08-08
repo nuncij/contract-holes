@@ -9,7 +9,7 @@ Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**
 
 Current position: M0 and M1 are complete; M2 implementation is underway.
 
-Next task: **FLOW-002**
+Next task: **RULE-005-V2**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -79,7 +79,7 @@ Acceptance criteria:
 
 Depends on: `AST-001`, `AST-002`.
 
-### [ ] FLOW-002 — Reusable data-flow facts — P0 — **NEXT**
+### [x] FLOW-002 — Reusable data-flow facts — P0 — **COMPLETE**
 
 Introduce expression facts for reads, writes, user-controlled inputs, external
 interactions, transferred value, and authorization conditions.
@@ -94,7 +94,7 @@ Acceptance criteria:
 
 Depends on: `AST-001`, `FLOW-001`.
 
-### [ ] RULE-005-V2 — Interprocedural reentrancy analysis — P0
+### [ ] RULE-005-V2 — Interprocedural reentrancy analysis — P0 — **NEXT**
 
 Replace the current source-order heuristic when compiler facts are available.
 

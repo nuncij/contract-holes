@@ -103,6 +103,9 @@ class UncheckedLowLevelCallRule(Rule):
 
     def _scan_ast(self, source: SoliditySource) -> Iterable[Finding]:
         assert source.ast is not None
+        if source.project_index is not None:
+            yield from self._scan_data_flow(source)
+            return
         for node, parent in _walk_ast(source.ast):
             if node.get("nodeType") != "FunctionCall" or not parent:
                 continue
@@ -133,6 +136,35 @@ class UncheckedLowLevelCallRule(Rule):
                     "call_kind": str(member.get("memberName")),
                     "target": target.strip(),
                     "evidence": "compiler-ast",
+                },
+            )
+            if finding:
+                yield finding
+
+    def _scan_data_flow(self, source: SoliditySource) -> Iterable[Finding]:
+        assert source.project_index is not None
+        for fact in source.project_index.data_flow.facts_for(
+            kind="external-interaction", path=source.path
+        ):
+            edge_kind = str(fact.metadata.get("edge_kind", ""))
+            call_kind = edge_kind.removeprefix("low-level-")
+            if call_kind not in {"call", "send", "staticcall", "delegatecall"}:
+                continue
+            if fact.metadata.get("result_ignored") is not True or fact.node is None:
+                continue
+            node = source.project_index.node_for_key(fact.node)
+            if node is None:
+                continue
+            source_range = source.ast_range(node)
+            if source_range is None:
+                continue
+            finding = self.finding(
+                source,
+                source_range[0],
+                metadata={
+                    "call_kind": call_kind,
+                    "target": fact.metadata.get("receiver") or "<expression>",
+                    "evidence": "compiler-data-flow",
                 },
             )
             if finding:
