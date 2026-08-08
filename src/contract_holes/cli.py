@@ -10,6 +10,7 @@ import sys
 
 from . import __version__
 from .address_source import AddressSourceError, fetch_and_write_verified_source
+from .ai_triage import AITriageError, explain_report, prepare_evidence_bundle
 from .benchmark import BenchmarkError, benchmark_exit_status, benchmark_paths
 from .baseline import (
     BaselineError,
@@ -45,7 +46,8 @@ def parser() -> argparse.ArgumentParser:
             "Use 'holes inspect PATH ...' for analysis JSON or "
             "'holes benchmark PATH ...' for repeatable metrics. Run generated "
             "bundles with 'holes proofs DIRECTORY'. Fetch verified source with "
-            "'holes fetch CHAIN_ID ADDRESS --output DIRECTORY'."
+            "'holes fetch CHAIN_ID ADDRESS --output DIRECTORY', or annotate a "
+            "JSON report with 'holes explain REPORT'."
         ),
     )
     result.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
@@ -333,6 +335,41 @@ def fetch_parser() -> argparse.ArgumentParser:
     return result
 
 
+def explain_parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(
+        prog="holes explain",
+        description=(
+            "Correlate scanner findings deterministically and optionally add "
+            "evidence-bound OpenAI explanations."
+        ),
+    )
+    result.add_argument("report", help="Contract Holes JSON report")
+    result.add_argument(
+        "--prepare",
+        action="store_true",
+        help="emit the deterministic evidence bundle without an API request",
+    )
+    result.add_argument(
+        "--model",
+        default="gpt-5.6-luna",
+        help="OpenAI Responses API model (default: gpt-5.6-luna)",
+    )
+    result.add_argument(
+        "--api-key-env",
+        default="OPENAI_API_KEY",
+        metavar="NAME",
+        help="environment variable containing the API key (default: OPENAI_API_KEY)",
+    )
+    result.add_argument(
+        "--timeout",
+        type=float,
+        default=60.0,
+        metavar="SECONDS",
+        help="OpenAI request timeout (default: 60)",
+    )
+    return result
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments and arguments[0] == "inspect":
@@ -345,6 +382,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _rules_main(arguments[1:])
     if arguments and arguments[0] == "fetch":
         return _fetch_main(arguments[1:])
+    if arguments and arguments[0] == "explain":
+        return _explain_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
     try:
@@ -594,6 +633,34 @@ def _fetch_main(argv: Sequence[str]) -> int:
         )
     except AddressSourceError as exc:
         print(f"holes fetch: error: {exc}", file=sys.stderr)
+        return 2
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return 0
+
+
+def _explain_main(argv: Sequence[str]) -> int:
+    argument_parser = explain_parser()
+    args = argument_parser.parse_args(argv)
+    try:
+        if args.prepare:
+            payload = prepare_evidence_bundle(args.report)
+        else:
+            api_key = os.environ.get(args.api_key_env, "")
+            if not api_key:
+                print(
+                    "holes explain: error: environment variable "
+                    f"{args.api_key_env} is not set",
+                    file=sys.stderr,
+                )
+                return 2
+            payload = explain_report(
+                args.report,
+                api_key,
+                model=args.model,
+                timeout_seconds=args.timeout,
+            )
+    except AITriageError as exc:
+        print(f"holes explain: error: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0

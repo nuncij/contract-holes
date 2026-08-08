@@ -151,6 +151,24 @@ It runs baseline-aware SARIF, uploads valid results for scanner statuses 0/1,
 then restores the finding gate status. Review the install pin, permissions, and
 platform notes in [CI and SARIF](docs/CI.md) before adoption.
 
+## Evidence-bound AI explanations
+
+AI can optionally annotate a completed JSON report after deterministic findings
+exist:
+
+```bash
+holes contracts --format json > holes.json
+holes explain holes.json --prepare
+OPENAI_API_KEY="your key" holes explain holes.json > triage.json
+```
+
+The offline preparation step fixes correlation groups and evidence IDs. Online
+mode uses strict Structured Outputs, then rejects missing/added groups and
+unknown/cross-group evidence references. Model text stays labelled untrusted and
+cannot affect findings, gates, SARIF, or proofs. Online mode sends report excerpts
+and metadata to OpenAI; see [AI triage](docs/AI_TRIAGE.md) before using it with
+confidential code.
+
 ## Inspecting compiler analysis
 
 Developers can inspect the compiler-backed model separately from security
@@ -270,7 +288,7 @@ Project status and future work are tracked explicitly:
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
 
-The project is currently at `0.5.0`. M0 through M4 are complete. The compiler
+The project is currently at `0.6.0`. M0 through M5 are complete. The compiler
 index, inheritance resolver, call graph, reusable data-flow facts,
 interprocedural `SOL005` analysis, versioned multi-file corpus, deterministic
 inspection JSON, and repeatable benchmark are complete. `SOL008` traces
@@ -287,8 +305,9 @@ minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
 complete, including user-supplied per-step invariants. Scan resource limits are
-now explicit and configurable. The next task is `ADDRESS-001`, verified-source
-ingestion with provenance.
+now explicit and configurable. Verified-source ingestion records chain/address
+provenance, and optional AI annotations are constrained to deterministic evidence.
+The next task is `SCHEMA-001`, freezing public JSON/SARIF compatibility.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

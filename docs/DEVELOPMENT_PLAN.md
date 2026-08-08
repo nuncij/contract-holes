@@ -1,9 +1,9 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-08  
-Current release: `0.5.0`
-Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
-Next: **AI-001 — Evidence-bound correlation and explanation**
+Current release: `0.6.0`
+Current milestone: **M6 — Audit-ready release (`1.0.0`)**
+Next: **SCHEMA-001 — Freeze JSON and SARIF compatibility**
 
 ## Product goal
 
@@ -25,16 +25,16 @@ The scanner is successful when it:
 | Area | Current state |
 | --- | --- |
 | Repository | Local Git repository on `main`, with task-scoped implementation commits |
-| Release | `0.5.0` |
+| Release | `0.6.0` |
 | Inputs | Solidity files/directories or Etherscan V2 verified source by chain/address |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
 | Rules | Thirteen registered rules, `SOL001` through `SOL013` |
 | Proofs | Runnable `SOL007` proof; `SOL005` probe, sequence fuzzing, invariants, requirement manifests, and isolated runner |
-| Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
+| Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 123 Python tests; CI/catalog/config/baselines/limits/address ingestion, offline corpora, benchmark, inspection, and isolated Forge execution tested |
+| Verification | 129 Python tests; CI/catalog/config/baselines/limits/address/AI boundaries, offline corpora, benchmark, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -245,8 +245,8 @@ back after the user explicitly requests compilation.
 | M2 — Cross-contract analysis | `0.3.0` | Complete | Cross-contract facts, reentrancy traces, corpus, inspection, and benchmark |
 | M3 — High-value detectors | `0.4.0` | Complete | Access control, call-target taint, signatures, proxies/upgrades, token assumptions, market integrity |
 | M4 — Dynamic verification | `0.5.0` | Complete | Reentrancy probes, transaction-sequence fuzzing, protocol invariants, isolated runner |
-| M5 — Team and CI workflow | `0.6.0` | **Current** | Configuration, baselines, rule catalog, CI integration, performance controls |
-| M6 — Audit-ready release | `1.0.0` | Planned | Benchmarked accuracy, stable schemas, compatibility policy, security docs |
+| M5 — Team and CI workflow | `0.6.0` | Complete | Configuration, baselines, catalog, CI, limits, address provenance, evidence-bound AI triage |
+| M6 — Audit-ready release | `1.0.0` | **Current** | Benchmarked accuracy, stable schemas, compatibility policy, security docs |
 
 ### M2 — Cross-contract analysis (`0.3.0`)
 

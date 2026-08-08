@@ -3,14 +3,15 @@
 This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
 Keep one task marked **NEXT** and at most one task marked **IN PROGRESS**.
 
-Current release: `0.5.0`
+Current release: `0.6.0`
 
-Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
+Current milestone: **M6 — Audit-ready release (`1.0.0`)**
 
-Current position: M0 through M4 are complete, including isolated execution of
-generated proofs, fuzz sequences, and user-supplied invariants.
+Current position: M0 through M5 are complete, including team configuration,
+baseline-aware CI, explicit resource limits, verified-source provenance, and
+evidence-bound AI annotations.
 
-Next: **AI-001**
+Next: **SCHEMA-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -179,11 +180,11 @@ counterexamples, and document conditions that require manual review.
 - [x] **CI-001** — Publish a reusable SARIF/CI workflow example — P1 — **COMPLETE**.
 - [x] **LIMIT-001** — Add file, compiler, time, and memory limits with explicit diagnostics — P0 — **COMPLETE**.
 - [x] **ADDRESS-001** — Ingest verified source by chain/address with provenance — P2 — **COMPLETE**.
-- [ ] **AI-001** — Correlate and explain deterministic evidence without inventing findings — P2 — **NEXT**.
+- [x] **AI-001** — Correlate and explain deterministic evidence without inventing findings — P2 — **COMPLETE**.
 
 ## M6 — Audit-ready release (`1.0.0`)
 
-- [ ] **SCHEMA-001** — Freeze and document versioned JSON/SARIF compatibility — P0.
+- [ ] **SCHEMA-001** — Freeze and document versioned JSON/SARIF compatibility — P0 — **NEXT**.
 - [ ] **BENCH-002** — Measure per-rule precision and recall on a versioned labelled corpus — P0.
 - [ ] **COMPAT-001** — Publish supported Python, Solidity, EVM, and Foundry ranges — P0.
 - [ ] **SECURITY-001** — Add threat model, secure-use guidance, and disclosure policy — P0.
