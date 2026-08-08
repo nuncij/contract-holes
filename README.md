@@ -94,11 +94,12 @@ Project status and future work are tracked explicitly:
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
 
-The project is currently at `0.2.0`. M0 and M1 are complete; M2 is underway.
-The compiler index, inheritance resolver, call graph, reusable data-flow facts,
-and interprocedural `SOL005` analysis (`AST-001` through `RULE-005-V2`) are
-complete. The next task is `TEST-002`: turn the focused compiler tests into a
-versioned multi-file positive and negative analysis corpus.
+The project is currently at `0.2.0`. M0 and M1 are complete; all M2 P0 analysis
+and corpus tasks are complete. The compiler index, inheritance resolver, call
+graph, reusable data-flow facts, interprocedural `SOL005` analysis, and versioned
+multi-file corpus (`AST-001` through `TEST-002`) are complete. The next task is
+`DEBUG-001`: expose these analysis layers through a deterministic inspection
+command for developers.
 
 The complete suite uses Python's standard library:
 

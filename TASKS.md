@@ -7,9 +7,9 @@ Current release: `0.2.0`
 
 Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**
 
-Current position: M0 and M1 are complete; M2 implementation is underway.
+Current position: M0 and M1 are complete; all M2 P0 analysis and corpus tasks are complete.
 
-Next task: **TEST-002**
+Next task: **DEBUG-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -108,7 +108,7 @@ Acceptance criteria:
 
 Depends on: `AST-002`, `FLOW-001`, `FLOW-002`.
 
-### [ ] TEST-002 — Multi-file analysis corpus — P0 — **NEXT**
+### [x] TEST-002 — Multi-file analysis corpus — P0 — **COMPLETE**
 
 Create versioned positive and negative fixtures for every M2 primitive.
 
@@ -121,7 +121,7 @@ Acceptance criteria:
 
 Depends on: can begin with `AST-001`; completes with `RULE-005-V2`.
 
-### [ ] DEBUG-001 — Analysis inspection command — P1
+### [ ] DEBUG-001 — Analysis inspection command — P1 — **NEXT**
 
 Expose project-index, inheritance, call-edge, and fact summaries for developers
 without mixing them into security findings.

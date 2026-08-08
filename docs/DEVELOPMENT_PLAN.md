@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.2.0`  
 Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**  
-Next task: **TEST-002 — Multi-file analysis corpus**
+Next task: **DEBUG-001 — Analysis inspection command**
 
 ## Product goal
 
@@ -34,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, JSON, and SARIF 2.1.0 |
 | Workflow | Severity filtering, CI exit thresholds, suppressions, dependency exclusions |
 | Project model | Shared AST, inheritance, call, and conservative intra-procedural value-flow facts |
-| Verification | 41 Python tests; real compiler reentrancy findings, safe negative, and Forge proof tested |
+| Verification | 44 Python tests; 16-source offline M2 corpus, safe pairs, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -53,8 +53,10 @@ The project-wide index, inheritance layer, call graph, and data-flow engine now
 connect source units, inherited symbols, calls, reads, writes, aliases,
 authorization conditions, user-controlled values, external returns, and value
 transfers. `SOL005` composes those facts across internal calls into an ordered
-path and recognizes named and state-lock reentrancy guards. The largest remaining
-M2 gap is a versioned multi-file positive and negative analysis corpus.
+path and recognizes named and state-lock reentrancy guards. A versioned Foundry
+corpus now locks down positive and negative behavior for imports, libraries,
+overrides, diamond inheritance, recursion, and modifiers. All M2 P0 tasks are
+complete; developer inspection and benchmarking remain as P1 work.
 
 ## Analysis architecture
 

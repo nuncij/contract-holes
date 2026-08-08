@@ -1,0 +1,176 @@
+{
+  "schema_version": "1.0",
+  "corpus_version": "m2-1",
+  "solc_version": "0.8.25",
+  "expected_clean_entries": [
+    "DiamondSafe.withdraw",
+    "ImportedSafe.withdraw",
+    "ModifierSafe.withdraw",
+    "OverrideSafe.withdraw",
+    "RecursiveSafe.withdraw"
+  ],
+  "expected_findings": [
+    {
+      "rule_id": "SOL005",
+      "path": "src/diamond/DiamondVulnerable.sol",
+      "evidence": "compiler-interprocedural-data-flow",
+      "entry_function": "DiamondVulnerable.withdraw",
+      "state_variable": "balances",
+      "trace": [
+        {
+          "kind": "call",
+          "function": "DiamondVulnerable.withdraw",
+          "path": "src/diamond/DiamondVulnerable.sol",
+          "call_kind": "internal",
+          "callee": "DiamondPayments._pay"
+        },
+        {
+          "kind": "interaction",
+          "function": "DiamondPayments._pay",
+          "path": "src/diamond/DiamondHierarchy.sol",
+          "call_kind": "low-level-call"
+        },
+        {
+          "kind": "call",
+          "function": "DiamondVulnerable.withdraw",
+          "path": "src/diamond/DiamondVulnerable.sol",
+          "call_kind": "internal",
+          "callee": "DiamondAccounting._record"
+        },
+        {
+          "kind": "write",
+          "function": "DiamondAccounting._record",
+          "path": "src/diamond/DiamondHierarchy.sol",
+          "state_variable": "balances"
+        }
+      ]
+    },
+    {
+      "rule_id": "SOL005",
+      "path": "src/imports/ImportedVulnerable.sol",
+      "evidence": "compiler-interprocedural-data-flow",
+      "entry_function": "ImportedVulnerable.withdraw",
+      "state_variable": "balances",
+      "trace": [
+        {
+          "kind": "call",
+          "function": "ImportedVulnerable.withdraw",
+          "path": "src/imports/ImportedVulnerable.sol",
+          "call_kind": "library",
+          "callee": "PaymentLibrary.pay"
+        },
+        {
+          "kind": "interaction",
+          "function": "PaymentLibrary.pay",
+          "path": "src/imports/PaymentLibrary.sol",
+          "call_kind": "low-level-call"
+        },
+        {
+          "kind": "write",
+          "function": "ImportedVulnerable.withdraw",
+          "path": "src/imports/ImportedVulnerable.sol",
+          "state_variable": "balances"
+        }
+      ]
+    },
+    {
+      "rule_id": "SOL005",
+      "path": "src/modifiers/ModifierVulnerable.sol",
+      "evidence": "compiler-interprocedural-data-flow",
+      "entry_function": "ModifierVulnerable.withdraw",
+      "state_variable": "credits",
+      "trace": [
+        {
+          "kind": "call",
+          "function": "ModifierVulnerable.withdraw",
+          "path": "src/modifiers/ModifierVulnerable.sol",
+          "call_kind": "internal",
+          "callee": "ModifierBase._pay"
+        },
+        {
+          "kind": "interaction",
+          "function": "ModifierBase._pay",
+          "path": "src/modifiers/ModifierBase.sol",
+          "call_kind": "low-level-call"
+        },
+        {
+          "kind": "write",
+          "function": "ModifierVulnerable.withdraw",
+          "path": "src/modifiers/ModifierVulnerable.sol",
+          "state_variable": "credits"
+        }
+      ]
+    },
+    {
+      "rule_id": "SOL005",
+      "path": "src/overrides/OverrideVulnerable.sol",
+      "evidence": "compiler-interprocedural-data-flow",
+      "entry_function": "OverrideVulnerable.withdraw",
+      "state_variable": "credits",
+      "trace": [
+        {
+          "kind": "call",
+          "function": "OverrideVulnerable.withdraw",
+          "path": "src/overrides/OverrideVulnerable.sol",
+          "call_kind": "internal",
+          "callee": "OverrideBase._pay"
+        },
+        {
+          "kind": "interaction",
+          "function": "OverrideBase._pay",
+          "path": "src/overrides/OverrideBase.sol",
+          "call_kind": "low-level-call"
+        },
+        {
+          "kind": "call",
+          "function": "OverrideVulnerable.withdraw",
+          "path": "src/overrides/OverrideVulnerable.sol",
+          "call_kind": "super",
+          "callee": "OverrideBase._record"
+        },
+        {
+          "kind": "write",
+          "function": "OverrideBase._record",
+          "path": "src/overrides/OverrideBase.sol",
+          "state_variable": "credits"
+        }
+      ]
+    },
+    {
+      "rule_id": "SOL005",
+      "path": "src/recursion/RecursiveVulnerable.sol",
+      "evidence": "compiler-interprocedural-data-flow",
+      "entry_function": "RecursiveVulnerable.withdraw",
+      "state_variable": "balances",
+      "trace": [
+        {
+          "kind": "call",
+          "function": "RecursiveVulnerable.withdraw",
+          "path": "src/recursion/RecursiveVulnerable.sol",
+          "call_kind": "internal",
+          "callee": "RecursivePayments._recursivePay"
+        },
+        {
+          "kind": "interaction",
+          "function": "RecursivePayments._recursivePay",
+          "path": "src/recursion/RecursivePayments.sol",
+          "call_kind": "low-level-call"
+        },
+        {
+          "kind": "call",
+          "function": "RecursivePayments._recursivePay",
+          "path": "src/recursion/RecursivePayments.sol",
+          "call_kind": "internal",
+          "callee": "RecursivePayments._recursivePay"
+        },
+        {
+          "kind": "write",
+          "function": "RecursiveVulnerable.withdraw",
+          "path": "src/recursion/RecursiveVulnerable.sol",
+          "state_variable": "balances"
+        }
+      ]
+    }
+  ]
+}
+
