@@ -11,6 +11,7 @@ except ModuleNotFoundError:  # pragma: no cover - exercised only on Python 3.10
     tomllib = None
 
 from .models import Severity
+from .limits import ScanLimits
 from .rules import DEFAULT_RULES
 
 
@@ -33,6 +34,7 @@ class HolesConfig:
     severity_overrides: dict[str, Severity] = field(default_factory=dict)
     compiler_enabled: bool = False
     compiler_offline: bool = False
+    limits: ScanLimits = ScanLimits()
 
 
 def discover_config(start: Path | str | None = None) -> Path | None:
@@ -76,7 +78,9 @@ def selected_rules(config: HolesConfig):
 
 def _validate_config(payload: object, source: Path) -> HolesConfig:
     root = _table(payload, "configuration root")
-    _unknown_keys(root, {"schema_version", "scan", "rules", "compiler"}, "root")
+    _unknown_keys(
+        root, {"schema_version", "scan", "rules", "compiler", "limits"}, "root"
+    )
     schema_version = root.get("schema_version", 1)
     if isinstance(schema_version, bool) or schema_version != 1:
         raise ConfigError("schema_version must be 1")
@@ -84,6 +88,7 @@ def _validate_config(payload: object, source: Path) -> HolesConfig:
     scan = _table(root.get("scan", {}), "[scan]")
     rules = _table(root.get("rules", {}), "[rules]")
     compiler = _table(root.get("compiler", {}), "[compiler]")
+    limits = _table(root.get("limits", {}), "[limits]")
     _unknown_keys(
         scan,
         {"paths", "exclude", "include_dependencies", "minimum_severity"},
@@ -91,6 +96,17 @@ def _validate_config(payload: object, source: Path) -> HolesConfig:
     )
     _unknown_keys(rules, {"enabled", "disabled", "severity"}, "[rules]")
     _unknown_keys(compiler, {"enabled", "offline"}, "[compiler]")
+    _unknown_keys(
+        limits,
+        {
+            "max_files",
+            "max_source_bytes",
+            "compiler_timeout_seconds",
+            "scan_timeout_seconds",
+            "max_python_memory_mb",
+        },
+        "[limits]",
+    )
 
     raw_paths = _string_list(scan.get("paths", []), "scan.paths")
     paths = tuple(
@@ -138,6 +154,39 @@ def _validate_config(payload: object, source: Path) -> HolesConfig:
     if compiler_offline and not compiler_enabled:
         raise ConfigError("compiler.offline = true requires compiler.enabled = true")
 
+    defaults = ScanLimits()
+    try:
+        scan_limits = ScanLimits(
+            max_files=_positive_integer(
+                limits.get("max_files", defaults.max_files), "limits.max_files"
+            ),
+            max_source_bytes=_positive_integer(
+                limits.get("max_source_bytes", defaults.max_source_bytes),
+                "limits.max_source_bytes",
+            ),
+            compiler_timeout_seconds=_positive_number(
+                limits.get(
+                    "compiler_timeout_seconds", defaults.compiler_timeout_seconds
+                ),
+                "limits.compiler_timeout_seconds",
+            ),
+            scan_timeout_seconds=_positive_number(
+                limits.get("scan_timeout_seconds", defaults.scan_timeout_seconds),
+                "limits.scan_timeout_seconds",
+            ),
+            max_python_memory_bytes=_positive_integer(
+                limits.get(
+                    "max_python_memory_mb",
+                    defaults.max_python_memory_bytes // (1024 * 1024),
+                ),
+                "limits.max_python_memory_mb",
+            )
+            * 1024
+            * 1024,
+        )
+    except ValueError as exc:
+        raise ConfigError(str(exc)) from exc
+
     return HolesConfig(
         source=source,
         paths=tuple(path.resolve() for path in paths),
@@ -149,6 +198,7 @@ def _validate_config(payload: object, source: Path) -> HolesConfig:
         severity_overrides=severity_overrides,
         compiler_enabled=compiler_enabled,
         compiler_offline=compiler_offline,
+        limits=scan_limits,
     )
 
 
@@ -186,6 +236,21 @@ def _boolean(value: object, label: str) -> bool:
     if not isinstance(value, bool):
         raise ConfigError(f"{label} must be true or false")
     return value
+
+
+def _positive_integer(value: object, label: str) -> int:
+    if isinstance(value, bool) or not isinstance(value, int) or value <= 0:
+        raise ConfigError(f"{label} must be a positive integer")
+    return value
+
+
+def _positive_number(value: object, label: str) -> float:
+    if isinstance(value, bool) or not isinstance(value, (int, float)) or value <= 0:
+        raise ConfigError(f"{label} must be a positive number")
+    result = float(value)
+    if result == float("inf") or result != result:
+        raise ConfigError(f"{label} must be finite")
+    return result
 
 
 def _severity(value: object, label: str) -> Severity:
@@ -247,6 +312,6 @@ def _parse_subset_value(value: str, source: Path, line_number: int) -> object:
         parsed = ast.literal_eval(value)
     except (SyntaxError, ValueError) as exc:
         raise ConfigError(f"invalid value at {source}:{line_number}") from exc
-    if isinstance(parsed, (str, int, list)) and not isinstance(parsed, bool):
+    if isinstance(parsed, (str, int, float, list)) and not isinstance(parsed, bool):
         return parsed
     raise ConfigError(f"unsupported value at {source}:{line_number}")

@@ -104,6 +104,12 @@ CLI paths and corresponding flags override configured values. Unknown keys,
 rule IDs, severities, and contradictory compiler settings fail clearly. See
 [configuration](docs/CONFIGURATION.md) for the complete schema and precedence.
 
+Normal scans also enforce finite file-count, total-source-size, compilation,
+total-time, and Python-memory boundaries. Configure them under `[limits]` or use
+the matching CLI overrides; failures are execution errors rather than clean
+scans. See [resource limits](docs/RESOURCE_LIMITS.md) for defaults and diagnostic
+categories.
+
 ## Baselines and new-finding CI
 
 Create a reviewed fingerprint baseline, then gate only findings introduced after
@@ -262,8 +268,9 @@ typed ERC-20 returns and requested-amount credits after inbound transfers.
 minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
-complete, including user-supplied per-step invariants. The next task is
-`LIMIT-001`, explicit file/compiler/time/memory controls.
+complete, including user-supplied per-step invariants. Scan resource limits are
+now explicit and configurable. The next task is `ADDRESS-001`, verified-source
+ingestion with provenance.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

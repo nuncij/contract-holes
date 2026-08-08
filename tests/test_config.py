@@ -14,6 +14,7 @@ from contract_holes.config import (
     selected_rules,
 )
 from contract_holes.models import Severity
+from contract_holes.limits import ScanLimits
 
 
 class ConfigTests(unittest.TestCase):
@@ -40,6 +41,13 @@ SOL005 = "critical"
 [compiler]
 enabled = true
 offline = true
+
+[limits]
+max_files = 42
+max_source_bytes = 4096
+compiler_timeout_seconds = 2.5
+scan_timeout_seconds = 8
+max_python_memory_mb = 64
 """,
                 encoding="utf-8",
             )
@@ -60,6 +68,16 @@ offline = true
             self.assertEqual(config.severity_overrides, {"SOL005": Severity.CRITICAL})
             self.assertTrue(config.compiler_enabled)
             self.assertTrue(config.compiler_offline)
+            self.assertEqual(
+                config.limits,
+                ScanLimits(
+                    max_files=42,
+                    max_source_bytes=4096,
+                    compiler_timeout_seconds=2.5,
+                    scan_timeout_seconds=8,
+                    max_python_memory_bytes=64 * 1024 * 1024,
+                ),
+            )
 
     def test_discovers_nearest_parent_configuration(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
@@ -172,6 +190,43 @@ offline = true
                 compile_sources=False,
                 compiler_offline=False,
             )
+
+    def test_cli_resource_limit_overrides_are_passed_to_scanner(self) -> None:
+        with (
+            patch("contract_holes.cli.Scanner") as scanner_type,
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            scanner_type.return_value.scan_paths.return_value = ([], 1)
+            status = main(
+                [
+                    "Example.sol",
+                    "--no-config",
+                    "--format",
+                    "json",
+                    "--max-files",
+                    "7",
+                    "--max-source-bytes",
+                    "8192",
+                    "--compiler-timeout",
+                    "3.5",
+                    "--scan-timeout",
+                    "9",
+                    "--max-memory-mb",
+                    "32",
+                ]
+            )
+
+        self.assertEqual(status, 0)
+        self.assertEqual(
+            scanner_type.call_args.kwargs["limits"],
+            ScanLimits(
+                max_files=7,
+                max_source_bytes=8192,
+                compiler_timeout_seconds=3.5,
+                scan_timeout_seconds=9,
+                max_python_memory_bytes=32 * 1024 * 1024,
+            ),
+        )
 
 
 if __name__ == "__main__":

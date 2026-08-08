@@ -63,7 +63,7 @@ class CompilationResult:
 class ForgeCompiler:
     """Load solc ASTs through Foundry without writing into the target project."""
 
-    def __init__(self, executable: str = "forge", timeout: int = 120):
+    def __init__(self, executable: str = "forge", timeout: float = 120.0):
         self.executable = executable
         self.timeout = timeout
 
@@ -117,7 +117,8 @@ class ForgeCompiler:
                 )
             except subprocess.TimeoutExpired as exc:
                 raise CompilerError(
-                    f"Foundry compilation exceeded the {self.timeout}-second timeout"
+                    "resource limit exceeded [compiler-time]: Foundry compilation "
+                    f"exceeded {self.timeout:g} seconds"
                 ) from exc
             except OSError as exc:
                 raise CompilerError(f"could not start Foundry: {exc}") from exc
@@ -260,4 +261,3 @@ def _process_error(stdout: str, stderr: str) -> str:
         return "unknown compiler error"
     lines = detail.splitlines()
     return "\n".join(lines[-40:])
-

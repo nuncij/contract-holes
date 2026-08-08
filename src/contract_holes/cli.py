@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 from collections.abc import Sequence
+from dataclasses import replace
 import json
 from pathlib import Path
 import sys
@@ -153,6 +154,36 @@ def parser() -> argparse.ArgumentParser:
         "--generate-proofs",
         metavar="DIRECTORY",
         help="write runnable Foundry proof tests for supported findings (requires --compile)",
+    )
+    result.add_argument(
+        "--max-files",
+        type=int,
+        metavar="COUNT",
+        help="maximum Solidity source files (overrides config)",
+    )
+    result.add_argument(
+        "--max-source-bytes",
+        type=int,
+        metavar="BYTES",
+        help="maximum total Solidity source bytes (overrides config)",
+    )
+    result.add_argument(
+        "--compiler-timeout",
+        type=float,
+        metavar="SECONDS",
+        help="maximum Foundry compilation time (overrides config)",
+    )
+    result.add_argument(
+        "--scan-timeout",
+        type=float,
+        metavar="SECONDS",
+        help="maximum total scan time (overrides config)",
+    )
+    result.add_argument(
+        "--max-memory-mb",
+        type=int,
+        metavar="MIB",
+        help="maximum Python peak allocated memory (overrides config)",
     )
     result.add_argument("--no-color", action="store_true", help="disable ANSI colors")
     return result
@@ -321,9 +352,26 @@ def main(argv: Sequence[str] | None = None) -> int:
         argument_parser.error("--offline requires --compile")
     if args.generate_proofs and not compile_sources:
         argument_parser.error("--generate-proofs requires --compile")
+    limit_changes: dict[str, int | float] = {}
+    if args.max_files is not None:
+        limit_changes["max_files"] = args.max_files
+    if args.max_source_bytes is not None:
+        limit_changes["max_source_bytes"] = args.max_source_bytes
+    if args.compiler_timeout is not None:
+        limit_changes["compiler_timeout_seconds"] = args.compiler_timeout
+    if args.scan_timeout is not None:
+        limit_changes["scan_timeout_seconds"] = args.scan_timeout
+    if args.max_memory_mb is not None:
+        limit_changes["max_python_memory_bytes"] = args.max_memory_mb * 1024 * 1024
+    try:
+        limits = replace(configuration.limits, **limit_changes)
+    except ValueError as exc:
+        print(f"holes: error: {exc}", file=sys.stderr)
+        return 2
     scanner = Scanner(
         rules=selected_rules(configuration),
         severity_overrides=configuration.severity_overrides,
+        limits=limits,
     )
     try:
         findings, files_scanned = scanner.scan_paths(

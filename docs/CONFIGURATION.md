@@ -25,6 +25,13 @@ SOL005 = "critical"
 [compiler]
 enabled = true
 offline = true
+
+[limits]
+max_files = 5000
+max_source_bytes = 104857600
+compiler_timeout_seconds = 120
+scan_timeout_seconds = 300
+max_python_memory_mb = 1024
 ```
 
 All sections and keys are optional. `schema_version` defaults to `1` when
@@ -39,6 +46,11 @@ thresholds.
 
 `compiler.offline = true` requires `compiler.enabled = true`. Compiler mode uses
 the isolated Foundry build and enables compiler-backed rules.
+
+The `[limits]` table controls finite file-count, total-source-size, compilation,
+total-time, and Python-memory boundaries. All values are positive;
+`compiler_timeout_seconds` cannot exceed `scan_timeout_seconds`. See
+[Resource limits](RESOURCE_LIMITS.md) for enforcement details and diagnostics.
 
 ## Precedence
 
