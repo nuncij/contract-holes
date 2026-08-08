@@ -1,9 +1,9 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-08  
-Current release: `0.2.0`  
-Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**  
-Next task: **BENCH-001 — Performance and correctness baseline**
+Current release: `0.3.0`
+Current milestone: **M3 — High-value detectors (`0.4.0`)**
+Next task: **RULE-008 — User-controlled external and delegatecall target taint**
 
 ## Product goal
 
@@ -24,17 +24,17 @@ The scanner is successful when it:
 
 | Area | Current state |
 | --- | --- |
-| Repository | Local Git repository, clean `main`, two implementation commits |
-| Release | `0.2.0` |
+| Repository | Local Git repository on `main`, with task-scoped implementation commits |
+| Release | `0.3.0` |
 | Inputs | One or more Solidity files or directories |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
 | Rules | Seven registered rules, `SOL001` through `SOL007` |
 | Proofs | Runnable Foundry proof for `SOL007` |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
-| Workflow | Severity filtering, CI exit thresholds, suppressions, dependency exclusions |
-| Project model | Shared AST, inheritance, call, and conservative intra-procedural value-flow facts |
-| Verification | 48 Python tests; 16-source offline M2 corpus, safe pairs, inspection, and Forge proof tested |
+| Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
+| Project model | Shared AST, inheritance, calls, value-flow facts, and interprocedural reentrancy traces |
+| Verification | 52 Python tests; 16-source offline M2 corpus, benchmark, inspection, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -55,9 +55,9 @@ authorization conditions, user-controlled values, external returns, and value
 transfers. `SOL005` composes those facts across internal calls into an ordered
 path and recognizes named and state-lock reentrancy guards. A versioned Foundry
 corpus now locks down positive and negative behavior for imports, libraries,
-overrides, diamond inheritance, recursion, and modifiers. All M2 P0 tasks and
-the deterministic analysis-inspection command are complete; benchmarking remains
-as the final M2 P1 task.
+overrides, diamond inheritance, recursion, and modifiers. Deterministic
+inspection and repeatable correctness/performance benchmarking complete the M2
+release gate. M3 starts with user-controlled external-call target taint.
 
 ## Analysis architecture
 
@@ -90,8 +90,8 @@ back after the user explicitly requests compilation.
 | --- | --- | --- | --- |
 | M0 — Scanner foundation | `0.1.0` | Complete | CLI, parser, findings, six source rules, reports, suppressions, tests |
 | M1 — Compiler evidence | `0.2.0` | Complete | Isolated solc AST loading, AST-backed calls, `SOL007`, first Foundry proof |
-| M2 — Cross-contract analysis | `0.3.0` | **Current** | Project index, inheritance resolution, call graph, reusable data-flow facts |
-| M3 — High-value detectors | `0.4.0` | Planned | Access control, call-target taint, signatures, proxies/upgrades, token assumptions |
+| M2 — Cross-contract analysis | `0.3.0` | Complete | Cross-contract facts, reentrancy traces, corpus, inspection, and benchmark |
+| M3 — High-value detectors | `0.4.0` | **Current** | Access control, call-target taint, signatures, proxies/upgrades, token assumptions |
 | M4 — Dynamic verification | `0.5.0` | Planned | Reentrancy probes, transaction-sequence fuzzing, protocol invariants |
 | M5 — Team and CI workflow | `0.6.0` | Planned | Configuration, baselines, rule catalog, CI integration, performance controls |
 | M6 — Audit-ready release | `1.0.0` | Planned | Benchmarked accuracy, stable schemas, compatibility policy, security docs |

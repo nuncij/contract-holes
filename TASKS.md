@@ -3,13 +3,13 @@
 This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
 Keep one task marked **NEXT** and at most one task marked **IN PROGRESS**.
 
-Current release: `0.2.0`
+Current release: `0.3.0`
 
-Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**
+Current milestone: **M3 — High-value detectors (`0.4.0`)**
 
-Current position: M0 and M1 are complete; all M2 P0 analysis and corpus tasks are complete.
+Current position: M0, M1, and M2 are complete; M3 implementation is next.
 
-Next task: **BENCH-001**
+Next task: **RULE-008**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -135,7 +135,7 @@ Acceptance criteria:
 
 Depends on: `AST-001`, expands with later FLOW tasks.
 
-### [ ] BENCH-001 — Performance and correctness baseline — P1 — **NEXT**
+### [x] BENCH-001 — Performance and correctness baseline — P1 — **COMPLETE**
 
 Record scan duration, peak memory, compiler duration, and finding counts for a
 small checked-in corpus.
@@ -151,7 +151,7 @@ Depends on: `TEST-002`.
 
 ## M3 — High-value detectors (`0.4.0`)
 
-- [ ] **RULE-008** — User-controlled external and `delegatecall` target taint — P0.
+- [ ] **RULE-008** — User-controlled external and `delegatecall` target taint — P0 — **NEXT**.
 - [ ] **RULE-009** — Authorization reachability and exposed privileged state changes — P0.
 - [ ] **RULE-010** — Signature recovery, nonce, deadline, and domain-separation hazards — P0.
 - [ ] **RULE-011** — Proxy initializer and storage-layout hazards — P0.

@@ -5,6 +5,7 @@ import unittest
 from unittest.mock import patch
 
 from contract_holes.cli import main
+from contract_holes.benchmark import BenchmarkError
 from contract_holes.inspector import InspectionError, InspectionFilters
 
 
@@ -80,6 +81,61 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(status, 2)
         self.assertIn("holes inspect: error: compiler unavailable", errors.getvalue())
+
+    def test_benchmark_command_does_not_fail_for_performance_regressions(self) -> None:
+        output = io.StringIO()
+        payload = {
+            "schema_version": "1.0",
+            "correctness": {"status": "passed"},
+            "performance_comparison": {
+                "status": "reported",
+                "regressions": ["modes.compiler.duration_seconds"],
+            },
+        }
+        with (
+            patch("contract_holes.cli.benchmark_paths", return_value=payload) as benchmark,
+            contextlib.redirect_stdout(output),
+        ):
+            status = main(
+                [
+                    "benchmark",
+                    "contracts",
+                    "--offline",
+                    "--expectations",
+                    "expected.json",
+                    "--baseline",
+                    "previous.json",
+                ]
+            )
+
+        self.assertEqual(status, 0)
+        self.assertEqual(json.loads(output.getvalue()), payload)
+        benchmark.assert_called_once_with(
+            ["contracts"],
+            include_dependencies=False,
+            offline=True,
+            expectations_path="expected.json",
+            baseline_path="previous.json",
+        )
+
+    def test_benchmark_command_fails_only_for_correctness_or_execution(self) -> None:
+        failed = {"correctness": {"status": "failed"}}
+        with (
+            patch("contract_holes.cli.benchmark_paths", return_value=failed),
+            contextlib.redirect_stdout(io.StringIO()),
+        ):
+            self.assertEqual(main(["benchmark", "contracts"]), 1)
+
+        errors = io.StringIO()
+        with (
+            patch(
+                "contract_holes.cli.benchmark_paths",
+                side_effect=BenchmarkError("no compiler"),
+            ),
+            contextlib.redirect_stderr(errors),
+        ):
+            self.assertEqual(main(["benchmark", "contracts"]), 2)
+        self.assertIn("holes benchmark: error: no compiler", errors.getvalue())
 
 
 if __name__ == "__main__":

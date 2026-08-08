@@ -77,6 +77,28 @@ Inspection always compiles with Foundry and writes JSON only to standard output.
 The compiler build remains isolated in a temporary directory, and the payload
 does not contain Solidity source contents.
 
+## Benchmarking
+
+Run source-only and compiler-backed correctness and performance measurements in
+one command:
+
+```bash
+holes benchmark tests/fixtures/m2_corpus/src --offline > benchmark.json
+holes benchmark tests/fixtures/m2_corpus/src --offline \
+  --baseline benchmark.json > comparison.json
+```
+
+The JSON report separates source scanning, Foundry compilation, project-index
+construction, and compiler-backed rule scanning. It records finding counts,
+durations, compiler versions, diagnostics, and Python peak allocated memory.
+The memory value covers this Python process and loaded compiler output; it does
+not claim to include Forge's child-process peak RSS.
+
+If the project root contains `expectations.json`, benchmark finding counts are
+checked automatically. Correctness mismatches exit with status 1. Comparison to
+a previous report labels performance changes over 20% but remains informational,
+so variable wall-clock timings never make CI flaky.
+
 For supported findings, the scanner can also write a standalone Foundry test
 that reproduces the underlying vulnerability primitive:
 
@@ -115,13 +137,11 @@ Project status and future work are tracked explicitly:
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
 
-The project is currently at `0.2.0`. M0 and M1 are complete; all M2 P0 analysis
-and corpus tasks are complete. The compiler index, inheritance resolver, call
-graph, reusable data-flow facts, interprocedural `SOL005` analysis, and versioned
-multi-file corpus (`AST-001` through `TEST-002`) are complete. `DEBUG-001` also
-provides deterministic, filtered inspection JSON for every analysis layer. The
-next task is `BENCH-001`: establish a repeatable performance and correctness
-baseline for M2.
+The project is currently at `0.3.0`. M0, M1, and M2 are complete. The compiler
+index, inheritance resolver, call graph, reusable data-flow facts,
+interprocedural `SOL005` analysis, versioned multi-file corpus, deterministic
+inspection JSON, and repeatable benchmark are complete. The next task is
+`RULE-008`: trace user-controlled external and `delegatecall` targets.
 
 The complete suite uses Python's standard library:
 

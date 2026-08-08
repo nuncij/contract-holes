@@ -7,6 +7,7 @@ from pathlib import Path
 import sys
 
 from . import __version__
+from .benchmark import BenchmarkError, benchmark_exit_status, benchmark_paths
 from .inspector import InspectionError, InspectionFilters, inspect_paths
 from .models import Severity
 from .proofs import ProofGenerationError, generate_foundry_proofs
@@ -18,7 +19,10 @@ def parser() -> argparse.ArgumentParser:
     result = argparse.ArgumentParser(
         prog="holes",
         description="Scan Solidity contracts for evidence of security vulnerabilities.",
-        epilog="Use 'holes inspect PATH ...' for compiler analysis JSON.",
+        epilog=(
+            "Use 'holes inspect PATH ...' for analysis JSON or "
+            "'holes benchmark PATH ...' for repeatable metrics."
+        ),
     )
     result.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
     result.add_argument("paths", nargs="+", help="Solidity files or directories to scan")
@@ -108,10 +112,41 @@ def inspection_parser() -> argparse.ArgumentParser:
     return result
 
 
+def benchmark_parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(
+        prog="holes benchmark",
+        description="Measure scanner correctness, duration, and Python peak memory as JSON.",
+    )
+    result.add_argument("paths", nargs="+", help="Solidity files or directories to benchmark")
+    result.add_argument(
+        "--expectations",
+        metavar="FILE",
+        help="finding-count expectations JSON (defaults to PROJECT/expectations.json)",
+    )
+    result.add_argument(
+        "--baseline",
+        metavar="FILE",
+        help="compare performance with a prior benchmark JSON without failing on timing",
+    )
+    result.add_argument(
+        "--include-dependencies",
+        action="store_true",
+        help="include dependency directories as explicit benchmark targets",
+    )
+    result.add_argument(
+        "--offline",
+        action="store_true",
+        help="prevent Foundry from downloading missing compiler versions",
+    )
+    return result
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments and arguments[0] == "inspect":
         return _inspect_main(arguments[1:])
+    if arguments and arguments[0] == "benchmark":
+        return _benchmark_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
     if args.offline and not args.compile:
@@ -184,3 +219,21 @@ def _inspect_main(argv: Sequence[str]) -> int:
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
+
+
+def _benchmark_main(argv: Sequence[str]) -> int:
+    argument_parser = benchmark_parser()
+    args = argument_parser.parse_args(argv)
+    try:
+        payload = benchmark_paths(
+            args.paths,
+            include_dependencies=args.include_dependencies,
+            offline=args.offline,
+            expectations_path=args.expectations,
+            baseline_path=args.baseline,
+        )
+    except BenchmarkError as exc:
+        print(f"holes benchmark: error: {exc}", file=sys.stderr)
+        return 2
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return benchmark_exit_status(payload)

@@ -24,3 +24,14 @@ PYTHONPATH=src python3 -m unittest tests.test_m2_corpus -v
 
 The vulnerable contracts are deliberately minimal review fixtures, not deployable
 protocol implementations.
+
+The same manifest contains source-only and compiler-backed finding-count
+expectations for the repeatable M2 benchmark:
+
+```bash
+holes benchmark tests/fixtures/m2_corpus/src --offline
+```
+
+Performance values are emitted for the current environment rather than checked
+into the corpus. A prior JSON report can be supplied with `--baseline`; timing
+regressions are reported but do not fail the command.
