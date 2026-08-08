@@ -1,0 +1,85 @@
+name: Contract Holes
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  scan:
+    name: Solidity security scan
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    env:
+      # Replace this with your reviewed package or Git commit pin.
+      CONTRACT_HOLES_INSTALL: contract-holes==0.5.0
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+
+      - name: Install Foundry
+        uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: v1.7.1
+
+      - name: Install Contract Holes
+        run: python -m pip install "$CONTRACT_HOLES_INSTALL"
+
+      - name: Scan and preserve gate status
+        id: holes
+        shell: bash
+        run: |
+          baseline_args=()
+          if [[ -f .holes-baseline.json ]]; then
+            baseline_args=(--baseline .holes-baseline.json)
+          fi
+
+          set +e
+          holes "${baseline_args[@]}" \
+            --format sarif \
+            --fail-on high \
+            > contract-holes.sarif
+          scan_status=$?
+          set -e
+
+          echo "exit_code=$scan_status" >> "$GITHUB_OUTPUT"
+          if (( scan_status > 1 )); then
+            exit "$scan_status"
+          fi
+
+      - name: Upload SARIF
+        if: >-
+          always() &&
+          (steps.holes.outputs.exit_code == '0' ||
+           steps.holes.outputs.exit_code == '1')
+        uses: github/codeql-action/upload-sarif@v4
+        with:
+          sarif_file: contract-holes.sarif
+          category: contract-holes
+
+      - name: Enforce new-finding gate
+        if: always()
+        shell: bash
+        run: |
+          scan_status="${{ steps.holes.outputs.exit_code }}"
+          if [[ -z "$scan_status" ]]; then
+            echo "Contract Holes did not produce an exit status" >&2
+            exit 2
+          fi
+          exit "$scan_status"

@@ -121,6 +121,12 @@ root is portable across checkouts. Creating refuses to overwrite; after review,
 refresh explicitly with `--update-baseline`. Baselines contain locations and
 fingerprints, not source excerpts. See [baseline workflow](docs/BASELINES.md).
 
+A copy-ready GitHub Actions template is available at
+[`examples/github-actions/contract-holes.yml`](examples/github-actions/contract-holes.yml).
+It runs baseline-aware SARIF, uploads valid results for scanner statuses 0/1,
+then restores the finding gate status. Review the install pin, permissions, and
+platform notes in [CI and SARIF](docs/CI.md) before adoption.
+
 ## Inspecting compiler analysis
 
 Developers can inspect the compiler-backed model separately from security
@@ -257,7 +263,7 @@ minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
 complete, including user-supplied per-step invariants. The next task is
-`CI-001`, a reusable SARIF and baseline CI workflow.
+`LIMIT-001`, explicit file/compiler/time/memory controls.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization
