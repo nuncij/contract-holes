@@ -134,6 +134,13 @@ against the recorded executed/succeeded counts and result digest. Calls originat
 from the executor; multiple actors, time changes, token funding, and protocol
 setup require a project adapter.
 
+Project-specific invariants plug into the generated interface with a stable
+assertion ID, boolean result, and arbitrary detail bytes. The sequence executor
+checks the adapter before execution and after each step, emits the assertion ID,
+step, result, and detail hash, and exposes a custom `HolesInvariantViolation`
+error through `assertLastInvariant()`. Adapter reverts are reported as failed
+invariants instead of being treated as safe.
+
 Directories named `lib`, `vendor`, `node_modules`, `out`, `cache`, and
 `artifacts` are skipped unless `--include-dependencies` is supplied.
 
@@ -175,7 +182,8 @@ typed ERC-20 returns and requested-amount credits after inbound transfers.
 minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
-complete; the next task is `INVARIANT-001`, user-defined protocol assertions.
+complete, including user-supplied per-step invariants. The next task is
+`PROOF-003`, proof-environment requirements and provenance.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

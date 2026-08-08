@@ -187,15 +187,46 @@ contract {contract_name}_Probe {{
     }}
 }}
 
+interface {contract_name}_Invariant {{
+    function check(address target_)
+        external
+        view
+        returns (bytes32 invariantId, bool holds, bytes memory details);
+}}
+
 // Generic sequence driver for project-specific Foundry tests. Every target call
 // originates from this executor. Use a project adapter when distinct actors,
 // time/blocks, token funding, or protocol-specific setup must be modelled.
 contract {contract_name}_SequenceExecutor {{
+    struct SequenceResult {{
+        uint256 executed;
+        uint256 succeeded;
+        bytes32 digest;
+        bool invariantHolds;
+    }}
+
+    error HolesInvariantViolation(
+        bytes32 invariantId,
+        uint256 afterStep,
+        bytes32 detailsHash
+    );
+
+    event HolesInvariantAssertion(
+        bytes32 indexed invariantId,
+        uint256 indexed afterStep,
+        bool holds,
+        bytes32 detailsHash
+    );
+
     uint256 public constant MAX_SEQUENCE_STEPS = 32;
 
     uint256 public lastExecuted;
     uint256 public lastSucceeded;
     bytes32 public lastResultDigest;
+    bytes32 public lastInvariantId;
+    bool public lastInvariantHolds = true;
+    uint256 public lastInvariantStep;
+    bytes32 public lastInvariantDetailsHash;
 
     function runSequence(
         address target_,
@@ -203,6 +234,60 @@ contract {contract_name}_SequenceExecutor {{
         uint256[] calldata values_,
         bool stopOnRevert_
     ) external payable returns (uint256 executed, uint256 succeeded, bytes32 digest) {{
+        SequenceResult memory result = _runSequence(
+            target_, calls_, values_, stopOnRevert_, address(0)
+        );
+        return (result.executed, result.succeeded, result.digest);
+    }}
+
+    function runSequenceWithInvariant(
+        address target_,
+        bytes[] calldata calls_,
+        uint256[] calldata values_,
+        bool stopOnRevert_,
+        address invariant_
+    )
+        external
+        payable
+        returns (
+            uint256 executed,
+            uint256 succeeded,
+            bytes32 digest,
+            bool invariantHolds
+        )
+    {{
+        require(invariant_.code.length != 0, "invariant has no code");
+        SequenceResult memory result = _runSequence(
+            target_, calls_, values_, stopOnRevert_, invariant_
+        );
+        return (
+            result.executed,
+            result.succeeded,
+            result.digest,
+            result.invariantHolds
+        );
+    }}
+
+    function assertLastInvariant() external view {{
+        if (!lastInvariantHolds) {{
+            revert HolesInvariantViolation(
+                lastInvariantId,
+                lastInvariantStep,
+                lastInvariantDetailsHash
+            );
+        }}
+    }}
+
+    function _runSequence(
+        address target_,
+        bytes[] calldata calls_,
+        uint256[] calldata values_,
+        bool stopOnRevert_,
+        address invariant_
+    )
+        internal
+        returns (SequenceResult memory result)
+    {{
         require(target_.code.length != 0, "target has no code");
         require(calls_.length == values_.length, "sequence length mismatch");
         require(calls_.length <= MAX_SEQUENCE_STEPS, "sequence too long");
@@ -213,22 +298,87 @@ contract {contract_name}_SequenceExecutor {{
         }}
         require(msg.value == requiredValue, "supply exact sequence value");
 
-        digest = keccak256(abi.encode(target_, calls_.length));
+        result.invariantHolds = true;
+        lastInvariantId = bytes32(0);
+        lastInvariantHolds = true;
+        lastInvariantStep = 0;
+        lastInvariantDetailsHash = bytes32(0);
+        if (invariant_ != address(0)) {{
+            result.invariantHolds = _checkInvariant(invariant_, target_, 0);
+            if (!result.invariantHolds) {{
+                lastExecuted = 0;
+                lastSucceeded = 0;
+                lastResultDigest = bytes32(0);
+                return result;
+            }}
+        }}
+
+        result.digest = keccak256(abi.encode(target_, calls_.length));
         for (uint256 index; index < calls_.length; ++index) {{
-            (bool success, bytes memory returnData) = target_.call{{
-                value: values_[index]
-            }}(calls_[index]);
-            ++executed;
-            if (success) ++succeeded;
-            digest = keccak256(
-                abi.encode(digest, index, success, keccak256(returnData))
+            (bool success, bytes32 nextDigest) = _executeStep(
+                target_, calls_[index], values_[index], result.digest, index
             );
+            result.digest = nextDigest;
+            ++result.executed;
+            if (success) ++result.succeeded;
+            if (invariant_ != address(0)) {{
+                result.invariantHolds = _checkInvariant(
+                    invariant_, target_, index + 1
+                );
+                if (!result.invariantHolds) break;
+            }}
             if (!success && stopOnRevert_) break;
         }}
 
-        lastExecuted = executed;
-        lastSucceeded = succeeded;
-        lastResultDigest = digest;
+        lastExecuted = result.executed;
+        lastSucceeded = result.succeeded;
+        lastResultDigest = result.digest;
+    }}
+
+    function _executeStep(
+        address target_,
+        bytes calldata call_,
+        uint256 value_,
+        bytes32 previousDigest_,
+        uint256 index_
+    ) internal returns (bool success, bytes32 digest) {{
+        bytes memory returnData;
+        (success, returnData) = target_.call{{value: value_}}(call_);
+        digest = keccak256(
+            abi.encode(
+                previousDigest_, index_, success, keccak256(returnData)
+            )
+        );
+    }}
+
+    function _checkInvariant(
+        address invariant_,
+        address target_,
+        uint256 afterStep_
+    ) internal returns (bool holds) {{
+        bytes32 invariantId;
+        bytes32 detailsHash;
+        try {contract_name}_Invariant(invariant_).check(target_) returns (
+            bytes32 returnedId,
+            bool returnedHolds,
+            bytes memory details
+        ) {{
+            invariantId = returnedId;
+            holds = returnedHolds;
+            detailsHash = keccak256(details);
+        }} catch (bytes memory reason) {{
+            invariantId = keccak256("HOLES_INVARIANT_ADAPTER_REVERT");
+            holds = false;
+            detailsHash = keccak256(reason);
+        }}
+
+        lastInvariantId = invariantId;
+        lastInvariantHolds = holds;
+        lastInvariantStep = afterStep_;
+        lastInvariantDetailsHash = detailsHash;
+        emit HolesInvariantAssertion(
+            invariantId, afterStep_, holds, detailsHash
+        );
     }}
 
     receive() external payable {{}}
@@ -248,6 +398,28 @@ contract {contract_name}_VulnerableModel {{
 
     function reset(uint256 nextCredit) external {{
         credit = nextCredit;
+    }}
+}}
+
+contract {contract_name}_CreditBoundInvariant is {contract_name}_Invariant {{
+    bytes32 public constant INVARIANT_ID = keccak256("MODEL_CREDIT_BOUND");
+    uint256 public immutable maximumCredit;
+
+    constructor(uint256 maximumCredit_) {{
+        maximumCredit = maximumCredit_;
+    }}
+
+    function check(address target_)
+        external
+        view
+        returns (bytes32 invariantId, bool holds, bytes memory details)
+    {{
+        uint256 credit = {contract_name}_VulnerableModel(target_).credit();
+        return (
+            INVARIANT_ID,
+            credit <= maximumCredit,
+            abi.encode(credit, maximumCredit)
+        );
     }}
 }}
 
@@ -271,6 +443,8 @@ contract {contract_name} {{
             new {contract_name}_SequenceExecutor();
         {contract_name}_VulnerableModel model =
             new {contract_name}_VulnerableModel();
+        {contract_name}_CreditBoundInvariant invariant =
+            new {contract_name}_CreditBoundInvariant(type(uint8).max);
         uint256 steps = commands.length;
         if (steps > executor.MAX_SEQUENCE_STEPS()) {{
             steps = executor.MAX_SEQUENCE_STEPS();
@@ -285,10 +459,42 @@ contract {contract_name} {{
                 : abi.encodeWithSignature("withdraw()");
         }}
 
-        (uint256 executed, , ) = executor.runSequence(
-            address(model), calls, values, false
-        );
+        (uint256 executed, , , bool invariantHolds) =
+            executor.runSequenceWithInvariant(
+                address(model), calls, values, false, address(invariant)
+            );
+        require(invariantHolds, "model credit bound should hold");
+        executor.assertLastInvariant();
         require(executed == steps, "executor should process every command");
+    }}
+
+    function test_SOL005_invariantReportsViolation() external {{
+        {contract_name}_SequenceExecutor executor =
+            new {contract_name}_SequenceExecutor();
+        {contract_name}_VulnerableModel model =
+            new {contract_name}_VulnerableModel();
+        {contract_name}_CreditBoundInvariant invariant =
+            new {contract_name}_CreditBoundInvariant(1);
+        bytes[] memory calls = new bytes[](1);
+        calls[0] = abi.encodeWithSignature("reset(uint256)", 2);
+        uint256[] memory values = new uint256[](1);
+
+        (, , , bool invariantHolds) = executor.runSequenceWithInvariant(
+            address(model), calls, values, false, address(invariant)
+        );
+        require(!invariantHolds, "credit bound should fail");
+        require(executor.lastInvariantStep() == 1, "expected failing step");
+        require(
+            executor.lastInvariantId() == invariant.INVARIANT_ID(),
+            "expected stable invariant id"
+        );
+
+        bool assertionReverted;
+        try executor.assertLastInvariant() {{}}
+        catch {{
+            assertionReverted = true;
+        }}
+        require(assertionReverted, "assertion should expose the violation");
     }}
 }}
 """

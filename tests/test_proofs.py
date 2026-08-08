@@ -106,7 +106,21 @@ solc_version = "0.8.25"
                 timeout=30,
             )
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-            self.assertIn("2 passed", result.stdout)
+            self.assertIn("3 passed", result.stdout)
+
+    def test_generates_user_supplied_invariant_api_and_assertion_output(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            generated = generate_foundry_proofs(
+                [reentrancy_finding()], Path(directory)
+            )
+            content = generated[0].read_text(encoding="utf-8")
+
+            self.assertIn("function check(address target_)", content)
+            self.assertIn("function runSequenceWithInvariant(", content)
+            self.assertIn("event HolesInvariantAssertion(", content)
+            self.assertIn("error HolesInvariantViolation(", content)
+            self.assertIn("function assertLastInvariant()", content)
+            self.assertIn("test_SOL005_invariantReportsViolation", content)
 
     def test_generation_is_idempotent_but_does_not_overwrite_changes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.4.0`
 Current milestone: **M4 — Dynamic verification (`0.5.0`)**
-Next: **INVARIANT-001 — User-supplied protocol invariants and assertions**
+Next: **PROOF-003 — Proof environment requirements and provenance**
 
 ## Product goal
 
@@ -34,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 83 Python tests; offline M2 and versioned M3 corpora, benchmark, inspection, and `SOL005`/`SOL007` Forge artifacts tested |
+| Verification | 84 Python tests; offline M2 and versioned M3 corpora, benchmark, inspection, and `SOL005`/`SOL007` Forge artifacts tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -156,6 +156,13 @@ stop after a reverted step, and inspect executed/succeeded counts plus a stable
 result digest. Target calls share the executor as their caller; distinct actors,
 block/time changes, token funding, and other protocol state transitions belong
 in a project-specific adapter.
+
+Generated sequence executors accept user-defined invariant adapters. The adapter
+returns a stable ID, pass/fail result, and detail bytes before the first call and
+after every executed step. The executor stores and emits the assertion ID, step,
+result, and detail hash, provides a Foundry-visible custom violation error, and
+treats an adapter revert as a failed check. This makes assertion output stable
+without pretending the scanner can infer a protocol's economic invariant.
 
 ## Analysis architecture
 
