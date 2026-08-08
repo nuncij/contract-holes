@@ -171,6 +171,14 @@ class ProjectInspector:
             for issue in self.project.signature.issues
             if issue.entry in selected
         ]
+        proxy_issues = [
+            self._proxy_issue_dict(issue)
+            for issue in self.project.proxy.issues
+            if (
+                issue.contract in set(self.selected_contracts)
+                or (issue.entry is not None and issue.entry in selected)
+            )
+        ]
         return {
             "schema_version": "1.0",
             "project_root": str(self.root),
@@ -192,6 +200,7 @@ class ProjectInspector:
                 "target_taint_issues": len(target_issues),
                 "authorization_issues": len(authorization_issues),
                 "signature_issues": len(signature_issues),
+                "proxy_issues": len(proxy_issues),
             },
             "project_index": {"sources": sources, "contracts": contracts},
             "inheritance": contracts,
@@ -204,6 +213,7 @@ class ProjectInspector:
             "target_taint": {"issues": target_issues},
             "authorization": {"issues": authorization_issues},
             "signature": {"issues": signature_issues},
+            "proxy": {"issues": proxy_issues},
         }
 
     def _matches_source(self, path: Path) -> bool:
@@ -439,6 +449,24 @@ class ProjectInspector:
             "action_function": analysis.function_name(issue.action.function),
             "hazards": list(issue.hazards),
             "missing_domain_components": list(issue.missing_domain_components),
+            "trace": trace,
+        }
+
+    def _proxy_issue_dict(self, issue) -> dict[str, object]:
+        analysis = self.project.proxy
+        trace: list[dict[str, object]] = []
+        for step in issue.trace:
+            item = analysis.event_dict(step)
+            if item.get("path") is not None:
+                item["path"] = self._path(Path(str(item["path"])))
+            trace.append(item)
+        return {
+            "issue_kind": issue.kind,
+            "contract": analysis.owner_name(issue.contract),
+            "entry_function": (
+                analysis.owner_name(issue.entry) if issue.entry is not None else None
+            ),
+            **issue.metadata,
             "trace": trace,
         }
 

@@ -18,6 +18,7 @@ It currently detects:
 | `SOL008` | High | User-controlled value reaches an external or `delegatecall` target |
 | `SOL009` | High | Externally reachable privileged state write lacks dominating authorization |
 | `SOL010` | High | Signature-authorized action lacks replay or validation protection |
+| `SOL011` | High | Proxy initialization or versioned storage layout is unsafe |
 
 These are review signals, not proofs. Findings include confidence and evidence;
 the scanner deliberately does not claim that a clean report means a contract is
@@ -72,8 +73,8 @@ holes inspect contracts/ --file Vault.sol --contract Vault --function withdraw
 The command emits deterministic JSON containing project-index summaries,
 inheritance, callable nodes, call edges, data-flow facts, guard recognition,
 reentrancy traces, target taint, authorization reachability, and signature
-recovery-to-action hazards. `--file`, `--contract`, and `--function` are
-repeatable;
+recovery-to-action hazards, and proxy-upgrade evidence. `--file`, `--contract`,
+and `--function` are repeatable;
 different filter types combine, while repeated values of one type are alternatives.
 File filters match source-path suffixes, contract names are exact, and functions
 accept either `withdraw` or `Vault.withdraw`.
@@ -151,8 +152,9 @@ externally controlled call destinations across aliases and internal helpers.
 pause, operator, treasury, and fee-control writes and requires preceding
 authorization. `SOL010` follows signature recovery through helpers to a
 state-changing action and checks replay consumption, expiry, domain separation,
-and zero-address recovery. The next task is `RULE-011`: proxy initializer and
-storage-layout hazards.
+and zero-address recovery. `SOL011` checks initializer guards, proxy storage
+feeding `delegatecall`, and explicit versioned storage prefixes. The next task
+is `RULE-012`: ERC-20 return-value and balance-delta assumptions.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization
@@ -164,6 +166,11 @@ timestamp checks, and EIP-712-style chain/contract domains. Custom signature
 libraries, invalidation schemes, cross-call digest provenance, and malleability
 policies can require manual review; pure recovery utilities without a subsequent
 action are intentionally not findings.
+
+`SOL011` also requires compiler mode. It recognizes common initializer and proxy
+patterns plus contract families named like `VaultV1`/`VaultV2`. Custom assembly
+slots, packed or structured storage, diamonds, and upgrade relationships that
+are not explicit in source naming need byte-accurate project-specific review.
 
 The complete suite uses Python's standard library:
 

@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.3.0`
 Current milestone: **M3 — High-value detectors (`0.4.0`)**
-Next: **RULE-011 — Proxy initializer and storage-layout hazards**
+Next: **RULE-012 — ERC-20 return value and balance-delta assumptions**
 
 ## Product goal
 
@@ -29,12 +29,12 @@ The scanner is successful when it:
 | Inputs | One or more Solidity files or directories |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
-| Rules | Ten registered rules, `SOL001` through `SOL010` |
+| Rules | Eleven registered rules, `SOL001` through `SOL011` |
 | Proofs | Runnable Foundry proof for `SOL007` |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
-| Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, and signature traces |
-| Verification | 64 Python tests; offline M2 and `SOL008`–`SOL010` corpora, benchmark, inspection, and Forge proof tested |
+| Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, and proxy-upgrade traces |
+| Verification | 68 Python tests; offline M2 and `SOL008`–`SOL011` corpora, benchmark, inspection, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -51,6 +51,7 @@ The scanner is successful when it:
 | `SOL008` controlled call target | Compiler-backed interprocedural taint | Does not yet prove allowlist dominance or persist taint through state across transactions |
 | `SOL009` exposed privileged write | Compiler-backed authorization reachability | Privileged-state names and branch dominance are conservative; custom protocol authorization may require review |
 | `SOL010` signature authorization | Compiler-backed recovery-to-action path | Protection and domain recognition are conservative; external library and cross-function digest provenance may require review |
+| `SOL011` proxy and upgrade safety | Compiler-backed initializer, delegatecall-storage, and versioned-layout evidence | Custom proxy standards and unnamed upgrade relationships require project-specific review |
 
 The project-wide index, inheritance layer, call graph, and data-flow engine now
 connect source units, inherited symbols, calls, reads, writes, aliases,
@@ -95,6 +96,20 @@ not arbitrary digest parameters across every call boundary. Signature libraries,
 custom invalidation schemes, unusual control flow, and cryptographic malleability
 policies require manual review.
 
+`SOL011` reports externally callable initializer paths that reach state without a
+recognized one-time guard, proxy-like contracts that combine ordinary mutable
+storage with `delegatecall`, and incompatible storage prefixes between explicit
+version pairs such as `VaultV1` and `VaultV2`. It follows initializer helpers,
+recognizes named and state-backed initialization guards, accepts unstructured
+proxy slots, and treats append-only inherited layouts as compatible.
+
+`SOL011` requires compiler mode. Initializer and proxy classification relies on
+common names, fallback behavior, and compiler-resolved state. Layout comparison
+is limited to explicitly versioned contract families and declaration/type
+prefixes; it does not replace byte-accurate storage-layout validation for packed
+fields, structs, custom assembly slots, diamonds, or externally deployed
+implementations. Those cases require manual review.
+
 ## Analysis architecture
 
 The intended pipeline is:
@@ -111,6 +126,7 @@ Solidity project
   -> interprocedural external-target taint               [M3: RULE-008 complete]
   -> authorization reachability and privileged writes   [M3: RULE-009 complete]
   -> signature recovery-to-action hazards               [M3: RULE-010 complete]
+  -> proxy initialization and layout hazards            [M3: RULE-011 complete]
   -> deterministic security rules
   -> structured findings with evidence paths
   -> filtered compiler-analysis inspection JSON

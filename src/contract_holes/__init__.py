@@ -6,6 +6,7 @@ from .callgraph import CallGraph
 from .dataflow import DataFlowAnalysis
 from .inheritance import InheritanceResolver
 from .project import ProjectIndex
+from .proxy import ProxyAnalysis
 from .reentrancy import ReentrancyAnalysis
 from .scanner import Scanner
 from .signature import SignatureAnalysis
@@ -19,6 +20,7 @@ __all__ = [
     "DataFlowAnalysis",
     "InheritanceResolver",
     "ProjectIndex",
+    "ProxyAnalysis",
     "ReentrancyAnalysis",
     "Scanner",
     "Severity",

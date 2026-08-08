@@ -199,6 +199,7 @@ class M2CorpusCompilerTests(unittest.TestCase):
                 "target_taint_issues": 0,
                 "authorization_issues": 0,
                 "signature_issues": 0,
+                "proxy_issues": 0,
             },
         )
         self.assertEqual(

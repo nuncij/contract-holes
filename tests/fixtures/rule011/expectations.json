@@ -1,0 +1,37 @@
+{
+  "schema_version": "1.0",
+  "rule_id": "SOL011",
+  "evidence": "compiler-proxy-upgrade-analysis",
+  "expected_findings": [
+    {
+      "contract": "UnsafeImplementation",
+      "issue_kind": "unguarded-initializer",
+      "entry_function": "UnsafeImplementation.initialize",
+      "trace_kinds": ["initializer-entry", "state-write"]
+    },
+    {
+      "contract": "UnsafeImplementation",
+      "issue_kind": "unguarded-initializer",
+      "entry_function": "UnsafeImplementation.setup",
+      "trace_kinds": ["initializer-entry", "call", "state-write"]
+    },
+    {
+      "contract": "UnsafeProxy",
+      "issue_kind": "proxy-storage-collision",
+      "entry_function": "UnsafeProxy.forward",
+      "trace_kinds": ["structured-storage", "delegatecall"]
+    },
+    {
+      "contract": "VaultUnsafeV2",
+      "issue_kind": "incompatible-upgrade-layout",
+      "entry_function": null,
+      "trace_kinds": ["previous-layout", "incompatible-layout"]
+    }
+  ],
+  "expected_clean": [
+    "CustomGuardedImplementation.setup",
+    "SafeImplementation.initialize",
+    "SafeProxy.forward",
+    "VaultSafeV2"
+  ]
+}

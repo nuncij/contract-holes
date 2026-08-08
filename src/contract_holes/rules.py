@@ -5,6 +5,7 @@ import re
 
 from .authorization import AuthorizationIssue
 from .models import Finding, RuleInfo, Severity
+from .proxy import ProxyIssue
 from .reentrancy import ReentrancyIssue
 from .signature import SignatureIssue
 from .source import FunctionRegion, SoliditySource
@@ -676,6 +677,89 @@ class SignatureAuthorizationHazardRule(Rule):
         return span.start if span is not None else None
 
 
+class ProxyUpgradeHazardRule(Rule):
+    info = RuleInfo(
+        rule_id="SOL011",
+        severity=Severity.HIGH,
+        title="Proxy initialization or storage layout is unsafe",
+        description=(
+            "A proxy-related path exposes repeatable initialization, structured proxy "
+            "storage to delegatecall collision, or an incompatible versioned layout."
+        ),
+        recommendation=(
+            "Use a one-time initializer, keep proxy control values in standardized "
+            "unstructured slots, and preserve the complete prior storage prefix when upgrading."
+        ),
+        confidence="medium",
+    )
+
+    def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if source.project_index is None:
+            return
+        analysis = source.project_index.proxy
+        current_path = source.path.resolve()
+        for issue in analysis.issues:
+            contract = source.project_index.node_for_key(issue.contract)
+            contract_source = (
+                source.project_index.source_for_node(contract)
+                if contract is not None
+                else None
+            )
+            if contract_source is None or contract_source.path.resolve() != current_path:
+                continue
+            anchor = self._finding_anchor(source, issue)
+            if anchor is None:
+                continue
+            message = self._message(analysis, issue)
+            finding = self.finding(
+                source,
+                anchor,
+                message=message,
+                metadata={
+                    "evidence": "compiler-proxy-upgrade-analysis",
+                    "issue_kind": issue.kind,
+                    "contract": analysis.owner_name(issue.contract),
+                    **issue.metadata,
+                    "trace": [analysis.event_dict(step) for step in issue.trace],
+                    "manual_review": (
+                        "Confirm the intended proxy standard, deployment initialization "
+                        "sequence, inherited storage, and upgrade relationship. Custom slots "
+                        "or version naming may require project-specific validation."
+                    ),
+                },
+            )
+            if finding:
+                yield finding
+
+    @staticmethod
+    def _message(analysis, issue: ProxyIssue) -> str:
+        contract = analysis.owner_name(issue.contract)
+        if issue.kind == "unguarded-initializer":
+            return (
+                f"Initializer {issue.metadata.get('initializer')} reaches state variable "
+                f"{issue.metadata.get('state_variable')!r} without a recognized one-time guard."
+            )
+        if issue.kind == "proxy-storage-collision":
+            return (
+                f"Proxy {contract} combines ordinary mutable storage with delegatecall, "
+                "creating a possible proxy/implementation slot collision."
+            )
+        return (
+            f"Versioned contract {issue.metadata.get('current_contract', contract)} changes "
+            f"the prior storage prefix at index {issue.metadata.get('mismatch_index')}."
+        )
+
+    @staticmethod
+    def _finding_anchor(source: SoliditySource, issue: ProxyIssue) -> int | None:
+        current_path = source.path.resolve()
+        if issue.sink.span is not None and issue.sink.span.path.resolve() == current_path:
+            return issue.sink.span.start
+        for step in issue.trace:
+            if step.span is not None and step.span.path.resolve() == current_path:
+                return step.span.start
+        return None
+
+
 def _walk_ast(
     node: dict[str, object], parent: dict[str, object] | None = None
 ) -> Iterable[tuple[dict[str, object], dict[str, object] | None]]:
@@ -732,4 +816,5 @@ DEFAULT_RULES: tuple[Rule, ...] = (
     UserControlledCallTargetRule(),
     ExposedPrivilegedStateRule(),
     SignatureAuthorizationHazardRule(),
+    ProxyUpgradeHazardRule(),
 )

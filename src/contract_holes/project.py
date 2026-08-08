@@ -108,6 +108,9 @@ class ProjectIndex:
         from .signature import SignatureAnalysis
 
         self.signature = SignatureAnalysis(self)
+        from .proxy import ProxyAnalysis
+
+        self.proxy = ProxyAnalysis(self)
         from .target_taint import CallTargetAnalysis
 
         self.target_taint = CallTargetAnalysis(self)
