@@ -1,0 +1,72 @@
+{
+  "$id": "urn:contract-holes:schema:report:1.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "baseline": {
+      "additionalProperties": true,
+      "properties": {
+        "existing": {"minimum": 0, "type": "integer"},
+        "new": {"minimum": 0, "type": "integer"},
+        "path": {"type": "string"},
+        "resolved": {"minimum": 0, "type": "integer"}
+      },
+      "required": ["path", "new", "existing", "resolved"],
+      "type": "object"
+    },
+    "files_scanned": {"minimum": 0, "type": "integer"},
+    "finding_count": {"minimum": 0, "type": "integer"},
+    "findings": {
+      "items": {"$ref": "#/$defs/finding"},
+      "type": "array"
+    },
+    "schema_version": {"const": "1.0", "type": "string"}
+  },
+  "required": ["schema_version", "files_scanned", "finding_count", "findings"],
+  "title": "Contract Holes report 1.0",
+  "type": "object",
+  "$defs": {
+    "finding": {
+      "additionalProperties": true,
+      "properties": {
+        "column": {"minimum": 1, "type": "integer"},
+        "confidence": {"enum": ["low", "medium", "high"], "type": "string"},
+        "end_line": {
+          "anyOf": [
+            {"minimum": 1, "type": "integer"},
+            {"type": "null"}
+          ]
+        },
+        "excerpt": {"type": "string"},
+        "fingerprint": {"pattern": "^[0-9a-f]{16}$", "type": "string"},
+        "line": {"minimum": 1, "type": "integer"},
+        "message": {"type": "string"},
+        "metadata": {"additionalProperties": true, "type": "object"},
+        "path": {"type": "string"},
+        "recommendation": {"type": "string"},
+        "rule_id": {"pattern": "^SOL[0-9]{3}$", "type": "string"},
+        "severity": {
+          "enum": ["info", "low", "medium", "high", "critical"],
+          "type": "string"
+        },
+        "title": {"type": "string"}
+      },
+      "required": [
+        "rule_id",
+        "severity",
+        "title",
+        "message",
+        "path",
+        "line",
+        "column",
+        "excerpt",
+        "recommendation",
+        "confidence",
+        "end_line",
+        "metadata",
+        "fingerprint"
+      ],
+      "type": "object"
+    }
+  }
+}

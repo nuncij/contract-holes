@@ -11,7 +11,7 @@ Current position: M0 through M5 are complete, including team configuration,
 baseline-aware CI, explicit resource limits, verified-source provenance, and
 evidence-bound AI annotations.
 
-Next: **SCHEMA-001**
+Next: **BENCH-002**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -184,8 +184,8 @@ counterexamples, and document conditions that require manual review.
 
 ## M6 — Audit-ready release (`1.0.0`)
 
-- [ ] **SCHEMA-001** — Freeze and document versioned JSON/SARIF compatibility — P0 — **NEXT**.
-- [ ] **BENCH-002** — Measure per-rule precision and recall on a versioned labelled corpus — P0.
+- [x] **SCHEMA-001** — Freeze and document versioned JSON/SARIF compatibility — P0 — **COMPLETE**.
+- [ ] **BENCH-002** — Measure per-rule precision and recall on a versioned labelled corpus — P0 — **NEXT**.
 - [ ] **COMPAT-001** — Publish supported Python, Solidity, EVM, and Foundry ranges — P0.
 - [ ] **SECURITY-001** — Add threat model, secure-use guidance, and disclosure policy — P0.
 - [ ] **DOCS-001** — Complete install, rule, CI, proof, and contributor documentation — P0.

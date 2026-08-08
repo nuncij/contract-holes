@@ -4,12 +4,11 @@ import hashlib
 import json
 import math
 from pathlib import Path
-import re
 from typing import Callable
 from urllib.error import HTTPError, URLError
 from urllib.request import Request, urlopen
 
-from .models import Severity
+from .schema import SchemaValidationError, validate_report_payload
 
 
 OPENAI_RESPONSES_ENDPOINT = "https://api.openai.com/v1/responses"
@@ -17,8 +16,6 @@ MAX_REPORT_BYTES = 2 * 1024 * 1024
 MAX_RESPONSE_BYTES = 4 * 1024 * 1024
 MAX_FINDINGS = 200
 MAX_AI_GROUPS = 50
-FINGERPRINT_PATTERN = re.compile(r"[0-9a-f]{16}\Z")
-RULE_PATTERN = re.compile(r"SOL[0-9]{3}\Z")
 
 
 class AITriageError(RuntimeError):
@@ -239,72 +236,14 @@ def _load_report(path: Path | str) -> tuple[dict[str, object], str]:
         payload = json.loads(raw.decode("utf-8"))
     except (UnicodeError, json.JSONDecodeError) as exc:
         raise AITriageError(f"scanner report is not valid JSON: {source}") from exc
-    if not isinstance(payload, dict) or payload.get("schema_version") != "1.0":
-        raise AITriageError("scanner report must use schema_version 1.0")
+    try:
+        validate_report_payload(payload)
+    except SchemaValidationError as exc:
+        raise AITriageError(f"invalid scanner report: {exc}") from exc
     findings = payload.get("findings")
-    if not isinstance(findings, list):
-        raise AITriageError("scanner report findings must be an array")
     if len(findings) > MAX_FINDINGS:
         raise AITriageError(f"scanner report contains more than {MAX_FINDINGS} findings")
-    finding_count = payload.get("finding_count")
-    if (
-        isinstance(finding_count, bool)
-        or not isinstance(finding_count, int)
-        or finding_count != len(findings)
-    ):
-        raise AITriageError("scanner report finding_count does not match findings")
-    seen: set[str] = set()
-    for index, finding in enumerate(findings):
-        _validate_finding(finding, index)
-        fingerprint = str(finding["fingerprint"])
-        if fingerprint in seen:
-            raise AITriageError(f"duplicate finding fingerprint: {fingerprint}")
-        seen.add(fingerprint)
     return payload, hashlib.sha256(raw).hexdigest()
-
-
-def _validate_finding(finding: object, index: int) -> None:
-    if not isinstance(finding, dict):
-        raise AITriageError(f"findings[{index}] must be an object")
-    string_fields = (
-        "fingerprint",
-        "rule_id",
-        "severity",
-        "title",
-        "message",
-        "path",
-        "excerpt",
-        "recommendation",
-        "confidence",
-    )
-    for name in string_fields:
-        if not isinstance(finding.get(name), str):
-            raise AITriageError(f"findings[{index}].{name} must be a string")
-    for name in ("line", "column"):
-        value = finding.get(name)
-        if isinstance(value, bool) or not isinstance(value, int) or value < 1:
-            raise AITriageError(f"findings[{index}].{name} must be a positive integer")
-    if not RULE_PATTERN.fullmatch(str(finding["rule_id"])):
-        raise AITriageError(f"findings[{index}].rule_id is invalid")
-    try:
-        Severity.parse(str(finding["severity"]))
-    except ValueError as exc:
-        raise AITriageError(f"findings[{index}].severity is invalid") from exc
-    fingerprint = str(finding["fingerprint"])
-    if not FINGERPRINT_PATTERN.fullmatch(fingerprint):
-        raise AITriageError(f"findings[{index}].fingerprint is invalid")
-    material = (
-        f"{finding['rule_id']}\0{finding['path']}\0{finding['line']}\0"
-        f"{str(finding['excerpt']).strip()}"
-    )
-    expected = hashlib.sha256(material.encode("utf-8")).hexdigest()[:16]
-    if fingerprint != expected:
-        raise AITriageError(
-            f"findings[{index}].fingerprint does not match deterministic evidence"
-        )
-    metadata = finding.get("metadata", {})
-    if not isinstance(metadata, dict):
-        raise AITriageError(f"findings[{index}].metadata must be an object")
 
 
 def _scope(finding: dict[str, object]) -> str:

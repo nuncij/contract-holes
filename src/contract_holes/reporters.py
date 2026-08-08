@@ -4,6 +4,15 @@ import json
 from pathlib import Path
 
 from .models import Finding, RuleInfo, Severity
+from .schema import (
+    REPORT_SCHEMA_VERSION,
+    SARIF_LEVELS,
+    SARIF_SCHEMA_URI,
+    SARIF_SECURITY_SEVERITY,
+    SARIF_VERSION,
+    validate_report_payload,
+    validate_sarif_payload,
+)
 
 
 COLORS = {
@@ -58,37 +67,34 @@ def json_report(
     baseline: dict[str, object] | None = None,
 ) -> str:
     payload = {
-        "schema_version": "1.0",
+        "schema_version": REPORT_SCHEMA_VERSION,
         "files_scanned": files_scanned,
         "finding_count": len(findings),
         "findings": [finding.to_dict() for finding in findings],
         **({"baseline": baseline} if baseline is not None else {}),
     }
+    validate_report_payload(payload)
     return json.dumps(payload, indent=2, sort_keys=True)
 
 
 def sarif_report(findings: list[Finding], rule_infos: list[RuleInfo]) -> str:
-    levels = {
-        Severity.CRITICAL: "error",
-        Severity.HIGH: "error",
-        Severity.MEDIUM: "warning",
-        Severity.LOW: "note",
-        Severity.INFO: "note",
-    }
     rules = [
         {
             "id": info.rule_id,
             "name": info.title,
             "shortDescription": {"text": info.description},
             "help": {"text": info.recommendation},
-            "properties": {"security-severity": str(info.severity), "confidence": info.confidence},
+            "properties": {
+                "security-severity": SARIF_SECURITY_SEVERITY[info.severity],
+                "confidence": info.confidence,
+            },
         }
         for info in rule_infos
     ]
     results = [
         {
             "ruleId": finding.rule_id,
-            "level": levels[finding.severity],
+            "level": SARIF_LEVELS[finding.severity],
             "message": {"text": finding.message},
             "locations": [
                 {
@@ -104,16 +110,16 @@ def sarif_report(findings: list[Finding], rule_infos: list[RuleInfo]) -> str:
             ],
             "partialFingerprints": {"primaryLocationLineHash": finding.fingerprint},
             "properties": {
+                **finding.metadata,
                 "severity": str(finding.severity),
                 "confidence": finding.confidence,
-                **finding.metadata,
             },
         }
         for finding in findings
     ]
     payload = {
-        "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
-        "version": "2.1.0",
+        "$schema": SARIF_SCHEMA_URI,
+        "version": SARIF_VERSION,
         "runs": [
             {
                 "tool": {
@@ -126,6 +132,7 @@ def sarif_report(findings: list[Finding], rule_infos: list[RuleInfo]) -> str:
             }
         ],
     }
+    validate_sarif_payload(payload)
     return json.dumps(payload, indent=2, sort_keys=True)
 
 

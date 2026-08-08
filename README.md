@@ -62,6 +62,11 @@ holes contracts/ --format sarif > holes.sarif
 holes contracts/ --minimum-severity medium --fail-on high
 ```
 
+JSON reports use the frozen Contract Holes `1.0` schema. SARIF follows version
+2.1.0 plus a documented producer profile, with stable severity mapping and the
+same finding fingerprint as JSON. Packaged schemas, fingerprint-v1 material, and
+consumer versioning rules are in [output compatibility](docs/OUTPUT_COMPATIBILITY.md).
+
 Add `--compile` to validate the project with Foundry and enable rules that need
 solc types and AST structure:
 

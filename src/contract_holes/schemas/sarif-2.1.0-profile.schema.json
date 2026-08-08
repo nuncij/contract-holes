@@ -1,0 +1,164 @@
+{
+  "$id": "urn:contract-holes:schema:sarif-profile:2.1.0",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "$schema": {
+      "const": "https://json.schemastore.org/sarif-2.1.0.json",
+      "type": "string"
+    },
+    "runs": {
+      "items": {"$ref": "#/$defs/run"},
+      "maxItems": 1,
+      "minItems": 1,
+      "type": "array"
+    },
+    "version": {"const": "2.1.0", "type": "string"}
+  },
+  "required": ["$schema", "version", "runs"],
+  "title": "Contract Holes SARIF 2.1.0 producer profile",
+  "type": "object",
+  "$defs": {
+    "driver": {
+      "additionalProperties": true,
+      "properties": {
+        "name": {"const": "contract-holes", "type": "string"},
+        "rules": {
+          "items": {"$ref": "#/$defs/rule"},
+          "type": "array"
+        }
+      },
+      "required": ["name", "rules"],
+      "type": "object"
+    },
+    "region": {
+      "additionalProperties": true,
+      "properties": {
+        "endLine": {"minimum": 1, "type": "integer"},
+        "startColumn": {"minimum": 1, "type": "integer"},
+        "startLine": {"minimum": 1, "type": "integer"}
+      },
+      "required": ["startLine", "startColumn"],
+      "type": "object"
+    },
+    "result": {
+      "additionalProperties": true,
+      "properties": {
+        "level": {"enum": ["error", "warning", "note"], "type": "string"},
+        "locations": {
+          "items": {
+            "additionalProperties": true,
+            "properties": {
+              "physicalLocation": {
+                "additionalProperties": true,
+                "properties": {
+                  "artifactLocation": {
+                    "additionalProperties": true,
+                    "properties": {"uri": {"type": "string"}},
+                    "required": ["uri"],
+                    "type": "object"
+                  },
+                  "region": {"$ref": "#/$defs/region"}
+                },
+                "required": ["artifactLocation", "region"],
+                "type": "object"
+              }
+            },
+            "required": ["physicalLocation"],
+            "type": "object"
+          },
+          "maxItems": 1,
+          "minItems": 1,
+          "type": "array"
+        },
+        "message": {
+          "additionalProperties": true,
+          "properties": {"text": {"type": "string"}},
+          "required": ["text"],
+          "type": "object"
+        },
+        "partialFingerprints": {
+          "additionalProperties": true,
+          "properties": {
+            "primaryLocationLineHash": {
+              "pattern": "^[0-9a-f]{16}$",
+              "type": "string"
+            }
+          },
+          "required": ["primaryLocationLineHash"],
+          "type": "object"
+        },
+        "properties": {
+          "additionalProperties": true,
+          "properties": {
+            "confidence": {"enum": ["low", "medium", "high"]},
+            "severity": {
+              "enum": ["info", "low", "medium", "high", "critical"]
+            }
+          },
+          "required": ["severity", "confidence"],
+          "type": "object"
+        },
+        "ruleId": {"pattern": "^SOL[0-9]{3}$", "type": "string"}
+      },
+      "required": [
+        "ruleId",
+        "level",
+        "message",
+        "locations",
+        "partialFingerprints",
+        "properties"
+      ],
+      "type": "object"
+    },
+    "rule": {
+      "additionalProperties": true,
+      "properties": {
+        "help": {
+          "additionalProperties": true,
+          "properties": {"text": {"type": "string"}},
+          "required": ["text"],
+          "type": "object"
+        },
+        "id": {"pattern": "^SOL[0-9]{3}$", "type": "string"},
+        "name": {"type": "string"},
+        "properties": {
+          "additionalProperties": true,
+          "properties": {
+            "confidence": {"enum": ["low", "medium", "high"]},
+            "security-severity": {
+              "enum": ["1.0", "3.0", "5.0", "8.0", "9.0"]
+            }
+          },
+          "required": ["security-severity", "confidence"],
+          "type": "object"
+        },
+        "shortDescription": {
+          "additionalProperties": true,
+          "properties": {"text": {"type": "string"}},
+          "required": ["text"],
+          "type": "object"
+        }
+      },
+      "required": ["id", "name", "shortDescription", "help", "properties"],
+      "type": "object"
+    },
+    "run": {
+      "additionalProperties": true,
+      "properties": {
+        "results": {
+          "items": {"$ref": "#/$defs/result"},
+          "type": "array"
+        },
+        "tool": {
+          "additionalProperties": true,
+          "properties": {"driver": {"$ref": "#/$defs/driver"}},
+          "required": ["driver"],
+          "type": "object"
+        }
+      },
+      "required": ["tool", "results"],
+      "type": "object"
+    }
+  }
+}
