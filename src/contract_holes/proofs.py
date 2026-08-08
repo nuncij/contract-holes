@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 import re
 
@@ -39,8 +40,11 @@ def generate_foundry_proofs(
         filename = _proof_filename(finding)
         destination = output_directory / filename
         manifest_destination = output_directory / _manifest_filename(filename)
-        artifacts[destination] = _proof_content(finding)
-        artifacts[manifest_destination] = _proof_manifest(finding, filename)
+        proof_content = _proof_content(finding)
+        artifacts[destination] = proof_content
+        artifacts[manifest_destination] = _proof_manifest(
+            finding, filename, proof_content
+        )
         if destination not in generated:
             generated.append(destination)
 
@@ -78,7 +82,9 @@ def _manifest_filename(proof_filename: str) -> str:
     return f"{stem}.proof.json"
 
 
-def _proof_manifest(finding: Finding, proof_filename: str) -> str:
+def _proof_manifest(
+    finding: Finding, proof_filename: str, proof_content: str
+) -> str:
     generated_tests = (
         [
             "test_SOL005_reentrancyPrimitive",
@@ -159,6 +165,7 @@ def _proof_manifest(finding: Finding, proof_filename: str) -> str:
         "artifact_version": "1.0",
         "artifact_kind": artifact_kind,
         "proof_source": proof_filename,
+        "proof_sha256": hashlib.sha256(proof_content.encode("utf-8")).hexdigest(),
         "finding": {
             "rule_id": finding.rule_id,
             "fingerprint": finding.fingerprint,

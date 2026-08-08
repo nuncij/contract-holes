@@ -41,6 +41,7 @@ against the real target. For `SOL005`, its initial status is
   "artifact_version": "1.0",
   "artifact_kind": "reentrancy-probe-sequence-invariant",
   "proof_source": "Vault_SOL005_18_<fingerprint>.t.sol",
+  "proof_sha256": "<sha256>",
   "finding": {
     "rule_id": "SOL005",
     "fingerprint": "<fingerprint>",
@@ -60,6 +61,22 @@ against the real target. For `SOL005`, its initial status is
   }
 }
 ```
+
+## Isolated execution
+
+Run every bundle in a directory with:
+
+```bash
+holes proofs test/holes --timeout 60
+```
+
+The runner rejects a changed source hash, unsupported schema, missing source, or
+unsafe source path. Each artifact is copied into a separate temporary Foundry
+project and compiled with the manifest's solc version. Offline mode is the
+default; `--allow-downloads` is explicit. The JSON result distinguishes proof
+failure, timeout, unsupported requirements, and runner configuration errors.
+Foundry and RPC environment overrides are removed, and the input directory is
+not used for cache or build output.
 
 Do not commit RPC credentials in a manifest. Store a non-secret environment
 variable name or local runner configuration when fork execution is added. Pin a

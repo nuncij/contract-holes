@@ -1,9 +1,9 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-08  
-Current release: `0.4.0`
-Current milestone: **M4 — Dynamic verification (`0.5.0`)**
-Next: **RUNNER-001 — Isolated proof execution with timeouts**
+Current release: `0.5.0`
+Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
+Next: **CONFIG-001 — Project-level `.holes.toml` settings**
 
 ## Product goal
 
@@ -25,16 +25,16 @@ The scanner is successful when it:
 | Area | Current state |
 | --- | --- |
 | Repository | Local Git repository on `main`, with task-scoped implementation commits |
-| Release | `0.4.0` |
+| Release | `0.5.0` |
 | Inputs | One or more Solidity files or directories |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
 | Rules | Thirteen registered rules, `SOL001` through `SOL013` |
-| Proofs | Runnable Foundry proof for `SOL007`; standalone model and configurable callback probe for compiler-backed `SOL005` |
+| Proofs | Runnable `SOL007` proof; `SOL005` probe, sequence fuzzing, invariants, requirement manifests, and isolated runner |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
-| Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
+| Workflow | Severity/CI policy, suppressions, inspection, benchmarks, and timeout-bounded proof execution |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 86 Python tests; offline M2 and versioned M3 corpora, benchmark, inspection, and `SOL005`/`SOL007` Forge artifacts tested |
+| Verification | 94 Python tests; offline M2/M3 corpora, benchmark, inspection, and isolated `SOL005`/`SOL007` Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -172,6 +172,12 @@ state, funding, actor, calldata, and invariant inputs explicitly unknown until a
 reviewer configures them. Modified sources or manifests are never overwritten.
 The format is documented in [PROOF_REQUIREMENTS.md](PROOF_REQUIREMENTS.md).
 
+The `holes proofs` runner validates manifest/source hashes and executes each
+runnable bundle in its own temporary Foundry project. It uses the recorded solc
+version, defaults to offline compilation, removes inherited Foundry/RPC settings,
+enforces a per-artifact timeout, redacts temporary paths, and returns structured
+pass/fail/timeout/unsupported JSON. The input proof directory remains unchanged.
+
 ## Analysis architecture
 
 The intended pipeline is:
@@ -211,8 +217,8 @@ back after the user explicitly requests compilation.
 | M1 — Compiler evidence | `0.2.0` | Complete | Isolated solc AST loading, AST-backed calls, `SOL007`, first Foundry proof |
 | M2 — Cross-contract analysis | `0.3.0` | Complete | Cross-contract facts, reentrancy traces, corpus, inspection, and benchmark |
 | M3 — High-value detectors | `0.4.0` | Complete | Access control, call-target taint, signatures, proxies/upgrades, token assumptions, market integrity |
-| M4 — Dynamic verification | `0.5.0` | **Current** | Reentrancy probes, transaction-sequence fuzzing, protocol invariants |
-| M5 — Team and CI workflow | `0.6.0` | Planned | Configuration, baselines, rule catalog, CI integration, performance controls |
+| M4 — Dynamic verification | `0.5.0` | Complete | Reentrancy probes, transaction-sequence fuzzing, protocol invariants, isolated runner |
+| M5 — Team and CI workflow | `0.6.0` | **Current** | Configuration, baselines, rule catalog, CI integration, performance controls |
 | M6 — Audit-ready release | `1.0.0` | Planned | Benchmarked accuracy, stable schemas, compatibility policy, security docs |
 
 ### M2 — Cross-contract analysis (`0.3.0`)

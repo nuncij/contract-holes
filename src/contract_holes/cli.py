@@ -11,6 +11,11 @@ from .benchmark import BenchmarkError, benchmark_exit_status, benchmark_paths
 from .inspector import InspectionError, InspectionFilters, inspect_paths
 from .models import Severity
 from .proofs import ProofGenerationError, generate_foundry_proofs
+from .proof_runner import (
+    ProofRunnerError,
+    proof_runner_exit_status,
+    run_foundry_proofs,
+)
 from .reporters import json_report, sarif_report, text_report
 from .scanner import ScanError, Scanner
 
@@ -21,7 +26,8 @@ def parser() -> argparse.ArgumentParser:
         description="Scan Solidity contracts for evidence of security vulnerabilities.",
         epilog=(
             "Use 'holes inspect PATH ...' for analysis JSON or "
-            "'holes benchmark PATH ...' for repeatable metrics."
+            "'holes benchmark PATH ...' for repeatable metrics. Run generated "
+            "bundles with 'holes proofs DIRECTORY'."
         ),
     )
     result.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
@@ -141,12 +147,35 @@ def benchmark_parser() -> argparse.ArgumentParser:
     return result
 
 
+def proof_runner_parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(
+        prog="holes proofs",
+        description="Run generated proof bundles in isolated Foundry projects.",
+    )
+    result.add_argument("directory", help="directory containing .proof.json bundles")
+    result.add_argument(
+        "--timeout",
+        type=float,
+        default=60.0,
+        metavar="SECONDS",
+        help="maximum runtime per artifact (default: 60)",
+    )
+    result.add_argument(
+        "--allow-downloads",
+        action="store_true",
+        help="allow Foundry to download a missing compiler (offline by default)",
+    )
+    return result
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments and arguments[0] == "inspect":
         return _inspect_main(arguments[1:])
     if arguments and arguments[0] == "benchmark":
         return _benchmark_main(arguments[1:])
+    if arguments and arguments[0] == "proofs":
+        return _proof_runner_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
     if args.offline and not args.compile:
@@ -238,3 +267,19 @@ def _benchmark_main(argv: Sequence[str]) -> int:
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))
     return benchmark_exit_status(payload)
+
+
+def _proof_runner_main(argv: Sequence[str]) -> int:
+    argument_parser = proof_runner_parser()
+    args = argument_parser.parse_args(argv)
+    try:
+        payload = run_foundry_proofs(
+            args.directory,
+            timeout_seconds=args.timeout,
+            allow_downloads=args.allow_downloads,
+        )
+    except ProofRunnerError as exc:
+        print(f"holes proofs: error: {exc}", file=sys.stderr)
+        return 2
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return proof_runner_exit_status(payload)

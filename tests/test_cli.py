@@ -9,6 +9,7 @@ from contract_holes.cli import main
 from contract_holes.benchmark import BenchmarkError
 from contract_holes.inspector import InspectionError, InspectionFilters
 from contract_holes.models import Finding, Severity
+from contract_holes.proof_runner import ProofRunnerError
 
 
 class CliTests(unittest.TestCase):
@@ -75,6 +76,48 @@ class CliTests(unittest.TestCase):
         self.assertEqual(status, 0)
         generate.assert_called_once_with([finding], Path("proofs"))
         self.assertIn("wrote 1 Foundry proof test", errors.getvalue())
+
+    def test_proofs_command_forwards_limits_and_returns_runner_status(self) -> None:
+        output = io.StringIO()
+        payload = {"schema_version": "1.0", "summary": {"all_passed": False}}
+        with (
+            patch(
+                "contract_holes.cli.run_foundry_proofs",
+                return_value=payload,
+            ) as run,
+            contextlib.redirect_stdout(output),
+        ):
+            status = main(
+                [
+                    "proofs",
+                    "proofs-dir",
+                    "--timeout",
+                    "12.5",
+                    "--allow-downloads",
+                ]
+            )
+
+        self.assertEqual(status, 1)
+        self.assertEqual(json.loads(output.getvalue()), payload)
+        run.assert_called_once_with(
+            "proofs-dir",
+            timeout_seconds=12.5,
+            allow_downloads=True,
+        )
+
+    def test_proofs_command_reports_runner_configuration_errors(self) -> None:
+        errors = io.StringIO()
+        with (
+            patch(
+                "contract_holes.cli.run_foundry_proofs",
+                side_effect=ProofRunnerError("bad manifest"),
+            ),
+            contextlib.redirect_stderr(errors),
+        ):
+            status = main(["proofs", "proofs-dir"])
+
+        self.assertEqual(status, 2)
+        self.assertIn("holes proofs: error: bad manifest", errors.getvalue())
 
     def test_inspect_command_emits_json_and_forwards_filters(self) -> None:
         output = io.StringIO()

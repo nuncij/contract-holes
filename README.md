@@ -114,7 +114,7 @@ that reproduces the underlying vulnerability primitive:
 
 ```bash
 holes contracts/ --compile --generate-proofs test/holes
-forge test --match-path 'test/holes/*.t.sol'
+holes proofs test/holes --timeout 60
 ```
 
 Automatic artifacts cover `SOL007` and compiler-backed `SOL005` findings.
@@ -134,6 +134,13 @@ fork, constructor, funding, actor, calldata, and invariant setup stays `null`
 and `configuration-required`; the generator does not guess it. See the
 [proof requirements guide](docs/PROOF_REQUIREMENTS.md) for the schema and
 handoff workflow.
+
+`holes proofs` validates each source hash, creates one temporary Foundry project
+per artifact, uses the manifest's compiler in offline mode by default, enforces
+the per-artifact timeout, and emits JSON with pass, fail, timeout, or unsupported
+status. It does not create Foundry cache or output files in the proof directory.
+Use `--allow-downloads` only when the pinned compiler is missing and network use
+is acceptable.
 
 The `SOL005` artifact also contains a bounded transaction-sequence executor and
 a dependency-free Foundry `testFuzz` entrypoint. A project test can provide up to
@@ -174,7 +181,7 @@ Project status and future work are tracked explicitly:
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
 
-The project is currently at `0.4.0`. M0 through M3 are complete. The compiler
+The project is currently at `0.5.0`. M0 through M4 are complete. The compiler
 index, inheritance resolver, call graph, reusable data-flow facts,
 interprocedural `SOL005` analysis, versioned multi-file corpus, deterministic
 inspection JSON, and repeatable benchmark are complete. `SOL008` traces
@@ -191,7 +198,7 @@ minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
 complete, including user-supplied per-step invariants. The next task is
-`RUNNER-001`, isolated proof execution with timeouts.
+`CONFIG-001`, project-level `.holes.toml` settings.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

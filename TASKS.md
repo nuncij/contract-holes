@@ -3,14 +3,14 @@
 This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
 Keep one task marked **NEXT** and at most one task marked **IN PROGRESS**.
 
-Current release: `0.4.0`
+Current release: `0.5.0`
 
-Current milestone: **M4 — Dynamic verification (`0.5.0`)**
+Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
 
-Current position: M0 through M3 are complete, including the versioned `m3-1`
-positive and safe corpus.
+Current position: M0 through M4 are complete, including isolated execution of
+generated proofs, fuzz sequences, and user-supplied invariants.
 
-Next: **RUNNER-001**
+Next: **CONFIG-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -169,11 +169,11 @@ counterexamples, and document conditions that require manual review.
 - [x] **FUZZ-001** — Generate calldata-driven Foundry transaction sequences — P0 — **COMPLETE**.
 - [x] **INVARIANT-001** — Define user-supplied protocol invariants and assertion output — P0 — **COMPLETE**.
 - [x] **PROOF-003** — Record compiler, chain/fork, constructor, and setup requirements — P1 — **COMPLETE**.
-- [ ] **RUNNER-001** — Execute proofs in isolated Foundry directories with timeouts — P0 — **NEXT**.
+- [x] **RUNNER-001** — Execute proofs in isolated Foundry directories with timeouts — P0 — **COMPLETE**.
 
 ## M5 — Team and CI workflow (`0.6.0`)
 
-- [ ] **CONFIG-001** — Add `.holes.toml` with rule, path, severity, and compiler settings — P0.
+- [ ] **CONFIG-001** — Add `.holes.toml` with rule, path, severity, and compiler settings — P0 — **NEXT**.
 - [ ] **BASELINE-001** — Compare fingerprints and fail CI only on new findings — P0.
 - [ ] **CATALOG-001** — Add `holes rules` with examples and remediation references — P1.
 - [ ] **CI-001** — Publish a reusable SARIF/CI workflow example — P1.

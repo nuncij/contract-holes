@@ -141,6 +141,7 @@ solc_version = "0.8.25"
 
             reentrancy = by_rule["SOL005"]
             self.assertEqual(reentrancy["schema_version"], "1.0")
+            self.assertEqual(len(reentrancy["proof_sha256"]), 64)
             self.assertEqual(
                 reentrancy["profiles"]["generated_tests"]["compiler"],
                 {
