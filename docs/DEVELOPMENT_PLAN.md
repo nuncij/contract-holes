@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.2.0`  
 Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**  
-Next task: **AST-001 — Project-wide compiler index**
+Next task: **AST-002 — Inheritance and symbol resolution**
 
 ## Product goal
 
@@ -33,7 +33,8 @@ The scanner is successful when it:
 | Proofs | Runnable Foundry proof for `SOL007` |
 | Output | Terminal text, JSON, and SARIF 2.1.0 |
 | Workflow | Severity filtering, CI exit thresholds, suppressions, dependency exclusions |
-| Verification | 22 Python tests; real solc compilation and generated Forge proof tested |
+| Project model | Shared, compilation-namespaced source/node/declaration index with reference lookup |
+| Verification | 27 Python tests; real multi-source solc indexing and generated Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -48,9 +49,9 @@ The scanner is successful when it:
 | `SOL006` weak randomness | Source heuristic | Does not trace the random value to a value-bearing decision |
 | `SOL007` packed hash collision | Compiler evidence plus primitive proof | Does not trace the hash to authorization, signatures, or identifiers |
 
-The largest architectural gap is that every file is still scanned mostly in
-isolation. The next milestone creates a project-wide model for inheritance,
-references, calls, and data flow.
+The project-wide compiler index now connects source units and declarations.
+The largest remaining gap is semantic resolution: inherited state, overrides,
+modifiers, calls, and data flow are not yet projected into reusable facts.
 
 ## Analysis architecture
 
@@ -60,7 +61,8 @@ The intended pipeline is:
 Solidity project
   -> source discovery and masking
   -> optional Foundry/solc compilation
-  -> project index (AST IDs, inheritance, symbols)       [M2: next]
+  -> project index (source units, AST IDs, references)   [M2: complete]
+  -> inheritance and symbol resolution                   [M2: next]
   -> call graph and data-flow facts                      [M2]
   -> deterministic security rules
   -> structured findings with evidence paths
@@ -155,4 +157,3 @@ and deterministic output across repeated scans of the same revision.
 - A task is complete only when its acceptance criteria, tests, and documentation
   are complete in the same commit.
 - Update [TASKS.md](../TASKS.md) whenever work starts, finishes, or changes scope.
-

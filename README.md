@@ -94,9 +94,10 @@ Project status and future work are tracked explicitly:
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
 
-The project is currently at `0.2.0`. M0 and M1 are complete; M2 has not started.
-The next task is `AST-001`, a project-wide compiler index needed for inheritance,
-call-graph, and data-flow analysis.
+The project is currently at `0.2.0`. M0 and M1 are complete; M2 is underway.
+The project-wide compiler index (`AST-001`) is complete. The next task is
+`AST-002`: inheritance and symbol resolution for state, modifiers, overrides,
+and `super` calls.
 
 The complete suite uses Python's standard library:
 

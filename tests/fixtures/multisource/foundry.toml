@@ -1,0 +1,6 @@
+[profile.default]
+src = "src"
+libs = ["lib"]
+remappings = ["example/=lib/example/src/"]
+solc_version = "0.8.25"
+

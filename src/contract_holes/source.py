@@ -3,6 +3,10 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import re
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .project import ProjectIndex
 
 
 FUNCTION_RE = re.compile(
@@ -106,11 +110,20 @@ class FunctionRegion:
 
 
 class SoliditySource:
-    def __init__(self, path: Path, text: str, ast: dict[str, object] | None = None):
+    def __init__(
+        self,
+        path: Path,
+        text: str,
+        ast: dict[str, object] | None = None,
+        project_index: "ProjectIndex | None" = None,
+        compilation_id: str | None = None,
+    ):
         self.path = path
         self.text = text
         self.masked = mask_comments_and_strings(text)
         self.ast = ast
+        self.project_index = project_index
+        self.compilation_id = compilation_id
         self._line_starts = [0]
         self._line_starts.extend(index + 1 for index, char in enumerate(text) if char == "\n")
         self._byte_boundaries = _byte_boundaries(text) if ast else ()

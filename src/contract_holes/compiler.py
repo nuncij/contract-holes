@@ -22,10 +22,42 @@ class CompilerDiagnostic:
 
 
 @dataclass(frozen=True, slots=True)
+class CompiledSource:
+    path: Path
+    source_id: int
+    compilation_id: str
+    ast: dict[str, object]
+    content: str | None = None
+
+
+@dataclass(frozen=True, slots=True)
 class CompilationResult:
-    asts: dict[Path, dict[str, object]]
+    sources: tuple[CompiledSource, ...]
     compiler_versions: tuple[str, ...]
     diagnostics: tuple[CompilerDiagnostic, ...]
+
+    @property
+    def asts(self) -> dict[Path, dict[str, object]]:
+        """Compatibility view for callers that only need one AST per path."""
+        result: dict[Path, dict[str, object]] = {}
+        for source in self.sources:
+            result.setdefault(source.path, source.ast)
+        return result
+
+    @property
+    def source_ids(self) -> dict[Path, int]:
+        result: dict[Path, int] = {}
+        for source in self.sources:
+            result.setdefault(source.path, source.source_id)
+        return result
+
+    @property
+    def source_contents(self) -> dict[Path, str]:
+        result: dict[Path, str] = {}
+        for source in self.sources:
+            if source.content is not None:
+                result.setdefault(source.path, source.content)
+        return result
 
 
 class ForgeCompiler:
@@ -48,7 +80,7 @@ class ForgeCompiler:
                 "Foundry is required for --compile, but 'forge' was not found on PATH"
             )
         if not files:
-            return CompilationResult({}, (), ())
+            return CompilationResult((), (), ())
 
         root = (project_root or find_project_root(files)).resolve()
         targets = [_target_argument(path.resolve(), root) for path in files]
@@ -97,12 +129,9 @@ class ForgeCompiler:
 
 def find_project_root(files: list[Path]) -> Path:
     resolved = [path.resolve() for path in files]
-    cwd = Path.cwd().resolve()
-    if all(_is_relative_to(path, cwd) for path in resolved):
-        starting_point = cwd
-    else:
-        common = Path(os.path.commonpath([str(path.parent) for path in resolved]))
-        starting_point = common
+    starting_point = Path(
+        os.path.commonpath([str(path.parent) for path in resolved])
+    )
 
     for candidate in (starting_point, *starting_point.parents):
         if (candidate / "foundry.toml").is_file() or (candidate / ".git").exists():
@@ -118,7 +147,7 @@ def _target_argument(path: Path, root: Path) -> str:
 
 
 def _load_build_info(directory: Path, root: Path) -> CompilationResult:
-    asts: dict[Path, dict[str, object]] = {}
+    compiled_sources: list[CompiledSource] = []
     versions: set[str] = set()
     diagnostics: list[CompilerDiagnostic] = []
     build_info_files = sorted(directory.glob("*.json"))
@@ -133,6 +162,13 @@ def _load_build_info(directory: Path, root: Path) -> CompilationResult:
         version = payload.get("solcLongVersion") or payload.get("solcVersion")
         if isinstance(version, str):
             versions.add(version)
+        compilation_id = payload.get("id")
+        if not isinstance(compilation_id, str) or not compilation_id:
+            compilation_id = path.stem
+        input_payload = payload.get("input", {})
+        input_sources = (
+            input_payload.get("sources", {}) if isinstance(input_payload, dict) else {}
+        )
         output = payload.get("output", {})
         if not isinstance(output, dict):
             continue
@@ -143,19 +179,68 @@ def _load_build_info(directory: Path, root: Path) -> CompilationResult:
                     continue
                 ast = source_output.get("ast")
                 if isinstance(ast, dict):
-                    source_path = Path(source_name)
-                    if not source_path.is_absolute():
-                        source_path = root / source_path
-                    asts[source_path.resolve()] = ast
+                    source_path = _source_path(source_name, root)
+                    source_id = source_output.get("id")
+                    if not isinstance(source_id, int):
+                        source_id = _source_id_from_ast(ast)
+                    if source_id is None:
+                        raise CompilerError(
+                            f"compiler source {source_name!r} has no numeric source ID"
+                        )
+                    content = _literal_source_content(input_sources, source_name)
+                    compiled_sources.append(
+                        CompiledSource(
+                            path=source_path,
+                            source_id=source_id,
+                            compilation_id=compilation_id,
+                            ast=ast,
+                            content=content,
+                        )
+                    )
         errors = output.get("errors", [])
         if isinstance(errors, list):
             diagnostics.extend(_diagnostic(item) for item in errors if isinstance(item, dict))
 
     return CompilationResult(
-        asts=asts,
+        sources=tuple(
+            sorted(
+                compiled_sources,
+                key=lambda item: (item.compilation_id, str(item.path), item.source_id),
+            )
+        ),
         compiler_versions=tuple(sorted(versions)),
         diagnostics=tuple(diagnostics),
     )
+
+
+def _source_path(source_name: str, root: Path) -> Path:
+    source_path = Path(source_name)
+    if not source_path.is_absolute():
+        source_path = root / source_path
+    return source_path.resolve()
+
+
+def _source_id_from_ast(ast: dict[str, object]) -> int | None:
+    value = ast.get("src")
+    if not isinstance(value, str):
+        return None
+    pieces = value.split(":", 2)
+    if len(pieces) != 3:
+        return None
+    try:
+        return int(pieces[2])
+    except ValueError:
+        return None
+
+
+def _literal_source_content(input_sources: object, source_name: str) -> str | None:
+    if not isinstance(input_sources, dict):
+        return None
+    source_input = input_sources.get(source_name)
+    if not isinstance(source_input, dict):
+        return None
+    content = source_input.get("content")
+    return content if isinstance(content, str) else None
 
 
 def _diagnostic(payload: dict[str, object]) -> CompilerDiagnostic:
@@ -175,12 +260,4 @@ def _process_error(stdout: str, stderr: str) -> str:
         return "unknown compiler error"
     lines = detail.splitlines()
     return "\n".join(lines[-40:])
-
-
-def _is_relative_to(path: Path, parent: Path) -> bool:
-    try:
-        path.relative_to(parent)
-        return True
-    except ValueError:
-        return False
 

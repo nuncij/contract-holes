@@ -5,7 +5,7 @@ import tempfile
 import unittest
 from unittest.mock import patch
 
-from contract_holes.compiler import CompilerError, ForgeCompiler
+from contract_holes.compiler import CompilerError, ForgeCompiler, find_project_root
 
 
 class CompilerTests(unittest.TestCase):
@@ -19,11 +19,21 @@ class CompilerTests(unittest.TestCase):
                 build_info = Path(command[command.index("--build-info-path") + 1])
                 build_info.mkdir(parents=True)
                 payload = {
+                    "id": "build-a",
                     "solcLongVersion": "0.8.25+commit.fake",
+                    "input": {
+                        "sources": {"Example.sol": {"content": "contract Example {}"}}
+                    },
                     "output": {
                         "sources": {
                             "Example.sol": {
-                                "ast": {"nodeType": "SourceUnit", "nodes": []}
+                                "id": 0,
+                                "ast": {
+                                    "nodeType": "SourceUnit",
+                                    "id": 1,
+                                    "src": "0:19:0",
+                                    "nodes": [],
+                                },
                             }
                         },
                         "errors": [
@@ -45,6 +55,9 @@ class CompilerTests(unittest.TestCase):
                 result = ForgeCompiler().compile([source], project_root=root, offline=True)
 
             self.assertIn(source.resolve(), result.asts)
+            self.assertEqual(result.sources[0].source_id, 0)
+            self.assertEqual(result.sources[0].compilation_id, "build-a")
+            self.assertEqual(result.source_contents[source.resolve()], "contract Example {}")
             self.assertEqual(result.compiler_versions, ("0.8.25+commit.fake",))
             self.assertEqual(result.diagnostics[0].error_code, "9302")
             command = run.call_args.args[0]
@@ -64,6 +77,16 @@ class CompilerTests(unittest.TestCase):
         ):
             with self.assertRaisesRegex(CompilerError, "ParserError: broken source"):
                 ForgeCompiler().compile([Path("Example.sol")], project_root=Path.cwd())
+
+    def test_nested_foundry_project_wins_over_parent_git_repository(self) -> None:
+        with tempfile.TemporaryDirectory(dir=Path.cwd()) as directory:
+            root = Path(directory)
+            (root / "foundry.toml").write_text("[profile.default]\n", encoding="utf-8")
+            (root / "src").mkdir()
+            source = root / "src" / "Nested.sol"
+            source.write_text("contract Nested {}", encoding="utf-8")
+
+            self.assertEqual(find_project_root([source]), root.resolve())
 
 
 if __name__ == "__main__":

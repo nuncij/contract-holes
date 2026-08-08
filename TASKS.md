@@ -3,10 +3,13 @@
 This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
 Keep one task marked **NEXT** and at most one task marked **IN PROGRESS**.
 
-Current release: `0.2.0`  
-Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**  
-Current position: M0 and M1 are complete; M2 has not started.  
-Next task: **AST-001**
+Current release: `0.2.0`
+
+Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**
+
+Current position: M0 and M1 are complete; M2 implementation is underway.
+
+Next task: **AST-002**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -31,7 +34,7 @@ P1 (important), and P2 (useful follow-up).
 
 Work in dependency order.
 
-### [ ] AST-001 — Project-wide compiler index — P0 — **NEXT**
+### [x] AST-001 — Project-wide compiler index — P0 — **COMPLETE**
 
 Build a `ProjectIndex` shared by every scanned source instead of handing each
 rule an isolated AST.
@@ -47,7 +50,7 @@ Acceptance criteria:
 
 Depends on: `COMP-002`.
 
-### [ ] AST-002 — Inheritance and symbol resolution — P0
+### [ ] AST-002 — Inheritance and symbol resolution — P0 — **NEXT**
 
 Use `linearizedBaseContracts` to resolve inherited state variables, functions,
 modifiers, overrides, and `super` targets.
