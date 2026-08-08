@@ -177,7 +177,14 @@ def _extract_source_archive(archive_bytes: bytes, destination: Path) -> None:
             path = PurePosixPath(member.name)
             if path.is_absolute() or ".." in path.parts or member.issym() or member.islnk():
                 raise ReleaseError(f"unsafe path in generated Git archive: {member.name}")
-        archive.extractall(destination, members=members)
+        if sys.version_info >= (3, 12):
+            archive.extractall(
+                destination,
+                members=members,
+                filter="fully_trusted",
+            )
+        else:  # pragma: no cover - filter was added after Python 3.10
+            archive.extractall(destination, members=members)
 
 
 def _build_distribution(source: Path, output: Path, epoch: int) -> None:
@@ -242,7 +249,8 @@ def _validate_wheel(path: Path, version: str) -> None:
         parsed = BytesParser(policy=email_policy).parsebytes(archive.read(metadata_name))
     if parsed.get("Name") != "contract-holes" or parsed.get("Version") != version:
         raise ReleaseError("wheel metadata name/version does not match release")
-    if parsed.get("Requires-Python") != ">=3.10,<3.15":
+    requires_python = str(parsed.get("Requires-Python", "")).replace(" ", "")
+    if set(requires_python.split(",")) != {">=3.10", "<3.15"}:
         raise ReleaseError("wheel Requires-Python does not match compatibility policy")
 
 
