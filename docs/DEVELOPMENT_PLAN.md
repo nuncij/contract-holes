@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.6.0`
 Current milestone: **M6 — Audit-ready release (`1.0.0`)**
-Next: **DOCS-001 — Complete user and contributor documentation**
+Next: **RELEASE-001 — Reproducible artifacts and 1.0 release checklist**
 
 ## Product goal
 
@@ -313,6 +313,10 @@ The [threat model](THREAT_MODEL.md), [secure-use guide](SECURE_USE.md), and
 and disclosure boundaries. Proof compiler versions are validated before being
 written to Foundry configuration, and common credentials are removed from native
 subprocess environments as defense in depth.
+
+The [documentation index](README.md) now routes installation, complete CLI,
+rule, CI, proof, evaluation, security, and contributor guidance. Internal links
+and public-command coverage are regression tested.
 
 Initial quality targets for supported vulnerability classes are at least 80%
 precision for high-confidence findings, no unlabelled silent analysis failures,

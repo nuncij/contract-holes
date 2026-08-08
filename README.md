@@ -41,6 +41,8 @@ See [rule catalog usage](docs/RULE_CATALOG.md).
 ## Quick start
 
 CPython 3.10 through 3.14 is supported.
+For wheel/source installs, Foundry setup, offline compiler use, upgrades, and
+smoke checks, see [installation](docs/INSTALLATION.md).
 
 ```bash
 python3 -m venv .venv
@@ -61,6 +63,9 @@ holes contracts/ --format json
 holes contracts/ --format sarif > holes.sarif
 holes contracts/ --minimum-severity medium --fail-on high
 ```
+
+The [CLI reference](docs/CLI_REFERENCE.md) documents every command, exit status,
+output stream, and option group.
 
 JSON reports use the frozen Contract Holes `1.0` schema. SARIF follows version
 2.1.0 plus a documented producer profile, with stable severity mapping and the
@@ -299,10 +304,14 @@ code.
 
 Project status and future work are tracked explicitly:
 
+- [Documentation index](docs/README.md) — installation, CLI, team workflow,
+  evidence, compatibility, and governance guides.
 - [Development plan](docs/DEVELOPMENT_PLAN.md) — architecture, current capability,
   rule maturity, milestones, and release gates.
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
+- [Contributing guide](CONTRIBUTING.md) — development setup, rule workflow,
+  compatibility constraints, tests, and review expectations.
 - [Threat model](docs/THREAT_MODEL.md) and
   [secure-use guide](docs/SECURE_USE.md) — trust boundaries, residual risks, and
   safe local/CI operation.
@@ -329,8 +338,9 @@ complete, including user-supplied per-step invariants. Scan resource limits are
 now explicit and configurable. Verified-source ingestion records chain/address
 provenance, and optional AI annotations are constrained to deterministic evidence.
 The frozen output schemas, per-rule evaluation corpus, supported toolchain policy,
-threat model, secure-use guide, and private disclosure process are complete. The
-next task is `DOCS-001`, completing the 1.0 user and contributor documentation.
+security boundaries, and complete user/contributor documentation are ready. The
+next task is `RELEASE-001`, producing reproducible artifacts and the 1.0 release
+checklist.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

@@ -11,7 +11,7 @@ Current position: M0 through M5 are complete, including team configuration,
 baseline-aware CI, explicit resource limits, verified-source provenance, and
 evidence-bound AI annotations.
 
-Next: **DOCS-001**
+Next: **RELEASE-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -188,8 +188,8 @@ counterexamples, and document conditions that require manual review.
 - [x] **BENCH-002** — Measure per-rule precision and recall on a versioned labelled corpus — P0 — **COMPLETE**.
 - [x] **COMPAT-001** — Publish supported Python, Solidity, EVM, and Foundry ranges — P0 — **COMPLETE**.
 - [x] **SECURITY-001** — Add threat model, secure-use guidance, and disclosure policy — P0 — **COMPLETE**.
-- [ ] **DOCS-001** — Complete install, rule, CI, proof, and contributor documentation — P0 — **NEXT**.
-- [ ] **RELEASE-001** — Produce reproducible package artifacts and a signed release checklist — P0.
+- [x] **DOCS-001** — Complete install, rule, CI, proof, and contributor documentation — P0 — **COMPLETE**.
+- [ ] **RELEASE-001** — Produce reproducible package artifacts and a signed release checklist — P0 — **NEXT**.
 
 ## Definition of done for every task
 
