@@ -22,6 +22,12 @@ the official checkout, Python setup, and CodeQL SARIF actions. For stricter
 supply-chain policy, replace action major tags with reviewed full commit SHAs and
 use dependency automation to propose updates.
 
+The separate
+[`compatibility.yml`](../examples/github-actions/compatibility.yml) example tests
+all supported Python minors and the published Foundry/Solidity/EVM reference
+points. It is a maintainer matrix, not required in every consuming repository.
+See [toolchain compatibility](COMPATIBILITY.md) before changing those pins.
+
 ## Why the scan step captures status
 
 `holes --fail-on high` exits 1 after writing a valid report when the gate finds a

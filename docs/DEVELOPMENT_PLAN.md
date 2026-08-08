@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.6.0`
 Current milestone: **M6 — Audit-ready release (`1.0.0`)**
-Next: **COMPAT-001 — Supported toolchain compatibility ranges**
+Next: **SECURITY-001 — Threat model, secure use, and disclosure policy**
 
 ## Product goal
 
@@ -302,6 +302,11 @@ after these deterministic workflows are stable.
 Freeze a documented finding schema and configuration format, publish supported
 Solidity/Foundry ranges, benchmark each rule against a versioned corpus, define a
 security disclosure process, and document the scanner's threat model.
+
+The output schemas, labelled accuracy corpus, and compatibility policy are now
+complete. Supported ranges and tested reference points are published in
+[toolchain compatibility](COMPATIBILITY.md), including a machine-readable host
+report and CI matrix.
 
 Initial quality targets for supported vulnerability classes are at least 80%
 precision for high-confidence findings, no unlabelled silent analysis failures,

@@ -1,0 +1,74 @@
+name: Contract Holes compatibility
+
+on:
+  workflow_dispatch:
+  pull_request:
+    paths:
+      - "pyproject.toml"
+      - "src/**"
+      - "tests/**"
+      - "examples/github-actions/compatibility.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  python:
+    name: Python ${{ matrix.python }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        python: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python }}
+      - run: python -m pip install --no-deps -e .
+      - run: python -m unittest discover -s tests -q
+
+  compiler:
+    name: Foundry ${{ matrix.foundry }}, solc ${{ matrix.solidity }}, ${{ matrix.evm }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - foundry: v1.5.0
+            solidity: 0.8.20
+            evm: paris
+          - foundry: v1.7.1
+            solidity: 0.8.25
+            evm: shanghai
+          - foundry: v1.7.1
+            solidity: 0.8.29
+            evm: cancun
+          - foundry: v1.7.1
+            solidity: 0.8.31
+            evm: prague
+          - foundry: v1.7.1
+            solidity: 0.8.36
+            evm: osaka
+    env:
+      FOUNDRY_SOLC_VERSION: ${{ matrix.solidity }}
+      FOUNDRY_EVM_VERSION: ${{ matrix.evm }}
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - uses: foundry-rs/foundry-toolchain@v1
+        with:
+          version: ${{ matrix.foundry }}
+      - run: python -m pip install --no-deps -e .
+      - run: >-
+          holes tests/fixtures/compatibility/Compatibility.sol
+          --compile --online --format json
+          > compatibility-report.json

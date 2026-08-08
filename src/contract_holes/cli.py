@@ -19,6 +19,7 @@ from .baseline import (
     write_baseline,
 )
 from .catalog import CatalogError, catalog_payload, json_catalog, text_catalog
+from .compatibility import compatibility_payload
 from .config import (
     ConfigError,
     HolesConfig,
@@ -52,7 +53,8 @@ def parser() -> argparse.ArgumentParser:
             "'holes benchmark PATH ...' for repeatable metrics. Run generated "
             "bundles with 'holes proofs DIRECTORY'. Fetch verified source with "
             "'holes fetch CHAIN_ID ADDRESS --output DIRECTORY', or annotate a "
-            "JSON report with 'holes explain REPORT'."
+            "JSON report with 'holes explain REPORT'. Run 'holes compatibility' "
+            "to inspect supported and observed tool versions."
         ),
     )
     result.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
@@ -389,6 +391,13 @@ def evaluation_parser() -> argparse.ArgumentParser:
     return result
 
 
+def compatibility_parser() -> argparse.ArgumentParser:
+    return argparse.ArgumentParser(
+        prog="holes compatibility",
+        description="Report supported and locally observed toolchain versions as JSON.",
+    )
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments and arguments[0] == "inspect":
@@ -405,6 +414,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _explain_main(arguments[1:])
     if arguments and arguments[0] == "evaluate":
         return _evaluate_main(arguments[1:])
+    if arguments and arguments[0] == "compatibility":
+        return _compatibility_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
     try:
@@ -700,3 +711,10 @@ def _evaluate_main(argv: Sequence[str]) -> int:
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))
     return evaluation_exit_status(payload)
+
+
+def _compatibility_main(argv: Sequence[str]) -> int:
+    argument_parser = compatibility_parser()
+    argument_parser.parse_args(argv)
+    print(json.dumps(compatibility_payload(), indent=2, sort_keys=True))
+    return 0

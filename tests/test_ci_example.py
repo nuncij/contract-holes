@@ -3,6 +3,7 @@ import unittest
 
 
 WORKFLOW = Path("examples/github-actions/contract-holes.yml")
+COMPATIBILITY_WORKFLOW = Path("examples/github-actions/compatibility.yml")
 
 
 class CiExampleTests(unittest.TestCase):
@@ -33,6 +34,30 @@ class CiExampleTests(unittest.TestCase):
         self.assertIn('echo "exit_code=$scan_status"', content)
         self.assertIn("steps.holes.outputs.exit_code == '1'", content)
         self.assertIn('exit "$scan_status"', content)
+
+    def test_compatibility_workflow_covers_published_reference_points(self) -> None:
+        content = COMPATIBILITY_WORKFLOW.read_text(encoding="utf-8")
+
+        for python in ("3.10", "3.11", "3.12", "3.13", "3.14"):
+            self.assertIn(f'"{python}"', content)
+        for entry in (
+            "v1.5.0",
+            "v1.7.1",
+            "0.8.20",
+            "0.8.25",
+            "0.8.29",
+            "0.8.31",
+            "0.8.36",
+            "paris",
+            "shanghai",
+            "cancun",
+            "prague",
+            "osaka",
+        ):
+            self.assertIn(entry, content)
+        self.assertIn("FOUNDRY_SOLC_VERSION", content)
+        self.assertIn("FOUNDRY_EVM_VERSION", content)
+        self.assertIn("--compile --online --format json", content)
 
 
 if __name__ == "__main__":

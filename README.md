@@ -40,7 +40,7 @@ See [rule catalog usage](docs/RULE_CATALOG.md).
 
 ## Quick start
 
-Python 3.10 or newer is required.
+CPython 3.10 through 3.14 is supported.
 
 ```bash
 python3 -m venv .venv
@@ -78,6 +78,17 @@ holes contracts/ --compile --offline
 Compilation happens in an isolated temporary directory, so the scanner does not
 modify the project's Foundry cache or artifacts. Foundry may download a matching
 solc version unless `--offline` is used.
+
+The compiler-backed compatibility commitment is Solidity 0.8.20 through 0.8.36,
+Foundry 1.5.x through 1.7.x, and EVM targets Paris through Osaka. Inspect the
+machine-readable policy and current host without scanning source:
+
+```bash
+holes compatibility
+```
+
+Supported versus tested versions, EVM caveats, and the reference CI matrix are
+documented in [toolchain compatibility](docs/COMPATIBILITY.md).
 
 ## Project configuration
 
@@ -312,7 +323,9 @@ positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurabl
 complete, including user-supplied per-step invariants. Scan resource limits are
 now explicit and configurable. Verified-source ingestion records chain/address
 provenance, and optional AI annotations are constrained to deterministic evidence.
-The next task is `SCHEMA-001`, freezing public JSON/SARIF compatibility.
+The frozen output schemas, per-rule evaluation corpus, and supported toolchain
+policy are complete. The next task is `SECURITY-001`, documenting the threat
+model, secure-use boundary, and disclosure process.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

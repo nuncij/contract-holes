@@ -7,7 +7,7 @@ name = "contract-holes"
 version = "0.6.0"
 description = "A fast, evidence-first Solidity vulnerability scanner"
 readme = "README.md"
-requires-python = ">=3.10"
+requires-python = ">=3.10,<3.15"
 license = { text = "MIT" }
 authors = [{ name = "scanner-gpt contributors" }]
 dependencies = []
