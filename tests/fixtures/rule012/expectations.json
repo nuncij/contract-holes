@@ -1,0 +1,27 @@
+{
+  "schema_version": "1.0",
+  "rule_id": "SOL012",
+  "evidence": "compiler-token-interaction-flow",
+  "expected_findings": [
+    {
+      "entry_function": "TokenVulnerable.ignoredTransfer",
+      "issue_kind": "ignored-return",
+      "trace_kinds": ["entry", "token-call"]
+    },
+    {
+      "entry_function": "TokenVulnerable.nominalDeposit",
+      "issue_kind": "nominal-amount-accounting",
+      "trace_kinds": ["entry", "token-call", "state-write"]
+    },
+    {
+      "entry_function": "TokenVulnerable.nominalDepositViaHelper",
+      "issue_kind": "nominal-amount-accounting",
+      "trace_kinds": ["entry", "call", "token-call", "state-write"]
+    }
+  ],
+  "expected_clean_entries": [
+    "TokenSafe.checkedTransfer",
+    "TokenSafe.deltaDeposit",
+    "TokenSafe.nonReturningToken"
+  ]
+}

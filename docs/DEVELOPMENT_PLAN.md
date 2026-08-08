@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.3.0`
 Current milestone: **M3 — High-value detectors (`0.4.0`)**
-Next: **RULE-012 — ERC-20 return value and balance-delta assumptions**
+Next: **RULE-013 — Oracle freshness, spot-price, and missing-slippage signals**
 
 ## Product goal
 
@@ -29,12 +29,12 @@ The scanner is successful when it:
 | Inputs | One or more Solidity files or directories |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
-| Rules | Eleven registered rules, `SOL001` through `SOL011` |
+| Rules | Twelve registered rules, `SOL001` through `SOL012` |
 | Proofs | Runnable Foundry proof for `SOL007` |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
-| Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, and proxy-upgrade traces |
-| Verification | 68 Python tests; offline M2 and `SOL008`–`SOL011` corpora, benchmark, inspection, and Forge proof tested |
+| Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, and token-flow traces |
+| Verification | 72 Python tests; offline M2 and `SOL008`–`SOL012` corpora, benchmark, inspection, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -52,6 +52,7 @@ The scanner is successful when it:
 | `SOL009` exposed privileged write | Compiler-backed authorization reachability | Privileged-state names and branch dominance are conservative; custom protocol authorization may require review |
 | `SOL010` signature authorization | Compiler-backed recovery-to-action path | Protection and domain recognition are conservative; external library and cross-function digest provenance may require review |
 | `SOL011` proxy and upgrade safety | Compiler-backed initializer, delegatecall-storage, and versioned-layout evidence | Custom proxy standards and unnamed upgrade relationships require project-specific review |
+| `SOL012` ERC-20 interaction safety | Compiler-backed typed-call and amount-origin flow | Custom wrappers, accepted-token policy, and indirect recipients may require review |
 
 The project-wide index, inheritance layer, call graph, and data-flow engine now
 connect source units, inherited symbols, calls, reads, writes, aliases,
@@ -110,6 +111,18 @@ prefixes; it does not replace byte-accurate storage-layout validation for packed
 fields, structs, custom assembly slots, diamonds, or externally deployed
 implementations. Those cases require manual review.
 
+`SOL012` resolves typed ERC-20 declarations, reports ignored boolean results, and
+traces requested `transferFrom` amounts through internal helper parameters to
+state credits. Checked return values, interfaces that deliberately return no
+value, and credits derived from observed before/after balances remain clean.
+
+`SOL012` requires compiler mode and currently recognizes token interfaces by
+ERC-20/token naming plus resolved function declarations. Nominal-amount analysis
+is limited to inbound transfers whose recipient is visibly `address(this)` and
+does not yet prove later use of a captured boolean. Safe-transfer libraries,
+indirect vault recipients, rebasing tokens, and protocol-enforced token allowlists
+require manual review.
+
 ## Analysis architecture
 
 The intended pipeline is:
@@ -127,6 +140,7 @@ Solidity project
   -> authorization reachability and privileged writes   [M3: RULE-009 complete]
   -> signature recovery-to-action hazards               [M3: RULE-010 complete]
   -> proxy initialization and layout hazards            [M3: RULE-011 complete]
+  -> typed token return and amount-flow hazards          [M3: RULE-012 complete]
   -> deterministic security rules
   -> structured findings with evidence paths
   -> filtered compiler-analysis inspection JSON

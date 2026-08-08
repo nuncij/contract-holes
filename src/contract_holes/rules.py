@@ -10,6 +10,7 @@ from .reentrancy import ReentrancyIssue
 from .signature import SignatureIssue
 from .source import FunctionRegion, SoliditySource
 from .target_taint import CallTargetIssue
+from .token import TokenIssue
 
 
 class Rule:
@@ -760,6 +761,100 @@ class ProxyUpgradeHazardRule(Rule):
         return None
 
 
+class TokenInteractionHazardRule(Rule):
+    info = RuleInfo(
+        rule_id="SOL012",
+        severity=Severity.MEDIUM,
+        title="ERC-20 interaction assumes success or nominal transfer amount",
+        description=(
+            "An ERC-20 boolean result is ignored or accounting credits the requested "
+            "transferFrom amount without using an observed balance delta."
+        ),
+        recommendation=(
+            "Use a safe token wrapper or validate returned booleans, and derive received "
+            "amounts from before/after balances when fee-on-transfer tokens are possible."
+        ),
+        confidence="medium",
+    )
+
+    def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if source.project_index is None:
+            return
+        analysis = source.project_index.token
+        current_path = source.path.resolve()
+        for issue in analysis.issues:
+            entry = source.project_index.node_for_key(issue.entry)
+            entry_source = (
+                source.project_index.source_for_node(entry) if entry is not None else None
+            )
+            if entry_source is None or entry_source.path.resolve() != current_path:
+                continue
+            anchor = self._finding_anchor(source, issue)
+            if anchor is None:
+                continue
+            if issue.kind == "ignored-return":
+                message = (
+                    f"ERC-20 {issue.token_call.label} return value is ignored in "
+                    f"{analysis.function_name(issue.token_call.function)}."
+                )
+            else:
+                state_variable = (
+                    issue.state_write.fact.metadata.get("name", "<state>")
+                    if issue.state_write is not None and issue.state_write.fact is not None
+                    else "<state>"
+                )
+                message = (
+                    f"State variable {state_variable!r} is updated from the requested "
+                    "transferFrom amount rather than an observed token balance delta."
+                )
+            finding = self.finding(
+                source,
+                anchor,
+                message=message,
+                metadata={
+                    "evidence": "compiler-token-interaction-flow",
+                    "issue_kind": issue.kind,
+                    "entry_function": analysis.function_name(issue.entry),
+                    "token_call_function": analysis.function_name(
+                        issue.token_call.function
+                    ),
+                    "token_member": issue.token_call.label,
+                    "state_variable": (
+                        issue.state_write.fact.metadata.get("name")
+                        if issue.state_write is not None
+                        and issue.state_write.fact is not None
+                        else None
+                    ),
+                    "trace": [analysis.event_dict(event) for event in issue.trace],
+                    "manual_review": (
+                        "Confirm the token interface, wrapper semantics, accepted token set, "
+                        "and whether rebasing or fee-on-transfer behavior is intentionally "
+                        "excluded by protocol policy."
+                    ),
+                },
+            )
+            if finding:
+                yield finding
+
+    @staticmethod
+    def _finding_anchor(source: SoliditySource, issue: TokenIssue) -> int | None:
+        current_path = source.path.resolve()
+        if (
+            issue.token_call.span is not None
+            and issue.token_call.span.path.resolve() == current_path
+        ):
+            return issue.token_call.span.start
+        for event in issue.trace:
+            if (
+                event.kind == "call"
+                and event.function == issue.entry
+                and event.span is not None
+                and event.span.path.resolve() == current_path
+            ):
+                return event.span.start
+        return None
+
+
 def _walk_ast(
     node: dict[str, object], parent: dict[str, object] | None = None
 ) -> Iterable[tuple[dict[str, object], dict[str, object] | None]]:
@@ -817,4 +912,5 @@ DEFAULT_RULES: tuple[Rule, ...] = (
     ExposedPrivilegedStateRule(),
     SignatureAuthorizationHazardRule(),
     ProxyUpgradeHazardRule(),
+    TokenInteractionHazardRule(),
 )

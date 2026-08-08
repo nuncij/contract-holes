@@ -19,6 +19,7 @@ It currently detects:
 | `SOL009` | High | Externally reachable privileged state write lacks dominating authorization |
 | `SOL010` | High | Signature-authorized action lacks replay or validation protection |
 | `SOL011` | High | Proxy initialization or versioned storage layout is unsafe |
+| `SOL012` | Medium | ERC-20 return value or nominal transfer amount is assumed |
 
 These are review signals, not proofs. Findings include confidence and evidence;
 the scanner deliberately does not claim that a clean report means a contract is
@@ -73,8 +74,8 @@ holes inspect contracts/ --file Vault.sol --contract Vault --function withdraw
 The command emits deterministic JSON containing project-index summaries,
 inheritance, callable nodes, call edges, data-flow facts, guard recognition,
 reentrancy traces, target taint, authorization reachability, and signature
-recovery-to-action hazards, and proxy-upgrade evidence. `--file`, `--contract`,
-and `--function` are repeatable;
+recovery-to-action hazards, proxy-upgrade evidence, and token amount flows.
+`--file`, `--contract`, and `--function` are repeatable;
 different filter types combine, while repeated values of one type are alternatives.
 File filters match source-path suffixes, contract names are exact, and functions
 accept either `withdraw` or `Vault.withdraw`.
@@ -153,8 +154,9 @@ pause, operator, treasury, and fee-control writes and requires preceding
 authorization. `SOL010` follows signature recovery through helpers to a
 state-changing action and checks replay consumption, expiry, domain separation,
 and zero-address recovery. `SOL011` checks initializer guards, proxy storage
-feeding `delegatecall`, and explicit versioned storage prefixes. The next task
-is `RULE-012`: ERC-20 return-value and balance-delta assumptions.
+feeding `delegatecall`, and explicit versioned storage prefixes. `SOL012` checks
+typed ERC-20 returns and requested-amount credits after inbound transfers. The
+next task is `RULE-013`: oracle freshness, spot-price, and slippage hazards.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization
@@ -171,6 +173,11 @@ action are intentionally not findings.
 patterns plus contract families named like `VaultV1`/`VaultV2`. Custom assembly
 slots, packed or structured storage, diamonds, and upgrade relationships that
 are not explicit in source naming need byte-accurate project-specific review.
+
+`SOL012` requires compiler mode and resolved token declarations. It recognizes
+common ERC-20/token interfaces and direct inbound recipients. Safe-transfer
+wrappers, indirect vault recipients, accepted-token policy, and rebasing behavior
+can require project-specific review.
 
 The complete suite uses Python's standard library:
 

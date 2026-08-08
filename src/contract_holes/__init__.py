@@ -11,6 +11,7 @@ from .reentrancy import ReentrancyAnalysis
 from .scanner import Scanner
 from .signature import SignatureAnalysis
 from .target_taint import CallTargetAnalysis
+from .token import TokenAnalysis
 
 __all__ = [
     "Finding",
@@ -25,5 +26,6 @@ __all__ = [
     "Scanner",
     "Severity",
     "SignatureAnalysis",
+    "TokenAnalysis",
 ]
 __version__ = "0.3.0"

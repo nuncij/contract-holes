@@ -179,6 +179,11 @@ class ProjectInspector:
                 or (issue.entry is not None and issue.entry in selected)
             )
         ]
+        token_issues = [
+            self._token_issue_dict(issue)
+            for issue in self.project.token.issues
+            if issue.entry in selected
+        ]
         return {
             "schema_version": "1.0",
             "project_root": str(self.root),
@@ -201,6 +206,7 @@ class ProjectInspector:
                 "authorization_issues": len(authorization_issues),
                 "signature_issues": len(signature_issues),
                 "proxy_issues": len(proxy_issues),
+                "token_issues": len(token_issues),
             },
             "project_index": {"sources": sources, "contracts": contracts},
             "inheritance": contracts,
@@ -214,6 +220,7 @@ class ProjectInspector:
             "authorization": {"issues": authorization_issues},
             "signature": {"issues": signature_issues},
             "proxy": {"issues": proxy_issues},
+            "token": {"issues": token_issues},
         }
 
     def _matches_source(self, path: Path) -> bool:
@@ -467,6 +474,27 @@ class ProjectInspector:
                 analysis.owner_name(issue.entry) if issue.entry is not None else None
             ),
             **issue.metadata,
+            "trace": trace,
+        }
+
+    def _token_issue_dict(self, issue) -> dict[str, object]:
+        analysis = self.project.token
+        trace: list[dict[str, object]] = []
+        for event in issue.trace:
+            item = analysis.event_dict(event)
+            if item.get("path") is not None:
+                item["path"] = self._path(Path(str(item["path"])))
+            trace.append(item)
+        return {
+            "issue_kind": issue.kind,
+            "entry_function": analysis.function_name(issue.entry),
+            "token_call_function": analysis.function_name(issue.token_call.function),
+            "token_member": issue.token_call.label,
+            "state_variable": (
+                issue.state_write.fact.metadata.get("name")
+                if issue.state_write is not None and issue.state_write.fact is not None
+                else None
+            ),
             "trace": trace,
         }
 

@@ -111,6 +111,9 @@ class ProjectIndex:
         from .proxy import ProxyAnalysis
 
         self.proxy = ProxyAnalysis(self)
+        from .token import TokenAnalysis
+
+        self.token = TokenAnalysis(self)
         from .target_taint import CallTargetAnalysis
 
         self.target_taint = CallTargetAnalysis(self)
