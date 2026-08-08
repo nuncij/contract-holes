@@ -68,7 +68,7 @@ SHA-256 digests before copying artifacts:
 
 ```bash
 .venv-release/bin/python scripts/release.py --output dist
-sha256sum -c dist/SHA256SUMS
+(cd dist && sha256sum -c SHA256SUMS)
 ```
 
 `dist/release-manifest.json` records the commit, source timestamp, exact build
