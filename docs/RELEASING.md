@@ -2,8 +2,9 @@
 
 Release artifacts are a pure-Python wheel and source distribution. The standard
 PyPA flow builds both archives from `pyproject.toml`; this repository adds a clean
-Git export, fixed build environment, `SOURCE_DATE_EPOCH`, independent double
-build, archive inspection, wheel installation/smoke scan, and SHA-256 manifest.
+Git export, fixed build environment, `SOURCE_DATE_EPOCH`, normalized sdist
+ownership/timestamps/gzip metadata, independent double build, archive inspection,
+wheel installation/smoke scan, and SHA-256 manifest.
 
 The official Python Packaging User Guide describes the
 [packaging flow](https://packaging.python.org/en/latest/flow/), and PyPA `build`

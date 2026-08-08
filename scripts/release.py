@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import argparse
+import copy
 from email.parser import BytesParser
 from email.policy import default as email_policy
+import gzip
 import hashlib
 from importlib import metadata
 import io
@@ -215,6 +217,53 @@ def _build_distribution(source: Path, output: Path, epoch: int) -> None:
             part.strip() for part in (completed.stdout, completed.stderr) if part.strip()
         )
         raise ReleaseError(f"package build failed:\n{detail[-8000:]}")
+    _normalize_sdist(
+        output / f"contract_holes-{_project_version(source)}.tar.gz",
+        epoch,
+    )
+
+
+def _normalize_sdist(path: Path, epoch: int) -> None:
+    entries: list[tuple[tarfile.TarInfo, bytes | None]] = []
+    with tarfile.open(path, mode="r:gz") as source:
+        for original in source.getmembers():
+            member_path = PurePosixPath(original.name)
+            if member_path.is_absolute() or ".." in member_path.parts:
+                raise ReleaseError(f"unsafe path in source distribution: {original.name}")
+            extracted = source.extractfile(original) if original.isfile() else None
+            entries.append(
+                (
+                    copy.copy(original),
+                    extracted.read() if extracted is not None else None,
+                )
+            )
+
+    tar_bytes = io.BytesIO()
+    with tarfile.open(fileobj=tar_bytes, mode="w", format=tarfile.PAX_FORMAT) as target:
+        for member, content in entries:
+            member.mtime = epoch
+            member.uid = 0
+            member.gid = 0
+            member.uname = ""
+            member.gname = ""
+            member.pax_headers = {}
+            target.addfile(
+                member,
+                io.BytesIO(content) if content is not None else None,
+            )
+
+    compressed = io.BytesIO()
+    with gzip.GzipFile(
+        filename="",
+        mode="wb",
+        compresslevel=9,
+        fileobj=compressed,
+        mtime=epoch,
+    ) as target:
+        target.write(tar_bytes.getvalue())
+    temporary = path.with_name(f".{path.name}.tmp")
+    temporary.write_bytes(compressed.getvalue())
+    temporary.replace(path)
 
 
 def _validate_artifacts(directory: Path, version: str) -> None:

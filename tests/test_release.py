@@ -47,7 +47,7 @@ class ReleaseTests(unittest.TestCase):
             "include CHANGELOG.md",
             "include LICENSE",
             "recursive-include docs *.md",
-            "recursive-include release *.asc *.md",
+            "recursive-include release *",
             "recursive-include src/contract_holes/schemas *.json",
             "recursive-include tests *.json *.md *.py *.sol *.toml",
         ):
@@ -72,6 +72,7 @@ class ReleaseTests(unittest.TestCase):
         self.assertIn("maintainer signature pending", checklist)
         self.assertIn("independent_builds", tool)
         self.assertIn("_smoke_test_wheel", tool)
+        self.assertIn("_normalize_sdist", tool)
         self.assertIn("_validate_wheel", tool)
         self.assertIn("_validate_sdist", tool)
 
