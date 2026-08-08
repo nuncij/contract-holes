@@ -1,4 +1,5 @@
 from pathlib import Path
+import json
 import shutil
 import subprocess
 import tempfile
@@ -121,6 +122,70 @@ solc_version = "0.8.25"
             self.assertIn("error HolesInvariantViolation(", content)
             self.assertIn("function assertLastInvariant()", content)
             self.assertIn("test_SOL005_invariantReportsViolation", content)
+
+    def test_records_compiler_chain_constructor_and_setup_requirements(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            generated = generate_foundry_proofs(
+                [reentrancy_finding(), packed_finding()], output
+            )
+            manifests = sorted(output.glob("*.proof.json"))
+
+            self.assertEqual(len(generated), 2)
+            self.assertEqual(len(manifests), 2)
+            payloads = [
+                json.loads(path.read_text(encoding="utf-8"))
+                for path in manifests
+            ]
+            by_rule = {payload["finding"]["rule_id"]: payload for payload in payloads}
+
+            reentrancy = by_rule["SOL005"]
+            self.assertEqual(reentrancy["schema_version"], "1.0")
+            self.assertEqual(
+                reentrancy["profiles"]["generated_tests"]["compiler"],
+                {
+                    "offline": True,
+                    "pragma": "^0.8.20",
+                    "solc_version": "0.8.25",
+                },
+            )
+            self.assertEqual(
+                reentrancy["profiles"]["generated_tests"]["chain"]["mode"],
+                "local",
+            )
+            project = reentrancy["profiles"]["project_probe"]
+            self.assertEqual(project["status"], "configuration-required")
+            self.assertIsNone(project["chain"]["fork_url"])
+            self.assertIsNone(project["chain"]["fork_block"])
+            self.assertEqual(project["constructor"]["contract"], "Vault")
+            self.assertIsNone(project["constructor"]["arguments"])
+            self.assertEqual(
+                {requirement["id"] for requirement in project["setup"]},
+                {
+                    "deploy-target",
+                    "initialize-state",
+                    "fund-target-and-probe",
+                    "configure-actors-and-authorization",
+                    "encode-entry-and-reentry-calldata",
+                    "implement-protocol-invariant",
+                },
+            )
+
+            packed = by_rule["SOL007"]
+            self.assertEqual(
+                packed["profiles"]["project_probe"]["status"],
+                "not-applicable",
+            )
+
+    def test_modified_requirement_manifest_is_not_overwritten(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory)
+            generate_foundry_proofs([reentrancy_finding()], output)
+            manifest = next(output.glob("*.proof.json"))
+            manifest.write_text("user requirements", encoding="utf-8")
+
+            with self.assertRaisesRegex(ProofGenerationError, "refusing to overwrite"):
+                generate_foundry_proofs([reentrancy_finding()], output)
 
     def test_generation_is_idempotent_but_does_not_overwrite_changes(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

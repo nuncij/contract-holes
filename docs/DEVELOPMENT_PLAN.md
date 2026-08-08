@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.4.0`
 Current milestone: **M4 — Dynamic verification (`0.5.0`)**
-Next: **PROOF-003 — Proof environment requirements and provenance**
+Next: **RUNNER-001 — Isolated proof execution with timeouts**
 
 ## Product goal
 
@@ -34,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 84 Python tests; offline M2 and versioned M3 corpora, benchmark, inspection, and `SOL005`/`SOL007` Forge artifacts tested |
+| Verification | 86 Python tests; offline M2 and versioned M3 corpora, benchmark, inspection, and `SOL005`/`SOL007` Forge artifacts tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -163,6 +163,14 @@ after every executed step. The executor stores and emits the assertion ID, step,
 result, and detail hash, provides a Foundry-visible custom violation error, and
 treats an adapter revert as a failed check. This makes assertion output stable
 without pretending the scanner can infer a protocol's economic invariant.
+
+Every generated Solidity artifact now has a deterministic `.proof.json`
+requirements sidecar. The versioned manifest records finding provenance and a
+locally runnable generated-test profile with its tested compiler. A separate
+project-probe profile leaves compiler/EVM, chain/fork, constructor, deployment,
+state, funding, actor, calldata, and invariant inputs explicitly unknown until a
+reviewer configures them. Modified sources or manifests are never overwritten.
+The format is documented in [PROOF_REQUIREMENTS.md](PROOF_REQUIREMENTS.md).
 
 ## Analysis architecture
 

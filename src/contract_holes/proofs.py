@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 import re
 
@@ -11,6 +12,8 @@ class ProofGenerationError(RuntimeError):
 
 
 SUPPORTED_PROOF_RULES = frozenset({"SOL005", "SOL007"})
+PROOF_MANIFEST_SCHEMA_VERSION = "1.0"
+TESTED_SOLC_VERSION = "0.8.25"
 
 
 def generate_foundry_proofs(
@@ -31,10 +34,17 @@ def generate_foundry_proofs(
         )
 
     generated: list[Path] = []
+    artifacts: dict[Path, str] = {}
     for finding in supported:
         filename = _proof_filename(finding)
         destination = output_directory / filename
-        content = _proof_content(finding)
+        manifest_destination = output_directory / _manifest_filename(filename)
+        artifacts[destination] = _proof_content(finding)
+        artifacts[manifest_destination] = _proof_manifest(finding, filename)
+        if destination not in generated:
+            generated.append(destination)
+
+    for destination, content in artifacts.items():
         if destination.exists():
             try:
                 existing = destination.read_text(encoding="utf-8")
@@ -46,7 +56,8 @@ def generate_foundry_proofs(
                 raise ProofGenerationError(
                     f"refusing to overwrite modified proof: {destination}"
                 )
-        else:
+    for destination, content in artifacts.items():
+        if not destination.exists():
             try:
                 with destination.open("x", encoding="utf-8") as handle:
                     handle.write(content)
@@ -54,13 +65,134 @@ def generate_foundry_proofs(
                 raise ProofGenerationError(
                     f"could not write proof {destination}: {exc}"
                 ) from exc
-        generated.append(destination)
     return generated
 
 
 def _proof_filename(finding: Finding) -> str:
     stem = re.sub(r"[^A-Za-z0-9_-]+", "_", finding.path.stem).strip("_") or "Contract"
     return f"{stem}_{finding.rule_id}_{finding.line}_{finding.fingerprint}.t.sol"
+
+
+def _manifest_filename(proof_filename: str) -> str:
+    stem = proof_filename.removesuffix(".t.sol")
+    return f"{stem}.proof.json"
+
+
+def _proof_manifest(finding: Finding, proof_filename: str) -> str:
+    generated_tests = (
+        [
+            "test_SOL005_reentrancyPrimitive",
+            "testFuzz_SOL005_transactionSequence",
+            "test_SOL005_invariantReportsViolation",
+        ]
+        if finding.rule_id == "SOL005"
+        else ["test_SOL007_packedEncodingCollision"]
+    )
+    contract_name = str(finding.metadata.get("entry_function") or "").split(
+        ".", 1
+    )[0] or None
+    if finding.rule_id == "SOL005":
+        project_profile: dict[str, object] = {
+            "status": "configuration-required",
+            "compiler": {
+                "solc_version": None,
+                "evm_version": None,
+                "reason": "target compiler settings are not retained in the finding",
+            },
+            "chain": {
+                "mode": None,
+                "chain_id": None,
+                "fork_url": None,
+                "fork_block": None,
+                "reason": "choose local deployment or a pinned authorized fork",
+            },
+            "constructor": {
+                "contract": contract_name,
+                "arguments": None,
+                "reason": "constructor arguments cannot be inferred safely",
+            },
+            "setup": [
+                {
+                    "id": "deploy-target",
+                    "required": True,
+                    "value": None,
+                },
+                {
+                    "id": "initialize-state",
+                    "required": True,
+                    "value": None,
+                },
+                {
+                    "id": "fund-target-and-probe",
+                    "required": True,
+                    "value": None,
+                },
+                {
+                    "id": "configure-actors-and-authorization",
+                    "required": True,
+                    "value": None,
+                },
+                {
+                    "id": "encode-entry-and-reentry-calldata",
+                    "required": True,
+                    "value": None,
+                },
+                {
+                    "id": "implement-protocol-invariant",
+                    "required": True,
+                    "value": None,
+                },
+            ],
+        }
+        artifact_kind = "reentrancy-probe-sequence-invariant"
+    else:
+        project_profile = {
+            "status": "not-applicable",
+            "reason": (
+                "the generated proof demonstrates a standalone encoding primitive"
+            ),
+        }
+        artifact_kind = "packed-encoding-primitive"
+
+    payload = {
+        "schema_version": PROOF_MANIFEST_SCHEMA_VERSION,
+        "artifact_version": "1.0",
+        "artifact_kind": artifact_kind,
+        "proof_source": proof_filename,
+        "finding": {
+            "rule_id": finding.rule_id,
+            "fingerprint": finding.fingerprint,
+            "confidence": finding.confidence,
+            "evidence": finding.metadata.get("evidence"),
+            "source_path": str(finding.path),
+            "line": finding.line,
+            "column": finding.column,
+        },
+        "profiles": {
+            "generated_tests": {
+                "status": "runnable",
+                "compiler": {
+                    "solc_version": TESTED_SOLC_VERSION,
+                    "pragma": "^0.8.20",
+                    "offline": True,
+                },
+                "chain": {
+                    "mode": "local",
+                    "chain_id": None,
+                    "fork_url": None,
+                    "fork_block": None,
+                },
+                "constructor": {
+                    "required": False,
+                    "arguments": [],
+                },
+                "setup": [],
+                "tests": generated_tests,
+            },
+            "project_probe": project_profile,
+        },
+    }
+    return json.dumps(payload, indent=2, sort_keys=True) + "\n"
 
 
 def _supports_proof(finding: Finding) -> bool:

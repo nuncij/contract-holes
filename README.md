@@ -127,6 +127,14 @@ impact assertions still need project-specific configuration. Generated files
 are deterministic, and the scanner refuses to overwrite a manually changed
 artifact.
 
+Each `.t.sol` file is paired with a versioned `.proof.json` requirements
+manifest. It records finding provenance and the tested compiler/local-chain
+settings separately from project-probe requirements. Unknown target compiler,
+fork, constructor, funding, actor, calldata, and invariant setup stays `null`
+and `configuration-required`; the generator does not guess it. See the
+[proof requirements guide](docs/PROOF_REQUIREMENTS.md) for the schema and
+handoff workflow.
+
 The `SOL005` artifact also contains a bounded transaction-sequence executor and
 a dependency-free Foundry `testFuzz` entrypoint. A project test can provide up to
 32 calldata/value steps, choose whether execution stops on a revert, and assert
@@ -183,7 +191,7 @@ minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
 complete, including user-supplied per-step invariants. The next task is
-`PROOF-003`, proof-environment requirements and provenance.
+`RUNNER-001`, isolated proof execution with timeouts.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

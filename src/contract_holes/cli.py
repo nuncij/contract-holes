@@ -186,7 +186,8 @@ def main(argv: Sequence[str] | None = None) -> int:
             return 2
         if proofs:
             print(
-                f"holes: wrote {len(proofs)} Foundry proof test(s) to {args.generate_proofs}",
+                f"holes: wrote {len(proofs)} Foundry proof test(s) and requirement "
+                f"manifest(s) to {args.generate_proofs}",
                 file=sys.stderr,
             )
         else:
