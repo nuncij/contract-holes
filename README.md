@@ -26,6 +26,18 @@ These are review signals, not proofs. Findings include confidence and evidence;
 the scanner deliberately does not claim that a clean report means a contract is
 safe.
 
+Inspect the complete detector guidance or one rule directly:
+
+```bash
+holes rules
+holes rules SOL005
+holes rules SOL013 --format json
+```
+
+The catalog includes live severity/confidence metadata, vulnerable and safer
+snippets, remediation, manual-review boundaries, and authoritative references.
+See [rule catalog usage](docs/RULE_CATALOG.md).
+
 ## Quick start
 
 Python 3.10 or newer is required.
@@ -245,7 +257,7 @@ minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
 complete, including user-supplied per-step invariants. The next task is
-`CATALOG-001`, the human-readable rule catalog command.
+`CI-001`, a reusable SARIF and baseline CI workflow.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

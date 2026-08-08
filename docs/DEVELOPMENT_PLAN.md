@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.5.0`
 Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
-Next: **CATALOG-001 — Human-readable rule catalog command**
+Next: **CI-001 — Reusable SARIF and baseline CI workflow**
 
 ## Product goal
 
@@ -32,9 +32,9 @@ The scanner is successful when it:
 | Rules | Thirteen registered rules, `SOL001` through `SOL013` |
 | Proofs | Runnable `SOL007` proof; `SOL005` probe, sequence fuzzing, invariants, requirement manifests, and isolated runner |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
-| Workflow | `.holes.toml`, new-finding baselines, severity/CI policy, suppressions, inspection, benchmarks, and proof execution |
+| Workflow | `.holes.toml`, baselines, `holes rules`, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 106 Python tests; configuration/baselines, offline M2/M3 corpora, benchmark, inspection, and isolated Forge execution tested |
+| Verification | 109 Python tests; catalog/config/baselines, offline corpora, benchmark, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -191,6 +191,13 @@ making a repository-root snapshot portable. Comparison reports new, existing,
 and resolved counts; baseline creation refuses overwrite, while explicit updates
 use an atomic replace. Stored entries omit source excerpts and absolute project
 paths. The workflow is documented in [BASELINES.md](BASELINES.md).
+
+`holes rules` renders all registered detectors or one selected rule as text or
+versioned JSON. Catalog entries combine the live rule severity, confidence,
+description, and recommendation with analysis mode, vulnerable/safer examples,
+manual-review boundaries, and authoritative remediation references. Tests
+require exact coverage of `SOL001` through `SOL013`. Usage is documented in
+[RULE_CATALOG.md](RULE_CATALOG.md).
 
 ## Analysis architecture
 

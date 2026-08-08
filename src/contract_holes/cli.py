@@ -14,6 +14,7 @@ from .baseline import (
     load_baseline,
     write_baseline,
 )
+from .catalog import CatalogError, catalog_payload, json_catalog, text_catalog
 from .config import (
     ConfigError,
     HolesConfig,
@@ -250,6 +251,25 @@ def proof_runner_parser() -> argparse.ArgumentParser:
     return result
 
 
+def rules_parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(
+        prog="holes rules",
+        description="Show detector examples, remediation, and references.",
+    )
+    result.add_argument(
+        "rule_id",
+        nargs="?",
+        help="show one rule such as SOL005 (default: all rules)",
+    )
+    result.add_argument(
+        "--format",
+        choices=("text", "json"),
+        default="text",
+        help="catalog output format (default: text)",
+    )
+    return result
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments and arguments[0] == "inspect":
@@ -258,6 +278,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _benchmark_main(arguments[1:])
     if arguments and arguments[0] == "proofs":
         return _proof_runner_main(arguments[1:])
+    if arguments and arguments[0] == "rules":
+        return _rules_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
     try:
@@ -456,3 +478,15 @@ def _proof_runner_main(argv: Sequence[str]) -> int:
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))
     return proof_runner_exit_status(payload)
+
+
+def _rules_main(argv: Sequence[str]) -> int:
+    argument_parser = rules_parser()
+    args = argument_parser.parse_args(argv)
+    try:
+        payload = catalog_payload(args.rule_id)
+    except CatalogError as exc:
+        print(f"holes rules: error: {exc}", file=sys.stderr)
+        return 2
+    print(json_catalog(payload) if args.format == "json" else text_catalog(payload))
+    return 0
