@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.3.0`
 Current milestone: **M3 — High-value detectors (`0.4.0`)**
-Next: **RULE-010 — Signature recovery, nonce, deadline, and domain-separation hazards**
+Next: **RULE-011 — Proxy initializer and storage-layout hazards**
 
 ## Product goal
 
@@ -29,12 +29,12 @@ The scanner is successful when it:
 | Inputs | One or more Solidity files or directories |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
-| Rules | Nine registered rules, `SOL001` through `SOL009` |
+| Rules | Ten registered rules, `SOL001` through `SOL010` |
 | Proofs | Runnable Foundry proof for `SOL007` |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
-| Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, and authorization traces |
-| Verification | 60 Python tests; offline M2, `SOL008`, and `SOL009` corpora, benchmark, inspection, and Forge proof tested |
+| Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, and signature traces |
+| Verification | 64 Python tests; offline M2 and `SOL008`–`SOL010` corpora, benchmark, inspection, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -50,6 +50,7 @@ The scanner is successful when it:
 | `SOL007` packed hash collision | Compiler evidence plus primitive proof | Does not trace the hash to authorization, signatures, or identifiers |
 | `SOL008` controlled call target | Compiler-backed interprocedural taint | Does not yet prove allowlist dominance or persist taint through state across transactions |
 | `SOL009` exposed privileged write | Compiler-backed authorization reachability | Privileged-state names and branch dominance are conservative; custom protocol authorization may require review |
+| `SOL010` signature authorization | Compiler-backed recovery-to-action path | Protection and domain recognition are conservative; external library and cross-function digest provenance may require review |
 
 The project-wide index, inheritance layer, call graph, and data-flow engine now
 connect source units, inherited symbols, calls, reads, writes, aliases,
@@ -78,6 +79,22 @@ through dynamic dispatch, authorization established in earlier transactions,
 modifiers with unusual placeholder control flow, and protocol invariants require
 manual review.
 
+`SOL010` follows compiler-identified `ecrecover` sites through resolved internal
+helpers to a subsequent state write or external interaction. It reports which of
+four protections are absent before the action: nonce/digest consumption, a
+timestamp deadline, chain-and-contract domain separation, and rejection of
+zero-address recovery. Pure recovery utilities are excluded, and a paired
+EIP-712-style fixture demonstrates the clean path.
+
+`SOL010` intentionally has no source-only fallback. Replay protection is
+recognized from writes to common nonce, used-digest, and replay-state names;
+expiry currently requires a dominating `require`/`assert` timestamp comparison.
+Domain provenance follows local aliases, direct `block.chainid` and
+`address(this)` inputs, named domain separators, and resolved helper returns, but
+not arbitrary digest parameters across every call boundary. Signature libraries,
+custom invalidation schemes, unusual control flow, and cryptographic malleability
+policies require manual review.
+
 ## Analysis architecture
 
 The intended pipeline is:
@@ -93,6 +110,7 @@ Solidity project
   -> interprocedural reentrancy evidence                 [M2: complete]
   -> interprocedural external-target taint               [M3: RULE-008 complete]
   -> authorization reachability and privileged writes   [M3: RULE-009 complete]
+  -> signature recovery-to-action hazards               [M3: RULE-010 complete]
   -> deterministic security rules
   -> structured findings with evidence paths
   -> filtered compiler-analysis inspection JSON

@@ -105,6 +105,9 @@ class ProjectIndex:
         from .authorization import AuthorizationAnalysis
 
         self.authorization = AuthorizationAnalysis(self)
+        from .signature import SignatureAnalysis
+
+        self.signature = SignatureAnalysis(self)
         from .target_taint import CallTargetAnalysis
 
         self.target_taint = CallTargetAnalysis(self)

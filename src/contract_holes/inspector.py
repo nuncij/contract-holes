@@ -166,6 +166,11 @@ class ProjectInspector:
             for issue in self.project.authorization.issues
             if issue.entry in selected
         ]
+        signature_issues = [
+            self._signature_issue_dict(issue)
+            for issue in self.project.signature.issues
+            if issue.entry in selected
+        ]
         return {
             "schema_version": "1.0",
             "project_root": str(self.root),
@@ -186,6 +191,7 @@ class ProjectInspector:
                 "reentrancy_issues": len(issues),
                 "target_taint_issues": len(target_issues),
                 "authorization_issues": len(authorization_issues),
+                "signature_issues": len(signature_issues),
             },
             "project_index": {"sources": sources, "contracts": contracts},
             "inheritance": contracts,
@@ -197,6 +203,7 @@ class ProjectInspector:
             },
             "target_taint": {"issues": target_issues},
             "authorization": {"issues": authorization_issues},
+            "signature": {"issues": signature_issues},
         }
 
     def _matches_source(self, path: Path) -> bool:
@@ -415,6 +422,23 @@ class ProjectInspector:
             "entry_function": analysis.function_name(issue.entry),
             "state_write_function": analysis.function_name(issue.state_write.function),
             "state_variable": analysis.state_variable_name(issue.state_write),
+            "trace": trace,
+        }
+
+    def _signature_issue_dict(self, issue) -> dict[str, object]:
+        analysis = self.project.signature
+        trace: list[dict[str, object]] = []
+        for event in issue.trace:
+            item = analysis.event_dict(event)
+            if item.get("path") is not None:
+                item["path"] = self._path(Path(str(item["path"])))
+            trace.append(item)
+        return {
+            "entry_function": analysis.function_name(issue.entry),
+            "recovery_function": analysis.function_name(issue.recovery.function),
+            "action_function": analysis.function_name(issue.action.function),
+            "hazards": list(issue.hazards),
+            "missing_domain_components": list(issue.missing_domain_components),
             "trace": trace,
         }
 

@@ -1,0 +1,51 @@
+{
+  "schema_version": "1.0",
+  "rule_id": "SOL010",
+  "evidence": "compiler-signature-authorization-path",
+  "expected_findings": [
+    {
+      "entry_function": "SignatureVulnerable.executeNoDeadline",
+      "hazards": ["missing-deadline"]
+    },
+    {
+      "entry_function": "SignatureVulnerable.executeReplayable",
+      "hazards": ["missing-replay-protection"]
+    },
+    {
+      "entry_function": "SignatureVulnerable.executeReversedDeadline",
+      "hazards": ["missing-deadline"]
+    },
+    {
+      "entry_function": "SignatureVulnerable.executeThroughHelper",
+      "hazards": [
+        "missing-replay-protection",
+        "missing-deadline",
+        "weak-domain-separation",
+        "unchecked-zero-recovery"
+      ]
+    },
+    {
+      "entry_function": "SignatureVulnerable.executeUncheckedRecovery",
+      "hazards": ["unchecked-zero-recovery"]
+    },
+    {
+      "entry_function": "SignatureVulnerable.executeWeak",
+      "hazards": [
+        "missing-replay-protection",
+        "missing-deadline",
+        "weak-domain-separation",
+        "unchecked-zero-recovery"
+      ]
+    },
+    {
+      "entry_function": "SignatureVulnerable.executeWeakDomain",
+      "hazards": ["weak-domain-separation"]
+    }
+  ],
+  "expected_clean_entries": [
+    "SignatureSafe.diagnosticAndCount",
+    "SignatureSafe.executeSafe",
+    "SignatureSafe.executeSafeThroughLibrary",
+    "SignatureSafe.recoverOnly"
+  ]
+}

@@ -8,6 +8,7 @@ from .inheritance import InheritanceResolver
 from .project import ProjectIndex
 from .reentrancy import ReentrancyAnalysis
 from .scanner import Scanner
+from .signature import SignatureAnalysis
 from .target_taint import CallTargetAnalysis
 
 __all__ = [
@@ -21,5 +22,6 @@ __all__ = [
     "ReentrancyAnalysis",
     "Scanner",
     "Severity",
+    "SignatureAnalysis",
 ]
 __version__ = "0.3.0"

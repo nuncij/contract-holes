@@ -524,6 +524,14 @@ class _FunctionAnalyzer:
                 condition_value = argument_values[0] if argument_values else FlowValue()
                 self._authorization_condition(condition, condition_value, call_name)
 
+        if call_name == "ecrecover":
+            self._fact(
+                "signature-recovery",
+                call,
+                value=FlowValue.merge(*argument_values),
+                metadata={"primitive": "ecrecover"},
+            )
+
         if edge is not None and edge.is_sink:
             parent = self.project.parent(call)
             target_expression = _call_target_expression(call, edge)

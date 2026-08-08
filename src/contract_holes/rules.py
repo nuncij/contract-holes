@@ -6,6 +6,7 @@ import re
 from .authorization import AuthorizationIssue
 from .models import Finding, RuleInfo, Severity
 from .reentrancy import ReentrancyIssue
+from .signature import SignatureIssue
 from .source import FunctionRegion, SoliditySource
 from .target_taint import CallTargetIssue
 
@@ -592,6 +593,89 @@ class ExposedPrivilegedStateRule(Rule):
         return span.start if span is not None else None
 
 
+class SignatureAuthorizationHazardRule(Rule):
+    info = RuleInfo(
+        rule_id="SOL010",
+        severity=Severity.HIGH,
+        title="Signature-authorized action lacks replay or validation protection",
+        description=(
+            "A signature recovery reaches a state-changing action while nonce consumption, "
+            "expiry, domain separation, or zero-address recovery checks are missing."
+        ),
+        recommendation=(
+            "Use a typed domain containing chain ID and the verifying contract, consume a "
+            "signer-scoped nonce, enforce a deadline, and reject address(0) recovery before "
+            "executing the authorized action."
+        ),
+        confidence="medium",
+    )
+
+    def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if source.project_index is None:
+            return
+        analysis = source.project_index.signature
+        current_path = source.path.resolve()
+        for issue in analysis.issues:
+            entry = source.project_index.node_for_key(issue.entry)
+            entry_source = (
+                source.project_index.source_for_node(entry) if entry is not None else None
+            )
+            if entry_source is None or entry_source.path.resolve() != current_path:
+                continue
+            anchor = self._finding_anchor(source, issue)
+            if anchor is None:
+                continue
+            action_function = analysis.function_name(issue.action.function)
+            finding = self.finding(
+                source,
+                anchor,
+                message=(
+                    f"Signature recovery from {analysis.function_name(issue.entry)} reaches "
+                    f"an action in {action_function} with hazards: "
+                    f"{', '.join(issue.hazards)}."
+                ),
+                metadata={
+                    "evidence": "compiler-signature-authorization-path",
+                    "entry_function": analysis.function_name(issue.entry),
+                    "recovery_function": analysis.function_name(issue.recovery.function),
+                    "action_function": action_function,
+                    "hazards": list(issue.hazards),
+                    "missing_domain_components": list(
+                        issue.missing_domain_components
+                    ),
+                    "trace": [analysis.event_dict(event) for event in issue.trace],
+                    "manual_review": (
+                        "Confirm whether replay prevention, expiry, domain separation, or "
+                        "invalid-signature rejection is provided by unmodelled library code, "
+                        "state transitions, or a trusted upstream protocol."
+                    ),
+                },
+            )
+            if finding:
+                yield finding
+
+    @staticmethod
+    def _finding_anchor(
+        source: SoliditySource, issue: SignatureIssue
+    ) -> int | None:
+        current_path = source.path.resolve()
+        if issue.recovery.span is not None and issue.recovery.span.path.resolve() == current_path:
+            return issue.recovery.span.start
+        for event in issue.trace:
+            if (
+                event.kind == "call"
+                and event.function == issue.entry
+                and event.span is not None
+                and event.span.path.resolve() == current_path
+            ):
+                return event.span.start
+        project = source.project_index
+        assert project is not None
+        entry = project.node_for_key(issue.entry)
+        span = project.source_span(entry) if entry is not None else None
+        return span.start if span is not None else None
+
+
 def _walk_ast(
     node: dict[str, object], parent: dict[str, object] | None = None
 ) -> Iterable[tuple[dict[str, object], dict[str, object] | None]]:
@@ -647,4 +731,5 @@ DEFAULT_RULES: tuple[Rule, ...] = (
     PackedEncodingCollisionRule(),
     UserControlledCallTargetRule(),
     ExposedPrivilegedStateRule(),
+    SignatureAuthorizationHazardRule(),
 )

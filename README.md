@@ -17,6 +17,7 @@ It currently detects:
 | `SOL007` | Medium | Multiple dynamic values in a packed hash encoding (compiler AST) |
 | `SOL008` | High | User-controlled value reaches an external or `delegatecall` target |
 | `SOL009` | High | Externally reachable privileged state write lacks dominating authorization |
+| `SOL010` | High | Signature-authorized action lacks replay or validation protection |
 
 These are review signals, not proofs. Findings include confidence and evidence;
 the scanner deliberately does not claim that a clean report means a contract is
@@ -70,8 +71,9 @@ holes inspect contracts/ --file Vault.sol --contract Vault --function withdraw
 
 The command emits deterministic JSON containing project-index summaries,
 inheritance, callable nodes, call edges, data-flow facts, guard recognition,
-reentrancy traces, target taint, and authorization reachability. `--file`,
-`--contract`, and `--function` are repeatable;
+reentrancy traces, target taint, authorization reachability, and signature
+recovery-to-action hazards. `--file`, `--contract`, and `--function` are
+repeatable;
 different filter types combine, while repeated values of one type are alternatives.
 File filters match source-path suffixes, contract names are exact, and functions
 accept either `withdraw` or `Vault.withdraw`.
@@ -147,13 +149,21 @@ inspection JSON, and repeatable benchmark are complete. `SOL008` traces
 externally controlled call destinations across aliases and internal helpers.
 `SOL009` traces externally reachable ownership, administration, upgrade, role,
 pause, operator, treasury, and fee-control writes and requires preceding
-authorization. The next task is `RULE-010`: signature replay and domain-separation
-hazards.
+authorization. `SOL010` follows signature recovery through helpers to a
+state-changing action and checks replay consumption, expiry, domain separation,
+and zero-address recovery. The next task is `RULE-011`: proxy initializer and
+storage-layout hazards.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization
 frameworks and project-specific state semantics. A clean scan is not evidence
 that every privileged operation was classified.
+
+`SOL010` also requires compiler mode. It recognizes common nonce/digest state,
+timestamp checks, and EIP-712-style chain/contract domains. Custom signature
+libraries, invalidation schemes, cross-call digest provenance, and malleability
+policies can require manual review; pure recovery utilities without a subsequent
+action are intentionally not findings.
 
 The complete suite uses Python's standard library:
 
