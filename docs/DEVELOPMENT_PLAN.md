@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.6.0`
 Current milestone: **M6 — Audit-ready release (`1.0.0`)**
-Next: **BENCH-002 — Per-rule precision and recall evaluation**
+Next: **COMPAT-001 — Supported toolchain compatibility ranges**
 
 ## Product goal
 
@@ -34,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 133 Python tests; frozen JSON/SARIF schemas plus CI/catalog/config/baselines/limits/address/AI boundaries, offline corpora, benchmark, inspection, and isolated Forge execution tested |
+| Verification | 137 Python tests; frozen JSON/SARIF schemas and 64 audit labels plus CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity

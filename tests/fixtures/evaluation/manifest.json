@@ -1,0 +1,137 @@
+{
+  "schema_version": "1.0",
+  "evaluation_version": "1.0",
+  "corpus_version": "audit-1",
+  "solc_version": "0.8.25",
+  "minimum_precision": 0.8,
+  "minimum_recall": 0.8,
+  "expected_positive_labels": 33,
+  "expected_safe_labels": 31,
+  "rule_ids": [
+    "SOL001", "SOL002", "SOL003", "SOL004", "SOL005", "SOL006", "SOL007",
+    "SOL008", "SOL009", "SOL010", "SOL011", "SOL012", "SOL013"
+  ],
+  "cases": [
+    {
+      "rule_id": "SOL001",
+      "fixture": "legacy",
+      "positive_labels": 1,
+      "safe_labels": 1,
+      "expected_findings": [
+        {"path": "src/LegacyPairs.sol", "line": 9}
+      ],
+      "expected_clean_entries": ["LegacySafe.privileged"]
+    },
+    {
+      "rule_id": "SOL002",
+      "fixture": "legacy",
+      "positive_labels": 2,
+      "safe_labels": 1,
+      "expected_findings": [
+        {"path": "src/LegacyPairs.sol", "line": 20, "call_kind": "call"},
+        {"path": "src/LegacyPairs.sol", "line": 24, "call_kind": "delegatecall"}
+      ],
+      "expected_clean_entries": ["LegacySafe.notify"]
+    },
+    {
+      "rule_id": "SOL003",
+      "fixture": "legacy",
+      "positive_labels": 1,
+      "safe_labels": 1,
+      "expected_findings": [
+        {"path": "src/LegacyPairs.sol", "line": 24}
+      ],
+      "expected_clean_entries": ["LegacySafe.runImplementation"]
+    },
+    {
+      "rule_id": "SOL004",
+      "fixture": "legacy",
+      "positive_labels": 1,
+      "safe_labels": 1,
+      "expected_findings": [
+        {"path": "src/LegacyPairs.sol", "line": 28}
+      ],
+      "expected_clean_entries": ["LegacySafe.destroy"]
+    },
+    {
+      "rule_id": "SOL005",
+      "fixture": "legacy",
+      "positive_labels": 1,
+      "safe_labels": 1,
+      "expected_findings": [
+        {
+          "entry_function": "LegacyVulnerable.withdraw",
+          "state_variable": "balances",
+          "trace_kinds": ["interaction", "write"]
+        }
+      ],
+      "expected_clean_entries": ["LegacySafe.withdraw"]
+    },
+    {
+      "rule_id": "SOL006",
+      "fixture": "legacy",
+      "positive_labels": 1,
+      "safe_labels": 1,
+      "expected_findings": [
+        {"path": "src/LegacyPairs.sol", "line": 32}
+      ],
+      "expected_clean_entries": ["LegacySafe.draw"]
+    },
+    {
+      "rule_id": "SOL007",
+      "fixture": "legacy",
+      "positive_labels": 1,
+      "safe_labels": 1,
+      "expected_findings": [
+        {
+          "path": "src/LegacyPairs.sol",
+          "line": 40,
+          "dynamic_argument_types": ["string calldata", "string calldata"]
+        }
+      ],
+      "expected_clean_entries": ["LegacySafe.unambiguousHash"]
+    },
+    {
+      "rule_id": "SOL008",
+      "fixture": "../rule008",
+      "expectations": "../rule008/expectations.json",
+      "positive_labels": 4,
+      "safe_labels": 3
+    },
+    {
+      "rule_id": "SOL009",
+      "fixture": "../rule009",
+      "expectations": "../rule009/expectations.json",
+      "positive_labels": 4,
+      "safe_labels": 7
+    },
+    {
+      "rule_id": "SOL010",
+      "fixture": "../rule010",
+      "expectations": "../rule010/expectations.json",
+      "positive_labels": 7,
+      "safe_labels": 4
+    },
+    {
+      "rule_id": "SOL011",
+      "fixture": "../rule011",
+      "expectations": "../rule011/expectations.json",
+      "positive_labels": 4,
+      "safe_labels": 4
+    },
+    {
+      "rule_id": "SOL012",
+      "fixture": "../rule012",
+      "expectations": "../rule012/expectations.json",
+      "positive_labels": 3,
+      "safe_labels": 3
+    },
+    {
+      "rule_id": "SOL013",
+      "fixture": "../rule013",
+      "expectations": "../rule013/expectations.json",
+      "positive_labels": 3,
+      "safe_labels": 3
+    }
+  ]
+}

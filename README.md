@@ -347,6 +347,17 @@ The complete suite uses Python's standard library:
 PYTHONPATH=src python3 -m unittest discover -s tests -v
 ```
 
+Per-rule correctness is measured separately on the versioned `audit-1` corpus:
+
+```bash
+holes evaluate tests/fixtures/evaluation/manifest.json
+```
+
+It currently covers 33 positive and 31 safe labels across `SOL001`–`SOL013` and
+reports TP/FP/FN plus macro/micro precision and recall. Its perfect checked-in
+regression score is not a real-world accuracy claim; see
+[precision and recall evaluation](docs/EVALUATION.md).
+
 The fallback parser masks comments and string contents while preserving offsets,
 then identifies contract and function regions. With `--compile`, solc source maps,
 exact state declarations, function boundaries, and expression types take

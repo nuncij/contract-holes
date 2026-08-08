@@ -26,6 +26,11 @@ from .config import (
     load_config,
     selected_rules,
 )
+from .evaluation import (
+    EvaluationError,
+    evaluate_labelled_corpus,
+    evaluation_exit_status,
+)
 from .inspector import InspectionError, InspectionFilters, inspect_paths
 from .models import Severity
 from .proofs import ProofGenerationError, generate_foundry_proofs
@@ -370,6 +375,20 @@ def explain_parser() -> argparse.ArgumentParser:
     return result
 
 
+def evaluation_parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(
+        prog="holes evaluate",
+        description="Measure per-rule precision and recall on a labelled corpus.",
+    )
+    result.add_argument("manifest", help="versioned evaluation manifest JSON")
+    result.add_argument(
+        "--allow-downloads",
+        action="store_true",
+        help="allow Foundry to download the pinned compiler (offline by default)",
+    )
+    return result
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments and arguments[0] == "inspect":
@@ -384,6 +403,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _fetch_main(arguments[1:])
     if arguments and arguments[0] == "explain":
         return _explain_main(arguments[1:])
+    if arguments and arguments[0] == "evaluate":
+        return _evaluate_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
     try:
@@ -664,3 +685,18 @@ def _explain_main(argv: Sequence[str]) -> int:
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
+
+
+def _evaluate_main(argv: Sequence[str]) -> int:
+    argument_parser = evaluation_parser()
+    args = argument_parser.parse_args(argv)
+    try:
+        payload = evaluate_labelled_corpus(
+            args.manifest,
+            offline=not args.allow_downloads,
+        )
+    except EvaluationError as exc:
+        print(f"holes evaluate: error: {exc}", file=sys.stderr)
+        return 2
+    print(json.dumps(payload, indent=2, sort_keys=True))
+    return evaluation_exit_status(payload)
