@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import subprocess
 import tempfile
@@ -51,6 +52,13 @@ class CompilerTests(unittest.TestCase):
             with (
                 patch("contract_holes.compiler.shutil.which", return_value="/usr/bin/forge"),
                 patch("contract_holes.compiler.subprocess.run", side_effect=fake_run) as run,
+                patch.dict(
+                    os.environ,
+                    {
+                        "OPENAI_API_KEY": "must-not-reach-forge",
+                        "FOUNDRY_SOLC_VERSION": "0.8.25",
+                    },
+                ),
             ):
                 result = ForgeCompiler().compile([source], project_root=root, offline=True)
 
@@ -63,6 +71,9 @@ class CompilerTests(unittest.TestCase):
             command = run.call_args.args[0]
             self.assertIn("--offline", command)
             self.assertEqual(run.call_args.kwargs["cwd"], root)
+            environment = run.call_args.kwargs["env"]
+            self.assertNotIn("OPENAI_API_KEY", environment)
+            self.assertEqual(environment["FOUNDRY_SOLC_VERSION"], "0.8.25")
 
     def test_missing_forge_is_actionable(self) -> None:
         with patch("contract_holes.compiler.shutil.which", return_value=None):

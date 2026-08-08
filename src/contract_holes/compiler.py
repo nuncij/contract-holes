@@ -8,6 +8,8 @@ import shutil
 import subprocess
 import tempfile
 
+from .process_environment import sanitized_subprocess_environment
+
 
 class CompilerError(RuntimeError):
     pass
@@ -110,6 +112,7 @@ class ForgeCompiler:
                 process = subprocess.run(
                     command,
                     cwd=root,
+                    env=sanitized_subprocess_environment(),
                     capture_output=True,
                     text=True,
                     timeout=self.timeout,

@@ -303,6 +303,11 @@ Project status and future work are tracked explicitly:
   rule maturity, milestones, and release gates.
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
+- [Threat model](docs/THREAT_MODEL.md) and
+  [secure-use guide](docs/SECURE_USE.md) — trust boundaries, residual risks, and
+  safe local/CI operation.
+- [Security policy](SECURITY.md) — supported versions, private reporting, and
+  coordinated disclosure targets.
 
 The project is currently at `0.6.0`. M0 through M5 are complete. The compiler
 index, inheritance resolver, call graph, reusable data-flow facts,
@@ -323,9 +328,9 @@ positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurabl
 complete, including user-supplied per-step invariants. Scan resource limits are
 now explicit and configurable. Verified-source ingestion records chain/address
 provenance, and optional AI annotations are constrained to deterministic evidence.
-The frozen output schemas, per-rule evaluation corpus, and supported toolchain
-policy are complete. The next task is `SECURITY-001`, documenting the threat
-model, secure-use boundary, and disclosure process.
+The frozen output schemas, per-rule evaluation corpus, supported toolchain policy,
+threat model, secure-use guide, and private disclosure process are complete. The
+next task is `DOCS-001`, completing the 1.0 user and contributor documentation.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization
@@ -384,4 +389,6 @@ dynamic verification, M5 team/CI workflow, and M6 audit-ready `1.0.0`. See the
 [development plan](docs/DEVELOPMENT_PLAN.md) for release gates and
 [TASKS.md](TASKS.md) for the ordered backlog.
 
-Only scan contracts you own or are authorized to assess.
+Only scan contracts you own or are authorized to assess. Start untrusted code in
+source-only mode and read the [secure-use guide](docs/SECURE_USE.md) before
+enabling native compiler or proof execution.

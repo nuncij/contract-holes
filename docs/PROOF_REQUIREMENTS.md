@@ -78,6 +78,12 @@ failure, timeout, unsupported requirements, and runner configuration errors.
 Foundry and RPC environment overrides are removed, and the input directory is
 not used for cache or build output.
 
+The manifest compiler must be an exact release in the supported Solidity range;
+arbitrary compiler strings are rejected before Foundry starts. Proof isolation
+protects the input directory from generated cache/output files, but it is not an
+OS sandbox for Forge or solc. Review the complete bundle and follow the
+[secure-use guide](SECURE_USE.md#proof-execution) for least-privilege execution.
+
 Do not commit RPC credentials in a manifest. Store a non-secret environment
 variable name or local runner configuration when fork execution is added. Pin a
 fork block so a proof remains reproducible, and run probes only against systems

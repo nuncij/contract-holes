@@ -4,12 +4,19 @@ from collections import Counter
 import hashlib
 import json
 import math
-import os
 from pathlib import Path
 import shutil
 import subprocess
 import tempfile
 import time
+
+from .compatibility import (
+    SOLIDITY_MAXIMUM_EXCLUSIVE,
+    SOLIDITY_MINIMUM,
+    parse_version,
+    version_is_supported,
+)
+from .process_environment import sanitized_subprocess_environment
 
 
 class ProofRunnerError(RuntimeError):
@@ -209,6 +216,21 @@ def _unsupported_reason(generated: object) -> str | None:
     compiler = generated.get("compiler")
     if not isinstance(compiler, dict) or not compiler.get("solc_version"):
         return "generated_tests profile contains no solc_version"
+    solc_version = compiler.get("solc_version")
+    parsed_version = (
+        parse_version(solc_version) if isinstance(solc_version, str) else None
+    )
+    if (
+        not isinstance(solc_version, str)
+        or parsed_version is None
+        or solc_version != ".".join(str(part) for part in parsed_version)
+        or not version_is_supported(
+            parsed_version,
+            SOLIDITY_MINIMUM,
+            SOLIDITY_MAXIMUM_EXCLUSIVE,
+        )
+    ):
+        return "generated_tests solc_version is not a supported exact release"
     chain = generated.get("chain")
     if not isinstance(chain, dict) or chain.get("mode") != "local":
         return "runner currently supports only local generated tests"
@@ -225,13 +247,10 @@ solc_version = "{solc_version}"
 
 
 def _runner_environment() -> dict[str, str]:
-    environment = os.environ.copy()
-    for key in tuple(environment):
-        if key.startswith(("FOUNDRY_", "DAPP_")) or key in {
-            "ETH_RPC_URL",
-            "ETHERSCAN_API_KEY",
-        }:
-            environment.pop(key, None)
+    environment = sanitized_subprocess_environment(
+        remove_prefixes=("FOUNDRY_", "DAPP_")
+    )
+    environment.pop("ETH_RPC_URL", None)
     return environment
 
 

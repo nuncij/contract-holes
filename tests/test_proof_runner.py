@@ -132,6 +132,26 @@ time.sleep(1)""",
             self.assertEqual(payload["results"][0]["status"], "unsupported")
             self.assertIn("only local", payload["results"][0]["diagnostic"])
 
+    def test_manifest_rejects_compiler_version_configuration_injection(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            make_bundle(root)
+            fake = make_fake_forge(root, "raise SystemExit(99)")
+            manifest_path = next(root.glob("*.proof.json"))
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            manifest["profiles"]["generated_tests"]["compiler"]["solc_version"] = (
+                '0.8.25"\nsolc = "/tmp/untrusted-compiler'
+            )
+            manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+
+            payload = run_foundry_proofs(root, forge_executable=str(fake))
+
+            self.assertEqual(payload["summary"]["unsupported"], 1)
+            self.assertIn(
+                "supported exact release",
+                payload["results"][0]["diagnostic"],
+            )
+
     def test_requires_positive_timeout_and_manifest_directory(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

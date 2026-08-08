@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.6.0`
 Current milestone: **M6 — Audit-ready release (`1.0.0`)**
-Next: **SECURITY-001 — Threat model, secure use, and disclosure policy**
+Next: **DOCS-001 — Complete user and contributor documentation**
 
 ## Product goal
 
@@ -307,6 +307,12 @@ The output schemas, labelled accuracy corpus, and compatibility policy are now
 complete. Supported ranges and tested reference points are published in
 [toolchain compatibility](COMPATIBILITY.md), including a machine-readable host
 report and CI matrix.
+
+The [threat model](THREAT_MODEL.md), [secure-use guide](SECURE_USE.md), and
+[security policy](../SECURITY.md) define native-tool, network, report, proof, AI,
+and disclosure boundaries. Proof compiler versions are validated before being
+written to Foundry configuration, and common credentials are removed from native
+subprocess environments as defense in depth.
 
 Initial quality targets for supported vulnerability classes are at least 80%
 precision for high-confidence findings, no unlabelled silent analysis failures,
