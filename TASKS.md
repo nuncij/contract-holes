@@ -7,9 +7,9 @@ Current release: `0.3.0`
 
 Current milestone: **M3 — High-value detectors (`0.4.0`)**
 
-Current position: M0, M1, and M2 are complete; `RULE-008` through `RULE-012` are complete in M3.
+Current position: M0, M1, and M2 are complete; `RULE-008` through `RULE-013` are complete in M3.
 
-Next: **RULE-013**
+Next: **CORPUS-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -156,8 +156,8 @@ Depends on: `TEST-002`.
 - [x] **RULE-010** — Signature recovery, nonce, deadline, and domain-separation hazards — P0 — **COMPLETE**.
 - [x] **RULE-011** — Proxy initializer and storage-layout hazards — P0 — **COMPLETE**.
 - [x] **RULE-012** — ERC-20 return value and balance-delta assumptions — P1 — **COMPLETE**.
-- [ ] **RULE-013** — Oracle freshness, spot-price, and missing-slippage signals — P1 — **NEXT**.
-- [ ] **CORPUS-001** — Versioned precision/false-positive cases for every M3 rule — P0.
+- [x] **RULE-013** — Oracle freshness, spot-price, and missing-slippage signals — P1 — **COMPLETE**.
+- [ ] **CORPUS-001** — Versioned precision/false-positive cases for every M3 rule — P0 — **NEXT**.
 
 Each M3 rule must emit a source-to-sink path, state its confidence, include safe
 counterexamples, and document conditions that require manual review.

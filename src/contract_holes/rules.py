@@ -4,6 +4,7 @@ from collections.abc import Iterable
 import re
 
 from .authorization import AuthorizationIssue
+from .market import MarketIssue
 from .models import Finding, RuleInfo, Severity
 from .proxy import ProxyIssue
 from .reentrancy import ReentrancyIssue
@@ -855,6 +856,79 @@ class TokenInteractionHazardRule(Rule):
         return None
 
 
+class OracleAndSlippageHazardRule(Rule):
+    info = RuleInfo(
+        rule_id="SOL013",
+        severity=Severity.HIGH,
+        title="Price input lacks freshness, manipulation resistance, or swap bounds",
+        description=(
+            "An oracle or AMM price reaches an action without freshness/TWAP evidence, "
+            "or a router swap permits zero output or an ineffective deadline."
+        ),
+        recommendation=(
+            "Validate oracle timestamps, use manipulation-resistant TWAPs where appropriate, "
+            "and require caller-controlled minimum output plus a meaningful deadline."
+        ),
+        confidence="medium",
+    )
+
+    def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if source.project_index is None:
+            return
+        analysis = source.project_index.market
+        current_path = source.path.resolve()
+        for issue in analysis.issues:
+            entry = source.project_index.node_for_key(issue.entry)
+            entry_source = (
+                source.project_index.source_for_node(entry) if entry is not None else None
+            )
+            if entry_source is None or entry_source.path.resolve() != current_path:
+                continue
+            anchor = self._finding_anchor(source, issue)
+            if anchor is None:
+                continue
+            finding = self.finding(
+                source,
+                anchor,
+                message=(
+                    f"{analysis.function_name(issue.entry)} reaches a price-sensitive action "
+                    f"with hazards: {', '.join(issue.hazards)}."
+                ),
+                metadata={
+                    "evidence": "compiler-market-integrity-flow",
+                    "issue_kind": issue.kind,
+                    "entry_function": analysis.function_name(issue.entry),
+                    "source_function": analysis.function_name(issue.source.function),
+                    "source_member": issue.source.label,
+                    "action_function": analysis.function_name(issue.action.function),
+                    "hazards": list(issue.hazards),
+                    "trace": [analysis.event_dict(event) for event in issue.trace],
+                    "manual_review": (
+                        "Confirm oracle heartbeat/round policy, liquidity and observation "
+                        "window assumptions, router semantics, and whether upstream callers "
+                        "supply enforceable slippage and expiry bounds."
+                    ),
+                },
+            )
+            if finding:
+                yield finding
+
+    @staticmethod
+    def _finding_anchor(source: SoliditySource, issue: MarketIssue) -> int | None:
+        current_path = source.path.resolve()
+        if issue.source.span is not None and issue.source.span.path.resolve() == current_path:
+            return issue.source.span.start
+        for event in issue.trace:
+            if (
+                event.kind == "call"
+                and event.function == issue.entry
+                and event.span is not None
+                and event.span.path.resolve() == current_path
+            ):
+                return event.span.start
+        return None
+
+
 def _walk_ast(
     node: dict[str, object], parent: dict[str, object] | None = None
 ) -> Iterable[tuple[dict[str, object], dict[str, object] | None]]:
@@ -913,4 +987,5 @@ DEFAULT_RULES: tuple[Rule, ...] = (
     SignatureAuthorizationHazardRule(),
     ProxyUpgradeHazardRule(),
     TokenInteractionHazardRule(),
+    OracleAndSlippageHazardRule(),
 )

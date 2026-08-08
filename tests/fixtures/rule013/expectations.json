@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0",
+  "rule_id": "SOL013",
+  "evidence": "compiler-market-integrity-flow",
+  "expected_findings": [
+    {
+      "entry_function": "MarketVulnerable.unsafeSwap",
+      "issue_kind": "swap-protection",
+      "hazards": ["missing-minimum-output", "ineffective-deadline"],
+      "trace_kinds": ["entry", "swap"]
+    },
+    {
+      "entry_function": "MarketVulnerable.useSpotPrice",
+      "issue_kind": "spot-price",
+      "hazards": ["manipulable-spot-price"],
+      "trace_kinds": ["entry", "spot-read", "action"]
+    },
+    {
+      "entry_function": "MarketVulnerable.useStalePrice",
+      "issue_kind": "stale-oracle",
+      "hazards": ["missing-freshness-check"],
+      "trace_kinds": ["entry", "oracle-read", "action"]
+    }
+  ],
+  "expected_clean_entries": [
+    "MarketSafe.safeSwap",
+    "MarketSafe.useFreshPrice",
+    "MarketSafe.useTwap"
+  ]
+}

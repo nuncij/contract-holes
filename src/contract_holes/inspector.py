@@ -184,6 +184,11 @@ class ProjectInspector:
             for issue in self.project.token.issues
             if issue.entry in selected
         ]
+        market_issues = [
+            self._market_issue_dict(issue)
+            for issue in self.project.market.issues
+            if issue.entry in selected
+        ]
         return {
             "schema_version": "1.0",
             "project_root": str(self.root),
@@ -207,6 +212,7 @@ class ProjectInspector:
                 "signature_issues": len(signature_issues),
                 "proxy_issues": len(proxy_issues),
                 "token_issues": len(token_issues),
+                "market_issues": len(market_issues),
             },
             "project_index": {"sources": sources, "contracts": contracts},
             "inheritance": contracts,
@@ -221,6 +227,7 @@ class ProjectInspector:
             "signature": {"issues": signature_issues},
             "proxy": {"issues": proxy_issues},
             "token": {"issues": token_issues},
+            "market": {"issues": market_issues},
         }
 
     def _matches_source(self, path: Path) -> bool:
@@ -495,6 +502,24 @@ class ProjectInspector:
                 if issue.state_write is not None and issue.state_write.fact is not None
                 else None
             ),
+            "trace": trace,
+        }
+
+    def _market_issue_dict(self, issue) -> dict[str, object]:
+        analysis = self.project.market
+        trace: list[dict[str, object]] = []
+        for event in issue.trace:
+            item = analysis.event_dict(event)
+            if item.get("path") is not None:
+                item["path"] = self._path(Path(str(item["path"])))
+            trace.append(item)
+        return {
+            "issue_kind": issue.kind,
+            "entry_function": analysis.function_name(issue.entry),
+            "source_function": analysis.function_name(issue.source.function),
+            "source_member": issue.source.label,
+            "action_function": analysis.function_name(issue.action.function),
+            "hazards": list(issue.hazards),
             "trace": trace,
         }
 

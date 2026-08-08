@@ -114,6 +114,9 @@ class ProjectIndex:
         from .token import TokenAnalysis
 
         self.token = TokenAnalysis(self)
+        from .market import MarketAnalysis
+
+        self.market = MarketAnalysis(self)
         from .target_taint import CallTargetAnalysis
 
         self.target_taint = CallTargetAnalysis(self)

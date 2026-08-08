@@ -5,6 +5,7 @@ from .authorization import AuthorizationAnalysis
 from .callgraph import CallGraph
 from .dataflow import DataFlowAnalysis
 from .inheritance import InheritanceResolver
+from .market import MarketAnalysis
 from .project import ProjectIndex
 from .proxy import ProxyAnalysis
 from .reentrancy import ReentrancyAnalysis
@@ -20,6 +21,7 @@ __all__ = [
     "CallTargetAnalysis",
     "DataFlowAnalysis",
     "InheritanceResolver",
+    "MarketAnalysis",
     "ProjectIndex",
     "ProxyAnalysis",
     "ReentrancyAnalysis",

@@ -20,6 +20,7 @@ It currently detects:
 | `SOL010` | High | Signature-authorized action lacks replay or validation protection |
 | `SOL011` | High | Proxy initialization or versioned storage layout is unsafe |
 | `SOL012` | Medium | ERC-20 return value or nominal transfer amount is assumed |
+| `SOL013` | High | Oracle freshness, spot-price manipulation, or swap bounds are missing |
 
 These are review signals, not proofs. Findings include confidence and evidence;
 the scanner deliberately does not claim that a clean report means a contract is
@@ -75,6 +76,8 @@ The command emits deterministic JSON containing project-index summaries,
 inheritance, callable nodes, call edges, data-flow facts, guard recognition,
 reentrancy traces, target taint, authorization reachability, and signature
 recovery-to-action hazards, proxy-upgrade evidence, and token amount flows.
+Market-integrity traces include oracle freshness, AMM spot-price use, and router
+swap protections.
 `--file`, `--contract`, and `--function` are repeatable;
 different filter types combine, while repeated values of one type are alternatives.
 File filters match source-path suffixes, contract names are exact, and functions
@@ -156,7 +159,9 @@ state-changing action and checks replay consumption, expiry, domain separation,
 and zero-address recovery. `SOL011` checks initializer guards, proxy storage
 feeding `delegatecall`, and explicit versioned storage prefixes. `SOL012` checks
 typed ERC-20 returns and requested-amount credits after inbound transfers. The
-next task is `RULE-013`: oracle freshness, spot-price, and slippage hazards.
+`SOL013` checks stale oracle use, direct AMM spot-price use, and ineffective
+minimum-output/deadline arguments. The next task is `CORPUS-001`: the consolidated
+M3 precision and false-positive corpus.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization
@@ -178,6 +183,12 @@ are not explicit in source naming need byte-accurate project-specific review.
 common ERC-20/token interfaces and direct inbound recipients. Safe-transfer
 wrappers, indirect vault recipients, accepted-token policy, and rebasing behavior
 can require project-specific review.
+
+`SOL013` requires compiler mode. It recognizes common Chainlink-style round
+reads, AMM reserve/slot reads, TWAP method names, and V2-style router argument
+positions. Custom oracle APIs, indirect price propagation, round-completeness
+policies, TWAP window/liquidity quality, V3 swap structs, and custom router
+semantics require manual review.
 
 The complete suite uses Python's standard library:
 

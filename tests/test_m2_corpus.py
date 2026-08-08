@@ -201,6 +201,7 @@ class M2CorpusCompilerTests(unittest.TestCase):
                 "signature_issues": 0,
                 "proxy_issues": 0,
                 "token_issues": 0,
+                "market_issues": 0,
             },
         )
         self.assertEqual(

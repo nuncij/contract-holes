@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.3.0`
 Current milestone: **M3 — High-value detectors (`0.4.0`)**
-Next: **RULE-013 — Oracle freshness, spot-price, and missing-slippage signals**
+Next: **CORPUS-001 — Versioned M3 precision and false-positive corpus**
 
 ## Product goal
 
@@ -29,12 +29,12 @@ The scanner is successful when it:
 | Inputs | One or more Solidity files or directories |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
-| Rules | Twelve registered rules, `SOL001` through `SOL012` |
+| Rules | Thirteen registered rules, `SOL001` through `SOL013` |
 | Proofs | Runnable Foundry proof for `SOL007` |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
-| Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, and token-flow traces |
-| Verification | 72 Python tests; offline M2 and `SOL008`–`SOL012` corpora, benchmark, inspection, and Forge proof tested |
+| Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
+| Verification | 76 Python tests; offline M2 and `SOL008`–`SOL013` corpora, benchmark, inspection, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -53,6 +53,7 @@ The scanner is successful when it:
 | `SOL010` signature authorization | Compiler-backed recovery-to-action path | Protection and domain recognition are conservative; external library and cross-function digest provenance may require review |
 | `SOL011` proxy and upgrade safety | Compiler-backed initializer, delegatecall-storage, and versioned-layout evidence | Custom proxy standards and unnamed upgrade relationships require project-specific review |
 | `SOL012` ERC-20 interaction safety | Compiler-backed typed-call and amount-origin flow | Custom wrappers, accepted-token policy, and indirect recipients may require review |
+| `SOL013` oracle and swap safety | Compiler-backed price-origin, freshness, and router-argument evidence | Custom oracle/router APIs, indirect origins, and TWAP quality require review |
 
 The project-wide index, inheritance layer, call graph, and data-flow engine now
 connect source units, inherited symbols, calls, reads, writes, aliases,
@@ -123,6 +124,18 @@ does not yet prove later use of a captured boolean. Safe-transfer libraries,
 indirect vault recipients, rebasing tokens, and protocol-enforced token allowlists
 require manual review.
 
+`SOL013` follows direct compiler value origins from Chainlink-style
+`latestRoundData` and AMM `getReserves`/`slot0` reads to state writes or external
+interactions. It requires a preceding timestamp freshness assertion for oracle
+data, treats direct reserve/slot use without TWAP evidence as manipulable, and
+reports zero minimum output or `block.timestamp` deadlines on common V2 router
+calls. Safe freshness, TWAP, and caller-bounded swap fixtures remain clean.
+
+`SOL013` intentionally has no source-only fallback. Member-name recognition and
+V2 router positions are conservative, and value origins are currently direct.
+Round completeness, heartbeat policy, observation duration, market liquidity,
+V3 structs, custom routers, and upstream bounds still require manual review.
+
 ## Analysis architecture
 
 The intended pipeline is:
@@ -141,6 +154,7 @@ Solidity project
   -> signature recovery-to-action hazards               [M3: RULE-010 complete]
   -> proxy initialization and layout hazards            [M3: RULE-011 complete]
   -> typed token return and amount-flow hazards          [M3: RULE-012 complete]
+  -> oracle freshness, spot-price, and swap bounds       [M3: RULE-013 complete]
   -> deterministic security rules
   -> structured findings with evidence paths
   -> filtered compiler-analysis inspection JSON
