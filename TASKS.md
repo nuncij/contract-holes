@@ -10,7 +10,7 @@ Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
 Current position: M0 through M4 are complete, including isolated execution of
 generated proofs, fuzz sequences, and user-supplied invariants.
 
-Next: **CONFIG-001**
+Next: **BASELINE-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -173,8 +173,8 @@ counterexamples, and document conditions that require manual review.
 
 ## M5 — Team and CI workflow (`0.6.0`)
 
-- [ ] **CONFIG-001** — Add `.holes.toml` with rule, path, severity, and compiler settings — P0 — **NEXT**.
-- [ ] **BASELINE-001** — Compare fingerprints and fail CI only on new findings — P0.
+- [x] **CONFIG-001** — Add `.holes.toml` with rule, path, severity, and compiler settings — P0 — **COMPLETE**.
+- [ ] **BASELINE-001** — Compare fingerprints and fail CI only on new findings — P0 — **NEXT**.
 - [ ] **CATALOG-001** — Add `holes rules` with examples and remediation references — P1.
 - [ ] **CI-001** — Publish a reusable SARIF/CI workflow example — P1.
 - [ ] **LIMIT-001** — Add file, compiler, time, and memory limits with explicit diagnostics — P0.

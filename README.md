@@ -62,6 +62,36 @@ Compilation happens in an isolated temporary directory, so the scanner does not
 modify the project's Foundry cache or artifacts. Foundry may download a matching
 solc version unless `--offline` is used.
 
+## Project configuration
+
+Place `.holes.toml` at the project root to share scan paths, exclusion globs,
+rule selection, severity overrides, and compiler behavior:
+
+```toml
+schema_version = 1
+
+[scan]
+paths = ["src"]
+exclude = ["mocks/**", "*.generated.sol"]
+minimum_severity = "medium"
+
+[rules]
+disabled = ["SOL004"]
+
+[rules.severity]
+SOL005 = "critical"
+
+[compiler]
+enabled = true
+offline = true
+```
+
+Then `holes` can run without a path. The nearest `.holes.toml` is discovered
+from the working directory; use `--config FILE` or `--no-config` explicitly.
+CLI paths and corresponding flags override configured values. Unknown keys,
+rule IDs, severities, and contradictory compiler settings fail clearly. See
+[configuration](docs/CONFIGURATION.md) for the complete schema and precedence.
+
 ## Inspecting compiler analysis
 
 Developers can inspect the compiler-backed model separately from security
@@ -198,7 +228,7 @@ minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
 positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
 `SOL005` reentrancy probes and calldata-driven transaction sequences are also
 complete, including user-supplied per-step invariants. The next task is
-`CONFIG-001`, project-level `.holes.toml` settings.
+`BASELINE-001`, new-finding-only CI comparisons.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

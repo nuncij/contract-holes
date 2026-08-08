@@ -48,6 +48,27 @@ class ScannerTests(unittest.TestCase):
             self.assertEqual([item.name for item in default], ["Main.sol"])
             self.assertEqual({item.name for item in included}, {"Main.sol", "Dependency.sol"})
 
+    def test_custom_globs_exclude_relative_paths_and_filenames(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "generated").mkdir()
+            (root / "src").mkdir()
+            (root / "generated" / "Generated.sol").write_text(
+                "contract Generated {}", encoding="utf-8"
+            )
+            (root / "src" / "Ignored.skip.sol").write_text(
+                "contract Ignored {}", encoding="utf-8"
+            )
+            kept = root / "src" / "Kept.sol"
+            kept.write_text("contract Kept {}", encoding="utf-8")
+
+            files = discover_sources(
+                [root],
+                exclude_patterns=("generated/**", "*.skip.sol"),
+            )
+
+            self.assertEqual(files, [kept])
+
     def test_invalid_path_is_an_actionable_error(self) -> None:
         with self.assertRaisesRegex(ScanError, "path does not exist"):
             discover_sources(["definitely-missing.sol"])

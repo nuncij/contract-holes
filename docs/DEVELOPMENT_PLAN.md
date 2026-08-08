@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.5.0`
 Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
-Next: **CONFIG-001 — Project-level `.holes.toml` settings**
+Next: **BASELINE-001 — New-finding-only CI comparisons**
 
 ## Product goal
 
@@ -32,9 +32,9 @@ The scanner is successful when it:
 | Rules | Thirteen registered rules, `SOL001` through `SOL013` |
 | Proofs | Runnable `SOL007` proof; `SOL005` probe, sequence fuzzing, invariants, requirement manifests, and isolated runner |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
-| Workflow | Severity/CI policy, suppressions, inspection, benchmarks, and timeout-bounded proof execution |
+| Workflow | `.holes.toml`, severity/CI policy, suppressions, inspection, benchmarks, and timeout-bounded proof execution |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 94 Python tests; offline M2/M3 corpora, benchmark, inspection, and isolated `SOL005`/`SOL007` Forge execution tested |
+| Verification | 100 Python tests; configuration, offline M2/M3 corpora, benchmark, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -177,6 +177,13 @@ runnable bundle in its own temporary Foundry project. It uses the recorded solc
 version, defaults to offline compilation, removes inherited Foundry/RPC settings,
 enforces a per-artifact timeout, redacts temporary paths, and returns structured
 pass/fail/timeout/unsupported JSON. The input proof directory remains unchanged.
+
+Project scans now discover a validated `.holes.toml`. The versioned schema sets
+scan roots and exclusions, dependency policy, minimum severity, enabled/disabled
+rules, per-rule severity overrides, and compiler/offline behavior. Relative paths
+resolve from the configuration file, explicit CLI values win, and unknown or
+contradictory settings fail instead of being ignored. The schema and precedence
+are documented in [CONFIGURATION.md](CONFIGURATION.md).
 
 ## Analysis architecture
 

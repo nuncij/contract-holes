@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from collections.abc import Iterable, Sequence
+from dataclasses import replace
+from fnmatch import fnmatchcase
 from pathlib import Path
 
 from .compiler import CompilerError, ForgeCompiler
-from .models import Finding, Severity
+from .models import Finding, RuleInfo, Severity
 from .project import ProjectIndex, ProjectIndexError
 from .rules import DEFAULT_RULES, Rule
 from .source import SoliditySource
@@ -24,12 +26,35 @@ class Scanner:
         self,
         rules: Sequence[Rule] = DEFAULT_RULES,
         compiler: ForgeCompiler | None = None,
+        severity_overrides: dict[str, Severity] | None = None,
     ):
         self.rules = tuple(rules)
         self.compiler = compiler or ForgeCompiler()
+        self.severity_overrides = dict(severity_overrides or {})
+
+    @property
+    def rule_infos(self) -> list[RuleInfo]:
+        return [
+            replace(
+                rule.info,
+                severity=self.severity_overrides.get(
+                    rule.info.rule_id, rule.info.severity
+                ),
+            )
+            for rule in self.rules
+        ]
 
     def scan_source(self, source: SoliditySource) -> list[Finding]:
-        findings = [finding for rule in self.rules for finding in rule.scan(source)]
+        findings = [
+            replace(
+                finding,
+                severity=self.severity_overrides.get(
+                    finding.rule_id, finding.severity
+                ),
+            )
+            for rule in self.rules
+            for finding in rule.scan(source)
+        ]
         return sorted(findings, key=_finding_sort_key)
 
     def scan_paths(
@@ -38,10 +63,15 @@ class Scanner:
         *,
         minimum_severity: Severity = Severity.INFO,
         include_dependencies: bool = False,
+        exclude_patterns: Sequence[str] = (),
         compile_sources: bool = False,
         compiler_offline: bool = False,
     ) -> tuple[list[Finding], int]:
-        files = discover_sources(paths, include_dependencies=include_dependencies)
+        files = discover_sources(
+            paths,
+            include_dependencies=include_dependencies,
+            exclude_patterns=exclude_patterns,
+        )
         project_index: ProjectIndex | None = None
         if compile_sources:
             try:
@@ -78,7 +108,10 @@ class Scanner:
 
 
 def discover_sources(
-    paths: Iterable[Path | str], *, include_dependencies: bool = False
+    paths: Iterable[Path | str],
+    *,
+    include_dependencies: bool = False,
+    exclude_patterns: Sequence[str] = (),
 ) -> list[Path]:
     discovered: set[Path] = set()
     for raw_path in paths:
@@ -88,6 +121,8 @@ def discover_sources(
         if path.is_file():
             if path.suffix.lower() != ".sol":
                 raise ScanError(f"expected a .sol file: {path}")
+            if _excluded(path.name, exclude_patterns):
+                continue
             discovered.add(path)
             continue
         for candidate in path.rglob("*.sol"):
@@ -96,9 +131,25 @@ def discover_sources(
                 part in DEFAULT_EXCLUDES for part in relative_parts[:-1]
             ):
                 continue
+            if _excluded(Path(*relative_parts).as_posix(), exclude_patterns):
+                continue
             discovered.add(candidate)
     return sorted(discovered, key=lambda item: str(item))
 
 
 def _finding_sort_key(finding: Finding) -> tuple[int, str, int, int, str]:
-    return (-int(finding.severity), str(finding.path), finding.line, finding.column, finding.rule_id)
+    return (
+        -int(finding.severity),
+        str(finding.path),
+        finding.line,
+        finding.column,
+        finding.rule_id,
+    )
+
+
+def _excluded(relative_path: str, patterns: Sequence[str]) -> bool:
+    return any(
+        fnmatchcase(relative_path, pattern)
+        or fnmatchcase(Path(relative_path).name, pattern)
+        for pattern in patterns
+    )

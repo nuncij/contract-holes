@@ -8,6 +8,13 @@ import sys
 
 from . import __version__
 from .benchmark import BenchmarkError, benchmark_exit_status, benchmark_paths
+from .config import (
+    ConfigError,
+    HolesConfig,
+    discover_config,
+    load_config,
+    selected_rules,
+)
 from .inspector import InspectionError, InspectionFilters, inspect_paths
 from .models import Severity
 from .proofs import ProofGenerationError, generate_foundry_proofs
@@ -31,7 +38,22 @@ def parser() -> argparse.ArgumentParser:
         ),
     )
     result.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
-    result.add_argument("paths", nargs="+", help="Solidity files or directories to scan")
+    result.add_argument(
+        "paths",
+        nargs="*",
+        help="Solidity files or directories (defaults to scan.paths in .holes.toml)",
+    )
+    config_group = result.add_mutually_exclusive_group()
+    config_group.add_argument(
+        "--config",
+        metavar="FILE",
+        help="use FILE instead of discovering .holes.toml",
+    )
+    config_group.add_argument(
+        "--no-config",
+        action="store_true",
+        help="do not discover or load .holes.toml",
+    )
     result.add_argument(
         "--format",
         choices=("text", "json", "sarif"),
@@ -41,9 +63,9 @@ def parser() -> argparse.ArgumentParser:
     result.add_argument(
         "--minimum-severity",
         metavar="LEVEL",
-        default="info",
+        default=None,
         choices=tuple(item.name.lower() for item in Severity),
-        help="only report findings at or above this severity",
+        help="only report findings at or above this severity (overrides config)",
     )
     result.add_argument(
         "--fail-on",
@@ -51,20 +73,58 @@ def parser() -> argparse.ArgumentParser:
         choices=tuple(item.name.lower() for item in Severity),
         help="exit with status 1 if a finding at or above this severity exists",
     )
-    result.add_argument(
+    dependency_group = result.add_mutually_exclusive_group()
+    dependency_group.add_argument(
         "--include-dependencies",
+        dest="include_dependencies",
         action="store_true",
+        default=None,
         help="include lib, vendor, node_modules, and generated artifact directories",
     )
-    result.add_argument(
-        "--compile",
-        action="store_true",
-        help="compile with Foundry and enable type-aware AST rules",
+    dependency_group.add_argument(
+        "--exclude-dependencies",
+        dest="include_dependencies",
+        action="store_false",
+        help=(
+            "exclude dependency and generated directories even if config "
+            "includes them"
+        ),
     )
     result.add_argument(
-        "--offline",
+        "--exclude",
+        dest="exclude_patterns",
+        action="append",
+        default=None,
+        metavar="GLOB",
+        help="exclude paths matching GLOB (repeatable; replaces config excludes)",
+    )
+    compile_group = result.add_mutually_exclusive_group()
+    compile_group.add_argument(
+        "--compile",
+        dest="compile",
         action="store_true",
-        help="prevent Foundry from downloading missing compiler versions (requires --compile)",
+        default=None,
+        help="compile with Foundry and enable type-aware AST rules",
+    )
+    compile_group.add_argument(
+        "--no-compile",
+        dest="compile",
+        action="store_false",
+        help="use source-only analysis even if config enables compilation",
+    )
+    network_group = result.add_mutually_exclusive_group()
+    network_group.add_argument(
+        "--offline",
+        dest="offline",
+        action="store_true",
+        default=None,
+        help="prevent Foundry from downloading missing compiler versions",
+    )
+    network_group.add_argument(
+        "--online",
+        dest="offline",
+        action="store_false",
+        help="allow Foundry compiler downloads even if config selects offline mode",
     )
     result.add_argument(
         "--generate-proofs",
@@ -178,18 +238,57 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _proof_runner_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
-    if args.offline and not args.compile:
+    try:
+        configuration = _scan_configuration(args)
+    except ConfigError as exc:
+        print(f"holes: error: {exc}", file=sys.stderr)
+        return 2
+    scan_paths = list(args.paths) or list(configuration.paths)
+    if not scan_paths:
+        print(
+            "holes: error: no scan paths; pass PATH or configure scan.paths",
+            file=sys.stderr,
+        )
+        return 2
+    minimum_severity = (
+        Severity.parse(args.minimum_severity)
+        if args.minimum_severity is not None
+        else configuration.minimum_severity
+    )
+    include_dependencies = (
+        args.include_dependencies
+        if args.include_dependencies is not None
+        else configuration.include_dependencies
+    )
+    exclude_patterns = (
+        tuple(args.exclude_patterns)
+        if args.exclude_patterns is not None
+        else configuration.exclude
+    )
+    compile_sources = (
+        args.compile if args.compile is not None else configuration.compiler_enabled
+    )
+    compiler_offline = (
+        args.offline if args.offline is not None else configuration.compiler_offline
+    )
+    if args.compile is False and args.offline is None:
+        compiler_offline = False
+    if compiler_offline and not compile_sources:
         argument_parser.error("--offline requires --compile")
-    if args.generate_proofs and not args.compile:
+    if args.generate_proofs and not compile_sources:
         argument_parser.error("--generate-proofs requires --compile")
-    scanner = Scanner()
+    scanner = Scanner(
+        rules=selected_rules(configuration),
+        severity_overrides=configuration.severity_overrides,
+    )
     try:
         findings, files_scanned = scanner.scan_paths(
-            args.paths,
-            minimum_severity=Severity.parse(args.minimum_severity),
-            include_dependencies=args.include_dependencies,
-            compile_sources=args.compile,
-            compiler_offline=args.offline,
+            scan_paths,
+            minimum_severity=minimum_severity,
+            include_dependencies=include_dependencies,
+            exclude_patterns=exclude_patterns,
+            compile_sources=compile_sources,
+            compiler_offline=compiler_offline,
         )
     except ScanError as exc:
         print(f"holes: error: {exc}", file=sys.stderr)
@@ -198,7 +297,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     if args.format == "json":
         output = json_report(findings, files_scanned)
     elif args.format == "sarif":
-        output = sarif_report(findings, [rule.info for rule in scanner.rules])
+        output = sarif_report(findings, scanner.rule_infos)
     else:
         output = text_report(
             findings,
@@ -227,6 +326,24 @@ def main(argv: Sequence[str] | None = None) -> int:
         if any(finding.severity >= threshold for finding in findings):
             return 1
     return 0
+
+
+def _scan_configuration(args: argparse.Namespace) -> HolesConfig:
+    if args.no_config:
+        return HolesConfig()
+    path = Path(args.config).resolve() if args.config else discover_config()
+    if path is None and args.paths:
+        candidates = {
+            candidate
+            for raw_path in args.paths
+            if (candidate := discover_config(Path(raw_path))) is not None
+        }
+        if len(candidates) > 1:
+            raise ConfigError(
+                "scan paths belong to multiple .holes.toml projects; use --config"
+            )
+        path = next(iter(candidates), None)
+    return load_config(path) if path is not None else HolesConfig()
 
 
 def _inspect_main(argv: Sequence[str]) -> int:
