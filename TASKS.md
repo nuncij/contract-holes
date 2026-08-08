@@ -9,7 +9,7 @@ Current milestone: **M2 — Cross-contract analysis (`0.3.0`)**
 
 Current position: M0 and M1 are complete; M2 implementation is underway.
 
-Next task: **FLOW-001**
+Next task: **FLOW-002**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -65,7 +65,7 @@ Acceptance criteria:
 
 Depends on: `AST-001`.
 
-### [ ] FLOW-001 — Internal call graph — P0 — **NEXT**
+### [x] FLOW-001 — Internal call graph — P0 — **COMPLETE**
 
 Create function-to-function edges for direct internal calls, inherited calls,
 `super`, library calls, and known `this` calls.
@@ -79,7 +79,7 @@ Acceptance criteria:
 
 Depends on: `AST-001`, `AST-002`.
 
-### [ ] FLOW-002 — Reusable data-flow facts — P0
+### [ ] FLOW-002 — Reusable data-flow facts — P0 — **NEXT**
 
 Introduce expression facts for reads, writes, user-controlled inputs, external
 interactions, transferred value, and authorization conditions.

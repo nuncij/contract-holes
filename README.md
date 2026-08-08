@@ -95,9 +95,10 @@ Project status and future work are tracked explicitly:
   completed work, and the single next task.
 
 The project is currently at `0.2.0`. M0 and M1 are complete; M2 is underway.
-The project-wide compiler index (`AST-001`) and inheritance resolution
-(`AST-002`) are complete. The next task is `FLOW-001`: an internal call graph
-with explicit resolution confidence and unresolved dynamic edges.
+The project-wide compiler index (`AST-001`), inheritance resolution (`AST-002`),
+and internal call graph (`FLOW-001`) are complete. The next task is `FLOW-002`:
+reusable data-flow facts for reads, writes, aliases, user input, authorization,
+and external interactions.
 
 The complete suite uses Python's standard library:
 

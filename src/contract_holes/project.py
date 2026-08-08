@@ -88,6 +88,7 @@ class ProjectIndex:
         self.declarations_by_id: dict[NodeKey, Node] = {}
         self.contracts_by_id: dict[NodeKey, Node] = {}
         self.functions_by_id: dict[NodeKey, Node] = {}
+        self.modifiers_by_id: dict[NodeKey, Node] = {}
         self._node_keys_by_object: dict[int, NodeKey] = {}
         self._node_sources_by_object: dict[int, IndexedSource] = {}
         self._parents_by_object: dict[int, Node | None] = {}
@@ -95,6 +96,9 @@ class ProjectIndex:
         from .inheritance import InheritanceResolver
 
         self.inheritance = InheritanceResolver(self)
+        from .callgraph import CallGraph
+
+        self.call_graph = CallGraph(self)
 
     def source_for_path(self, path: Path | str) -> IndexedSource | None:
         candidates = self.sources_by_path.get(Path(path).resolve(), ())
@@ -271,6 +275,8 @@ class ProjectIndex:
                 self.contracts_by_id[key] = node
             elif node_type == "FunctionDefinition":
                 self.functions_by_id[key] = node
+            elif node_type == "ModifierDefinition":
+                self.modifiers_by_id[key] = node
         for value in node.values():
             if isinstance(value, dict) and "nodeType" in value:
                 self._index_tree(value, source, parent=node)
