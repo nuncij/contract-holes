@@ -93,6 +93,11 @@ class DataFlowAnalysis:
             by_kind.setdefault(fact.kind, []).append(fact)
         self.by_function = {key: tuple(values) for key, values in by_function.items()}
         self.by_kind = {key: tuple(values) for key, values in by_kind.items()}
+        self.argument_values: dict[NodeKey, FlowValue] = {
+            fact.node: fact.value
+            for fact in self.by_kind.get("call-argument", ())
+            if fact.node is not None
+        }
 
     def facts_for(
         self,
@@ -128,6 +133,14 @@ class DataFlowAnalysis:
             "schema_version": "1.0",
             "facts": [self._fact_dict(fact) for fact in self.facts],
         }
+
+    def value_for_argument(self, argument: NodeKey | Node) -> FlowValue | None:
+        key = (
+            argument
+            if isinstance(argument, NodeKey)
+            else self.project.key_for_node(argument)
+        )
+        return self.argument_values.get(key) if key is not None else None
 
     @staticmethod
     def _fact_dict(fact: FlowFact) -> dict[str, object]:
@@ -484,12 +497,20 @@ class _FunctionAnalyzer:
         return self._value(owner) if isinstance(owner, dict) else FlowValue(unknown=True)
 
     def _function_call_value(self, call: Node) -> FlowValue:
-        arguments = call.get("arguments", [])
-        argument_values = [
-            self._value(argument)
-            for argument in arguments
+        raw_arguments = call.get("arguments", [])
+        arguments = [
+            argument
+            for argument in raw_arguments
             if isinstance(argument, dict)
-        ]
+        ] if isinstance(raw_arguments, list) else []
+        argument_values = [self._value(argument) for argument in arguments]
+        for index, (argument, value) in enumerate(zip(arguments, argument_values)):
+            self._fact(
+                "call-argument",
+                argument,
+                value=value,
+                metadata={"index": index},
+            )
         option_names, option_expressions = _call_options(call)
         option_values = [self._value(option) for option in option_expressions]
         call_key = self.project.key_for_node(call)
@@ -505,6 +526,24 @@ class _FunctionAnalyzer:
 
         if edge is not None and edge.is_sink:
             parent = self.project.parent(call)
+            target_expression = _call_target_expression(call, edge)
+            target_value = (
+                self._value(target_expression)
+                if target_expression is not None
+                else FlowValue(unknown=True)
+            )
+            self._fact(
+                "external-target",
+                call,
+                value=target_value,
+                metadata={
+                    "edge_kind": edge.kind,
+                    "confidence": edge.confidence,
+                    "target": edge.target,
+                    "receiver": _call_receiver(self.project, call),
+                    "empty_calldata": _has_empty_calldata(call, edge),
+                },
+            )
             self._fact(
                 "external-interaction",
                 call,
@@ -780,6 +819,32 @@ def _call_receiver(project: "ProjectIndex", call: Node) -> str | None:
         return None
     text = source.source.text[span.start : span.end].strip()
     return text or (str(owner.get("name")) if owner.get("name") else None)
+
+
+def _call_target_expression(call: Node, edge: CallEdge) -> Node | None:
+    expression = _unwrap_call_options(call.get("expression"))
+    if not isinstance(expression, dict):
+        return None
+    if expression.get("nodeType") == "MemberAccess":
+        owner = expression.get("expression")
+        return owner if isinstance(owner, dict) else None
+    if edge.kind == "function-pointer":
+        return expression
+    return None
+
+
+def _has_empty_calldata(call: Node, edge: CallEdge) -> bool:
+    if edge.kind != "low-level-call":
+        return False
+    arguments = call.get("arguments", [])
+    if not isinstance(arguments, list) or len(arguments) != 1:
+        return False
+    argument = arguments[0]
+    if not isinstance(argument, dict) or argument.get("nodeType") != "Literal":
+        return False
+    value = argument.get("value")
+    hex_value = argument.get("hexValue")
+    return value in {"", None} and hex_value in {"", None}
 
 
 def _walk_ast(node: Node):

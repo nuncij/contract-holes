@@ -156,6 +156,11 @@ class ProjectInspector:
             for issue in self.project.reentrancy.issues
             if issue.entry in selected
         ]
+        target_issues = [
+            self._target_issue_dict(issue)
+            for issue in self.project.target_taint.issues
+            if issue.entry in selected
+        ]
         return {
             "schema_version": "1.0",
             "project_root": str(self.root),
@@ -174,6 +179,7 @@ class ProjectInspector:
                 "facts": len(facts),
                 "guarded_functions": len(guarded),
                 "reentrancy_issues": len(issues),
+                "target_taint_issues": len(target_issues),
             },
             "project_index": {"sources": sources, "contracts": contracts},
             "inheritance": contracts,
@@ -183,6 +189,7 @@ class ProjectInspector:
                 "guarded_functions": guarded,
                 "issues": issues,
             },
+            "target_taint": {"issues": target_issues},
         }
 
     def _matches_source(self, path: Path) -> bool:
@@ -369,6 +376,23 @@ class ProjectInspector:
             "interaction_function": self._qualified_name(issue.interaction.function),
             "state_write_function": self._qualified_name(issue.state_write.function),
             "state_variable": analysis.state_variable_name(issue.state_write),
+            "trace": trace,
+        }
+
+    def _target_issue_dict(self, issue) -> dict[str, object]:
+        analysis = self.project.target_taint
+        trace: list[dict[str, object]] = []
+        for step in issue.trace:
+            item = analysis.step_dict(step)
+            if item.get("path") is not None:
+                item["path"] = self._path(Path(str(item["path"])))
+            trace.append(item)
+        return {
+            "entry_function": analysis.function_name(issue.entry),
+            "sink_function": analysis.function_name(issue.sink.function),
+            "call_kind": issue.sink.metadata.get("edge_kind"),
+            "target": issue.sink.metadata.get("receiver"),
+            "taints": list(issue.taints),
             "trace": trace,
         }
 

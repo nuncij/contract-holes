@@ -1,0 +1,33 @@
+{
+  "schema_version": "1.0",
+  "rule_id": "SOL008",
+  "evidence": "compiler-interprocedural-target-taint",
+  "expected_findings": [
+    {
+      "entry_function": "TargetVulnerable.arbitrary",
+      "call_kind": "low-level-call",
+      "trace_kinds": ["input", "sink"]
+    },
+    {
+      "entry_function": "TargetVulnerable.invoke",
+      "call_kind": "external",
+      "trace_kinds": ["input", "sink"]
+    },
+    {
+      "entry_function": "TargetVulnerable.throughHelper",
+      "call_kind": "low-level-call",
+      "trace_kinds": ["input", "call", "parameter", "sink"]
+    },
+    {
+      "entry_function": "TargetVulnerable.upgrade",
+      "call_kind": "low-level-delegatecall",
+      "trace_kinds": ["input", "sink"]
+    }
+  ],
+  "expected_clean_entries": [
+    "TargetSafe.fixedPlugin",
+    "TargetSafe.fixedTarget",
+    "TargetSafe.payment"
+  ]
+}
+

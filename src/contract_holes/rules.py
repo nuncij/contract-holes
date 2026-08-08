@@ -6,6 +6,7 @@ import re
 from .models import Finding, RuleInfo, Severity
 from .reentrancy import ReentrancyIssue
 from .source import FunctionRegion, SoliditySource
+from .target_taint import CallTargetIssue
 
 
 class Rule:
@@ -424,6 +425,90 @@ class PackedEncodingCollisionRule(Rule):
                 yield finding
 
 
+class UserControlledCallTargetRule(Rule):
+    info = RuleInfo(
+        rule_id="SOL008",
+        severity=Severity.HIGH,
+        title="User-controlled value selects an external call target",
+        description=(
+            "An externally controlled value reaches a call destination, allowing a caller "
+            "to select code that executes across the contract's trust boundary."
+        ),
+        recommendation=(
+            "Use a fixed or immutable destination, or validate the target against an explicit "
+            "allowlist before making the call. Treat delegatecall destinations as privileged code."
+        ),
+        confidence="medium",
+    )
+
+    def scan(self, source: SoliditySource) -> Iterable[Finding]:
+        if source.project_index is None:
+            return
+        analysis = source.project_index.target_taint
+        current_path = source.path.resolve()
+        for issue in analysis.issues:
+            entry = source.project_index.node_for_key(issue.entry)
+            entry_source = (
+                source.project_index.source_for_node(entry) if entry is not None else None
+            )
+            if entry_source is None or entry_source.path.resolve() != current_path:
+                continue
+            anchor = self._finding_anchor(source, issue)
+            if anchor is None:
+                continue
+            call_kind = str(issue.sink.metadata.get("edge_kind", "external"))
+            target = str(
+                issue.sink.metadata.get("receiver")
+                or issue.sink.metadata.get("target")
+                or "<target>"
+            )
+            sink_function = analysis.function_name(issue.sink.function)
+            finding = self.finding(
+                source,
+                anchor,
+                message=(
+                    f"Externally controlled input reaches {call_kind!r} target "
+                    f"{target!r} in {sink_function}."
+                ),
+                metadata={
+                    "evidence": "compiler-interprocedural-target-taint",
+                    "entry_function": analysis.function_name(issue.entry),
+                    "sink_function": sink_function,
+                    "call_kind": call_kind,
+                    "target": target,
+                    "taints": list(issue.taints),
+                    "trace": [analysis.step_dict(step) for step in issue.trace],
+                    "manual_review": (
+                        "Confirm whether target validation, an immutable registry, or protocol "
+                        "design intentionally permits caller-selected code."
+                    ),
+                },
+            )
+            if finding:
+                yield finding
+
+    @staticmethod
+    def _finding_anchor(
+        source: SoliditySource, issue: CallTargetIssue
+    ) -> int | None:
+        current_path = source.path.resolve()
+        if issue.sink.span is not None and issue.sink.span.path.resolve() == current_path:
+            return issue.sink.span.start
+        for step in issue.trace:
+            if (
+                step.kind == "call"
+                and step.function == issue.entry
+                and step.span is not None
+                and step.span.path.resolve() == current_path
+            ):
+                return step.span.start
+        project = source.project_index
+        assert project is not None
+        entry = project.node_for_key(issue.entry)
+        span = project.source_span(entry) if entry is not None else None
+        return span.start if span is not None else None
+
+
 def _walk_ast(
     node: dict[str, object], parent: dict[str, object] | None = None
 ) -> Iterable[tuple[dict[str, object], dict[str, object] | None]]:
@@ -477,4 +562,5 @@ DEFAULT_RULES: tuple[Rule, ...] = (
     ReentrancyRule(),
     WeakRandomnessRule(),
     PackedEncodingCollisionRule(),
+    UserControlledCallTargetRule(),
 )

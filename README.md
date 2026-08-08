@@ -15,6 +15,7 @@ It currently detects:
 | `SOL005` | High | Persistent state mutation after an external interaction |
 | `SOL006` | Medium | Block properties hashed as a source of randomness |
 | `SOL007` | Medium | Multiple dynamic values in a packed hash encoding (compiler AST) |
+| `SOL008` | High | User-controlled value reaches an external or `delegatecall` target |
 
 These are review signals, not proofs. Findings include confidence and evidence;
 the scanner deliberately does not claim that a clean report means a contract is
@@ -140,8 +141,10 @@ Project status and future work are tracked explicitly:
 The project is currently at `0.3.0`. M0, M1, and M2 are complete. The compiler
 index, inheritance resolver, call graph, reusable data-flow facts,
 interprocedural `SOL005` analysis, versioned multi-file corpus, deterministic
-inspection JSON, and repeatable benchmark are complete. The next task is
-`RULE-008`: trace user-controlled external and `delegatecall` targets.
+inspection JSON, and repeatable benchmark are complete. `SOL008` now traces
+externally controlled call destinations across aliases and internal helpers. The
+next task is `RULE-009`: authorization reachability and exposed privileged state
+changes.
 
 The complete suite uses Python's standard library:
 

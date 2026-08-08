@@ -9,7 +9,7 @@ Current milestone: **M3 — High-value detectors (`0.4.0`)**
 
 Current position: M0, M1, and M2 are complete; M3 implementation is next.
 
-Next task: **RULE-008**
+Next task: **RULE-009**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -151,8 +151,8 @@ Depends on: `TEST-002`.
 
 ## M3 — High-value detectors (`0.4.0`)
 
-- [ ] **RULE-008** — User-controlled external and `delegatecall` target taint — P0 — **NEXT**.
-- [ ] **RULE-009** — Authorization reachability and exposed privileged state changes — P0.
+- [x] **RULE-008** — User-controlled external and `delegatecall` target taint — P0 — **COMPLETE**.
+- [ ] **RULE-009** — Authorization reachability and exposed privileged state changes — P0 — **NEXT**.
 - [ ] **RULE-010** — Signature recovery, nonce, deadline, and domain-separation hazards — P0.
 - [ ] **RULE-011** — Proxy initializer and storage-layout hazards — P0.
 - [ ] **RULE-012** — ERC-20 return value and balance-delta assumptions — P1.

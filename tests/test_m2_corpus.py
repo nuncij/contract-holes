@@ -193,9 +193,10 @@ class M2CorpusCompilerTests(unittest.TestCase):
                 "functions": 1,
                 "modifiers": 0,
                 "call_edges": 2,
-                "facts": 6,
+                "facts": 10,
                 "guarded_functions": 0,
                 "reentrancy_issues": 1,
+                "target_taint_issues": 0,
             },
         )
         self.assertEqual(

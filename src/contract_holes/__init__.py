@@ -7,10 +7,12 @@ from .inheritance import InheritanceResolver
 from .project import ProjectIndex
 from .reentrancy import ReentrancyAnalysis
 from .scanner import Scanner
+from .target_taint import CallTargetAnalysis
 
 __all__ = [
     "Finding",
     "CallGraph",
+    "CallTargetAnalysis",
     "DataFlowAnalysis",
     "InheritanceResolver",
     "ProjectIndex",
