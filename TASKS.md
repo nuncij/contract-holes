@@ -10,7 +10,7 @@ Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
 Current position: M0 through M4 are complete, including isolated execution of
 generated proofs, fuzz sequences, and user-supplied invariants.
 
-Next: **ADDRESS-001**
+Next: **AI-001**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -178,8 +178,8 @@ counterexamples, and document conditions that require manual review.
 - [x] **CATALOG-001** — Add `holes rules` with examples and remediation references — P1 — **COMPLETE**.
 - [x] **CI-001** — Publish a reusable SARIF/CI workflow example — P1 — **COMPLETE**.
 - [x] **LIMIT-001** — Add file, compiler, time, and memory limits with explicit diagnostics — P0 — **COMPLETE**.
-- [ ] **ADDRESS-001** — Ingest verified source by chain/address with provenance — P2 — **NEXT**.
-- [ ] **AI-001** — Correlate and explain deterministic evidence without inventing findings — P2.
+- [x] **ADDRESS-001** — Ingest verified source by chain/address with provenance — P2 — **COMPLETE**.
+- [ ] **AI-001** — Correlate and explain deterministic evidence without inventing findings — P2 — **NEXT**.
 
 ## M6 — Audit-ready release (`1.0.0`)
 

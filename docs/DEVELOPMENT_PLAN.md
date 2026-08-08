@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.5.0`
 Current milestone: **M5 — Team and CI workflow (`0.6.0`)**
-Next: **ADDRESS-001 — Verified-source ingestion with provenance**
+Next: **AI-001 — Evidence-bound correlation and explanation**
 
 ## Product goal
 
@@ -26,15 +26,15 @@ The scanner is successful when it:
 | --- | --- |
 | Repository | Local Git repository on `main`, with task-scoped implementation commits |
 | Release | `0.5.0` |
-| Inputs | One or more Solidity files or directories |
+| Inputs | Solidity files/directories or Etherscan V2 verified source by chain/address |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
 | Rules | Thirteen registered rules, `SOL001` through `SOL013` |
 | Proofs | Runnable `SOL007` proof; `SOL005` probe, sequence fuzzing, invariants, requirement manifests, and isolated runner |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
-| Workflow | `.holes.toml`, baselines, `holes rules`, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
+| Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 118 Python tests; CI/catalog/config/baselines/limits, offline corpora, benchmark, inspection, and isolated Forge execution tested |
+| Verification | 123 Python tests; CI/catalog/config/baselines/limits/address ingestion, offline corpora, benchmark, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity

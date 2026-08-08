@@ -110,6 +110,24 @@ the matching CLI overrides; failures are execution errors rather than clean
 scans. See [resource limits](docs/RESOURCE_LIMITS.md) for defaults and diagnostic
 categories.
 
+## Fetching verified source
+
+Public verified Solidity can be ingested by chain and address before scanning:
+
+```bash
+export ETHERSCAN_API_KEY="your key"
+holes fetch 1 0x1234567890abcdef1234567890abcdef12345678 \
+  --output verified/example
+holes verified/example --compile
+```
+
+The new output directory contains normalized source files, preserved standard
+compiler input when available, and `provenance.json` with provider/compiler/proxy
+metadata and SHA-256 hashes. It refuses overwrites, rejects unsafe source paths,
+and never stores the API key. This records the explorer response; it does not
+independently prove deployed-bytecode equivalence or follow proxy implementations.
+See [verified-source ingestion](docs/VERIFIED_SOURCE.md).
+
 ## Baselines and new-finding CI
 
 Create a reviewed fingerprint baseline, then gate only findings introduced after

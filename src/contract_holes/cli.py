@@ -4,10 +4,12 @@ import argparse
 from collections.abc import Sequence
 from dataclasses import replace
 import json
+import os
 from pathlib import Path
 import sys
 
 from . import __version__
+from .address_source import AddressSourceError, fetch_and_write_verified_source
 from .benchmark import BenchmarkError, benchmark_exit_status, benchmark_paths
 from .baseline import (
     BaselineError,
@@ -42,7 +44,8 @@ def parser() -> argparse.ArgumentParser:
         epilog=(
             "Use 'holes inspect PATH ...' for analysis JSON or "
             "'holes benchmark PATH ...' for repeatable metrics. Run generated "
-            "bundles with 'holes proofs DIRECTORY'."
+            "bundles with 'holes proofs DIRECTORY'. Fetch verified source with "
+            "'holes fetch CHAIN_ID ADDRESS --output DIRECTORY'."
         ),
     )
     result.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
@@ -301,6 +304,35 @@ def rules_parser() -> argparse.ArgumentParser:
     return result
 
 
+def fetch_parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(
+        prog="holes fetch",
+        description="Fetch verified Solidity source from Etherscan V2 with provenance.",
+    )
+    result.add_argument("chain_id", help="positive EVM chain ID, such as 1 or 8453")
+    result.add_argument("address", help="deployed 0x-prefixed contract address")
+    result.add_argument(
+        "--output",
+        required=True,
+        metavar="DIRECTORY",
+        help="new directory for source files and provenance.json",
+    )
+    result.add_argument(
+        "--api-key-env",
+        default="ETHERSCAN_API_KEY",
+        metavar="NAME",
+        help="environment variable containing the API key (default: ETHERSCAN_API_KEY)",
+    )
+    result.add_argument(
+        "--timeout",
+        type=float,
+        default=30.0,
+        metavar="SECONDS",
+        help="HTTP request timeout (default: 30)",
+    )
+    return result
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments and arguments[0] == "inspect":
@@ -311,6 +343,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _proof_runner_main(arguments[1:])
     if arguments and arguments[0] == "rules":
         return _rules_main(arguments[1:])
+    if arguments and arguments[0] == "fetch":
+        return _fetch_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
     try:
@@ -537,4 +571,29 @@ def _rules_main(argv: Sequence[str]) -> int:
         print(f"holes rules: error: {exc}", file=sys.stderr)
         return 2
     print(json_catalog(payload) if args.format == "json" else text_catalog(payload))
+    return 0
+
+
+def _fetch_main(argv: Sequence[str]) -> int:
+    argument_parser = fetch_parser()
+    args = argument_parser.parse_args(argv)
+    api_key = os.environ.get(args.api_key_env, "")
+    if not api_key:
+        print(
+            f"holes fetch: error: environment variable {args.api_key_env} is not set",
+            file=sys.stderr,
+        )
+        return 2
+    try:
+        payload = fetch_and_write_verified_source(
+            args.chain_id,
+            args.address,
+            api_key,
+            args.output,
+            timeout_seconds=args.timeout,
+        )
+    except AddressSourceError as exc:
+        print(f"holes fetch: error: {exc}", file=sys.stderr)
+        return 2
+    print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
