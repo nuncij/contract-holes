@@ -1,12 +1,14 @@
 import contextlib
 import io
 import json
+from pathlib import Path
 import unittest
 from unittest.mock import patch
 
 from contract_holes.cli import main
 from contract_holes.benchmark import BenchmarkError
 from contract_holes.inspector import InspectionError, InspectionFilters
+from contract_holes.models import Finding, Severity
 
 
 class CliTests(unittest.TestCase):
@@ -33,6 +35,46 @@ class CliTests(unittest.TestCase):
 
         self.assertEqual(status, 0)
         self.assertIn("No findings", output.getvalue())
+
+    def test_generate_proofs_forwards_compiler_findings_to_generator(self) -> None:
+        finding = Finding(
+            rule_id="SOL005",
+            severity=Severity.HIGH,
+            title="Reentrancy",
+            message="interaction before write",
+            path=Path("contracts/Vault.sol"),
+            line=10,
+            column=5,
+            excerpt="target.call(\"\")",
+            recommendation="update state first",
+        )
+        output = io.StringIO()
+        errors = io.StringIO()
+        with (
+            patch(
+                "contract_holes.cli.Scanner.scan_paths",
+                return_value=([finding], 1),
+            ),
+            patch(
+                "contract_holes.cli.generate_foundry_proofs",
+                return_value=[Path("proofs/Vault_SOL005.t.sol")],
+            ) as generate,
+            contextlib.redirect_stdout(output),
+            contextlib.redirect_stderr(errors),
+        ):
+            status = main(
+                [
+                    "contracts",
+                    "--compile",
+                    "--generate-proofs",
+                    "proofs",
+                    "--no-color",
+                ]
+            )
+
+        self.assertEqual(status, 0)
+        generate.assert_called_once_with([finding], Path("proofs"))
+        self.assertIn("wrote 1 Foundry proof test", errors.getvalue())
 
     def test_inspect_command_emits_json_and_forwards_filters(self) -> None:
         output = io.StringIO()

@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `0.4.0`
 Current milestone: **M4 — Dynamic verification (`0.5.0`)**
-Next: **PROOF-002 — Configurable `SOL005` reentrancy probe**
+Next: **FUZZ-001 — Calldata-driven Foundry transaction sequences**
 
 ## Product goal
 
@@ -30,11 +30,11 @@ The scanner is successful when it:
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
 | Rules | Thirteen registered rules, `SOL001` through `SOL013` |
-| Proofs | Runnable Foundry proof for `SOL007` |
+| Proofs | Runnable Foundry proof for `SOL007`; standalone model and configurable callback probe for compiler-backed `SOL005` |
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 79 Python tests; offline M2 and versioned M3 corpora, benchmark, inspection, and Forge proof tested |
+| Verification | 83 Python tests; offline M2 and versioned M3 corpora, benchmark, inspection, and `SOL005`/`SOL007` Forge artifacts tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -45,7 +45,7 @@ The scanner is successful when it:
 | `SOL002` unchecked call | Compiler evidence when available | Does not track an assigned success value to its later use |
 | `SOL003` `delegatecall` | Source signal | Does not yet determine whether the target is user-controlled or trusted |
 | `SOL004` `selfdestruct` | Direct evidence | Protocol impact still depends on the call path and deployment assumptions |
-| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence | Branch paths remain conservative; no executable proof yet |
+| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence plus configurable callback probe | Branch paths remain conservative; target deployment, setup, and impact assertions remain project-specific |
 | `SOL006` weak randomness | Source heuristic | Does not trace the random value to a value-bearing decision |
 | `SOL007` packed hash collision | Compiler evidence plus primitive proof | Does not trace the hash to authorization, signatures, or identifiers |
 | `SOL008` controlled call target | Compiler-backed interprocedural taint | Does not yet prove allowlist dominance or persist taint through state across transactions |
@@ -141,6 +141,14 @@ compiler version, positive finding, and safe counterexample for `SOL008` through
 `SOL013`. Its 25 positive and 24 safe labels close the M3 release gate while
 remaining deliberately curated rather than claiming real-world precision or
 recall.
+
+For compiler-backed `SOL005` findings, proof generation now emits a dependency-free
+Foundry file containing a generic vulnerable model and a configurable callback
+probe. The model test demonstrates nested execution. The probe accepts target,
+entry and reentry calldata, and separate ETH values at runtime so reviewers can
+wire it into project-specific deployment and setup. Generated comments retain
+the finding's entry, interaction, state-write function, and state variable, and
+explicitly avoid claiming protocol impact.
 
 ## Analysis architecture
 

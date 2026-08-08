@@ -117,10 +117,15 @@ holes contracts/ --compile --generate-proofs test/holes
 forge test --match-path 'test/holes/*.t.sol'
 ```
 
-Automatic proofs currently cover `SOL007`. They demonstrate the collision but
-do not claim protocol impact; that still requires checking how the contract uses
-the hash. Generated files are deterministic, and the scanner refuses to
-overwrite a proof that was manually changed.
+Automatic artifacts cover `SOL007` and compiler-backed `SOL005` findings.
+`SOL007` demonstrates the packed-encoding collision. `SOL005` writes a standalone
+primitive test plus a configurable callback probe whose `run` function accepts
+the deployed target, entry calldata, reentry calldata, and call values. The
+generated model proves that nested execution is possible, not that the scanned
+protocol is exploitable; its deployment, setup, authorization, funding, and
+impact assertions still need project-specific configuration. Generated files
+are deterministic, and the scanner refuses to overwrite a manually changed
+artifact.
 
 Directories named `lib`, `vendor`, `node_modules`, `out`, `cache`, and
 `artifacts` are skipped unless `--include-dependencies` is supplied.
@@ -161,8 +166,9 @@ feeding `delegatecall`, and explicit versioned storage prefixes. `SOL012` checks
 typed ERC-20 returns and requested-amount credits after inbound transfers.
 `SOL013` checks stale oracle use, direct AMM spot-price use, and ineffective
 minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
-positive labels and 24 safe labels across `SOL008` through `SOL013`. The next
-task is `PROOF-002`: configurable `SOL005` reentrancy probes.
+positive labels and 24 safe labels across `SOL008` through `SOL013`. Configurable
+`SOL005` reentrancy probes are also complete; the next task is `FUZZ-001`,
+calldata-driven Foundry transaction sequences.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization
