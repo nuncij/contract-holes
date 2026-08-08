@@ -147,7 +147,7 @@ Project status and future work are tracked explicitly:
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
 
-The project is currently at `0.3.0`. M0, M1, and M2 are complete. The compiler
+The project is currently at `0.4.0`. M0 through M3 are complete. The compiler
 index, inheritance resolver, call graph, reusable data-flow facts,
 interprocedural `SOL005` analysis, versioned multi-file corpus, deterministic
 inspection JSON, and repeatable benchmark are complete. `SOL008` traces
@@ -158,10 +158,11 @@ authorization. `SOL010` follows signature recovery through helpers to a
 state-changing action and checks replay consumption, expiry, domain separation,
 and zero-address recovery. `SOL011` checks initializer guards, proxy storage
 feeding `delegatecall`, and explicit versioned storage prefixes. `SOL012` checks
-typed ERC-20 returns and requested-amount credits after inbound transfers. The
+typed ERC-20 returns and requested-amount credits after inbound transfers.
 `SOL013` checks stale oracle use, direct AMM spot-price use, and ineffective
-minimum-output/deadline arguments. The next task is `CORPUS-001`: the consolidated
-M3 precision and false-positive corpus.
+minimum-output/deadline arguments. The versioned `m3-1` corpus validates 25
+positive labels and 24 safe labels across `SOL008` through `SOL013`. The next
+task is `PROOF-002`: configurable `SOL005` reentrancy probes.
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
 ordering are conservative, so findings can require review for custom authorization

@@ -1,9 +1,9 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-08  
-Current release: `0.3.0`
-Current milestone: **M3 — High-value detectors (`0.4.0`)**
-Next: **CORPUS-001 — Versioned M3 precision and false-positive corpus**
+Current release: `0.4.0`
+Current milestone: **M4 — Dynamic verification (`0.5.0`)**
+Next: **PROOF-002 — Configurable `SOL005` reentrancy probe**
 
 ## Product goal
 
@@ -25,7 +25,7 @@ The scanner is successful when it:
 | Area | Current state |
 | --- | --- |
 | Repository | Local Git repository on `main`, with task-scoped implementation commits |
-| Release | `0.3.0` |
+| Release | `0.4.0` |
 | Inputs | One or more Solidity files or directories |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
@@ -34,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, and filtered analysis-inspection JSON |
 | Workflow | Severity/CI policy, suppressions, inspection, and correctness/performance benchmarks |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 76 Python tests; offline M2 and `SOL008`–`SOL013` corpora, benchmark, inspection, and Forge proof tested |
+| Verification | 79 Python tests; offline M2 and versioned M3 corpora, benchmark, inspection, and Forge proof tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -136,6 +136,12 @@ V2 router positions are conservative, and value origins are currently direct.
 Round completeness, heartbeat policy, observation duration, market liquidity,
 V3 structs, custom routers, and upstream bounds still require manual review.
 
+The versioned `m3-1` aggregate corpus pins every rule fixture, evidence label,
+compiler version, positive finding, and safe counterexample for `SOL008` through
+`SOL013`. Its 25 positive and 24 safe labels close the M3 release gate while
+remaining deliberately curated rather than claiming real-world precision or
+recall.
+
 ## Analysis architecture
 
 The intended pipeline is:
@@ -174,8 +180,8 @@ back after the user explicitly requests compilation.
 | M0 — Scanner foundation | `0.1.0` | Complete | CLI, parser, findings, six source rules, reports, suppressions, tests |
 | M1 — Compiler evidence | `0.2.0` | Complete | Isolated solc AST loading, AST-backed calls, `SOL007`, first Foundry proof |
 | M2 — Cross-contract analysis | `0.3.0` | Complete | Cross-contract facts, reentrancy traces, corpus, inspection, and benchmark |
-| M3 — High-value detectors | `0.4.0` | **Current** | Access control, call-target taint, signatures, proxies/upgrades, token assumptions |
-| M4 — Dynamic verification | `0.5.0` | Planned | Reentrancy probes, transaction-sequence fuzzing, protocol invariants |
+| M3 — High-value detectors | `0.4.0` | Complete | Access control, call-target taint, signatures, proxies/upgrades, token assumptions, market integrity |
+| M4 — Dynamic verification | `0.5.0` | **Current** | Reentrancy probes, transaction-sequence fuzzing, protocol invariants |
 | M5 — Team and CI workflow | `0.6.0` | Planned | Configuration, baselines, rule catalog, CI integration, performance controls |
 | M6 — Audit-ready release | `1.0.0` | Planned | Benchmarked accuracy, stable schemas, compatibility policy, security docs |
 

@@ -3,13 +3,14 @@
 This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
 Keep one task marked **NEXT** and at most one task marked **IN PROGRESS**.
 
-Current release: `0.3.0`
+Current release: `0.4.0`
 
-Current milestone: **M3 — High-value detectors (`0.4.0`)**
+Current milestone: **M4 — Dynamic verification (`0.5.0`)**
 
-Current position: M0, M1, and M2 are complete; `RULE-008` through `RULE-013` are complete in M3.
+Current position: M0 through M3 are complete, including the versioned `m3-1`
+positive and safe corpus.
 
-Next: **CORPUS-001**
+Next: **PROOF-002**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -157,14 +158,14 @@ Depends on: `TEST-002`.
 - [x] **RULE-011** — Proxy initializer and storage-layout hazards — P0 — **COMPLETE**.
 - [x] **RULE-012** — ERC-20 return value and balance-delta assumptions — P1 — **COMPLETE**.
 - [x] **RULE-013** — Oracle freshness, spot-price, and missing-slippage signals — P1 — **COMPLETE**.
-- [ ] **CORPUS-001** — Versioned precision/false-positive cases for every M3 rule — P0 — **NEXT**.
+- [x] **CORPUS-001** — Versioned precision/false-positive cases for every M3 rule — P0 — **COMPLETE**.
 
 Each M3 rule must emit a source-to-sink path, state its confidence, include safe
 counterexamples, and document conditions that require manual review.
 
 ## M4 — Dynamic verification (`0.5.0`)
 
-- [ ] **PROOF-002** — Generate a configurable `SOL005` reentrancy probe — P0.
+- [ ] **PROOF-002** — Generate a configurable `SOL005` reentrancy probe — P0 — **NEXT**.
 - [ ] **FUZZ-001** — Generate calldata-driven Foundry transaction sequences — P0.
 - [ ] **INVARIANT-001** — Define user-supplied protocol invariants and assertion output — P0.
 - [ ] **PROOF-003** — Record compiler, chain/fork, constructor, and setup requirements — P1.
