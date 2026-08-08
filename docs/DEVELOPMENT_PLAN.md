@@ -1,7 +1,7 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-08  
-Current release: `0.6.0`
+Current release: `1.0.0` release candidate
 Current milestone: **M6 — Audit-ready release (`1.0.0`)**
 Next: **RELEASE-001 — Reproducible artifacts and 1.0 release checklist**
 
@@ -25,7 +25,7 @@ The scanner is successful when it:
 | Area | Current state |
 | --- | --- |
 | Repository | Local Git repository on `main`, with task-scoped implementation commits |
-| Release | `0.6.0` |
+| Release | `1.0.0` release candidate |
 | Inputs | Solidity files/directories or Etherscan V2 verified source by chain/address |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |

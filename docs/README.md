@@ -15,6 +15,8 @@
 - [Resource limits](RESOURCE_LIMITS.md)
 - [Output compatibility](OUTPUT_COMPATIBILITY.md)
 - [Toolchain compatibility](COMPATIBILITY.md)
+- [Release process](RELEASING.md)
+- [Release checklist contract](RELEASE_CHECKLIST.md)
 
 ## Evidence and verification
 
@@ -30,6 +32,7 @@
 - [Security policy](../SECURITY.md)
 - [Contributing](../CONTRIBUTING.md)
 - [Task tracker](../TASKS.md)
+- [Changelog](../CHANGELOG.md)
 
 Command help from the installed version is canonical when it differs from prose:
 

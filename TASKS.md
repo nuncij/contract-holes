@@ -3,7 +3,7 @@
 This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
 Keep one task marked **NEXT** and at most one task marked **IN PROGRESS**.
 
-Current release: `0.6.0`
+Current release: `1.0.0` release candidate
 
 Current milestone: **M6 — Audit-ready release (`1.0.0`)**
 
@@ -189,7 +189,7 @@ counterexamples, and document conditions that require manual review.
 - [x] **COMPAT-001** — Publish supported Python, Solidity, EVM, and Foundry ranges — P0 — **COMPLETE**.
 - [x] **SECURITY-001** — Add threat model, secure-use guidance, and disclosure policy — P0 — **COMPLETE**.
 - [x] **DOCS-001** — Complete install, rule, CI, proof, and contributor documentation — P0 — **COMPLETE**.
-- [ ] **RELEASE-001** — Produce reproducible package artifacts and a signed release checklist — P0 — **NEXT**.
+- [ ] **RELEASE-001** — Produce reproducible package artifacts and a signed release checklist — P0 — **IN PROGRESS / NEXT**.
 
 ## Definition of done for every task
 
