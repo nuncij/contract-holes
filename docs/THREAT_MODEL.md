@@ -103,6 +103,29 @@ untrusted and cannot affect exit status, baselines, SARIF, or proof generation.
 Residual risks are disclosure of sensitive report content and persuasive but
 wrong prose within an allowed annotation. `--prepare` is the offline boundary.
 
+### Bounty workspaces and scoped compilation
+
+`holes bounty` requires a private mode-`0700` workspace, mode-`0600` profile,
+explicit authorization acknowledgement, immutable source identity, and
+default-deny relative scope. Git profiles require the exact clean worktree
+commit. Directory profiles bind normalized Solidity bytes and safe remappings.
+Source manifests and scan records use deterministic hashes, atomic creation, and
+refuse changed or symlinked files.
+
+Compiler-enabled bounty scans do not load the target `foundry.toml`. Approved
+source is copied into a temporary project with fixed local configuration,
+offline compilation, no tests/scripts, `ffi = false`, a scrubbed Git/Foundry/RPC/
+wallet/cloud/CI environment, and contained remappings. Absolute, traversing,
+URL, or backslash imports are rejected before Forge runs. Compiler build-info
+must contain the exact approved literal bytes and no extra source unit.
+
+This remains native compilation, not a process sandbox. A compromised Forge or
+installed solc can access the host, and source-only filesystem reads retain
+TOCTOU risk against an attacker who can modify approved files concurrently.
+Use a disposable OS/container boundary with no secrets or network. Profile
+acknowledgement records a human decision; it does not prove legal authorization
+or that linked program rules remain current.
+
 ### Reports, baselines, suppressions, and CI
 
 Reports may contain source excerpts and local paths. A baseline can hide an
@@ -126,6 +149,8 @@ retention remain supply-chain/operations responsibilities.
 | AI invents evidence | fixed groups and local evidence-ID validation | treat all model prose as untrusted |
 | Baseline/suppression hides issue | explicit checked-in policy inputs | require security-owner review |
 | Explorer returns wrong source | provider provenance and content hashes | compare bytecode independently |
+| Bounty scope/import escapes target | normalized paths, no symlinks/traversal, staged approved sources | run in a disposable read-only target mount |
+| Private bounty record is replaced | private permissions, hashes, atomic create/refuse overwrite | restrict workspace access and review digests |
 | Toolchain/package compromise | documented pins and compatibility matrix | use immutable hashes, trusted registry, and provenance |
 
 ## Out of scope

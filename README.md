@@ -72,6 +72,8 @@ contact any external service:
 ```bash
 holes bounty init --help
 holes bounty validate PRIVATE_WORKSPACE
+holes bounty identify TARGET --scope contracts
+holes bounty scan PRIVATE_WORKSPACE
 ```
 
 See the [bounty profile contract](docs/BOUNTY_PROFILE.md). There is deliberately

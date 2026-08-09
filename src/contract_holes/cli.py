@@ -17,6 +17,7 @@ from .bounty_profile import (
     initialize_bounty_workspace,
     load_bounty_profile,
 )
+from .bounty_scope import BountyScopeError, identify_source, scan_bounty_workspace
 from .baseline import (
     BaselineError,
     compare_baseline,
@@ -482,6 +483,31 @@ def bounty_parser() -> argparse.ArgumentParser:
         description="Validate bounty.toml and emit its normalized identity as JSON.",
     )
     validate.add_argument("workspace", help="workspace directory or bounty.toml")
+    identify = commands.add_parser(
+        "identify",
+        help="compute a deterministic local source-set identity",
+        description=(
+            "Hash approved local Solidity paths and safe remappings without "
+            "scanning or using the network."
+        ),
+    )
+    identify.add_argument("source", help="local source root")
+    identify.add_argument(
+        "--scope",
+        action="append",
+        required=True,
+        metavar="PATH",
+        help="approved relative source path (repeatable)",
+    )
+    scan = commands.add_parser(
+        "scan",
+        help="validate scope and scan approved local source",
+        description=(
+            "Validate immutable source identity, stage only approved sources, "
+            "and run an offline scan."
+        ),
+    )
+    scan.add_argument("workspace", help="bounty workspace directory")
     return result
 
 
@@ -832,19 +858,37 @@ def _bounty_main(argv: Sequence[str]) -> int:
             )
             command = "bounty.init"
             status = "created"
-        else:
+            payload: dict[str, object] = {
+                "schema_version": "1.0",
+                "command": command,
+                "status": status,
+                "workspace": str(profile.workspace),
+                "profile": profile.normalized_payload(),
+            }
+        elif args.bounty_command == "validate":
             profile = load_bounty_profile(args.workspace)
             command = "bounty.validate"
             status = "valid"
-    except BountyProfileError as exc:
+            payload = {
+                "schema_version": "1.0",
+                "command": command,
+                "status": status,
+                "workspace": str(profile.workspace),
+                "profile": profile.normalized_payload(),
+            }
+        elif args.bounty_command == "identify":
+            identity = identify_source(args.source, args.scope)
+            payload = {
+                "schema_version": "1.0",
+                "command": "bounty.identify",
+                "status": "identified",
+                "source": identity.public_payload(),
+            }
+        else:
+            result = scan_bounty_workspace(args.workspace)
+            payload = result.scan_record
+    except (BountyProfileError, BountyScopeError) as exc:
         print(f"holes bounty: error: {exc}", file=sys.stderr)
         return 2
-    payload = {
-        "schema_version": "1.0",
-        "command": command,
-        "status": status,
-        "workspace": str(profile.workspace),
-        "profile": profile.normalized_payload(),
-    }
     print(json.dumps(payload, indent=2, sort_keys=True))
     return 0

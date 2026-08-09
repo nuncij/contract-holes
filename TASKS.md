@@ -10,9 +10,10 @@ Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — IN PROGRESS**
 
 Current position: M0 through M6 and the signed audit-ready 1.0 release are
 complete. M7 has an approved development plan and its profile/workspace
-foundation is complete.
+foundation, pinned scope validation, and offline/private execution boundary are
+complete.
 
-Next: **BOUNTY-002 — pinned source provenance and default-deny scope.**
+Next: **BOUNTY-004 — stable candidates and human review state.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -224,7 +225,7 @@ Acceptance criteria:
 
 Depends on: `CONFIG-001`, `SCHEMA-001`, `SECURITY-001`.
 
-### [ ] BOUNTY-002 — Pinned source provenance and default-deny scope — P0 — **NEXT**
+### [x] BOUNTY-002 — Pinned source provenance and default-deny scope — P0 — **COMPLETE**
 
 Resolve approved source identity and ensure the scanner consumes only declared
 in-scope content.
@@ -245,7 +246,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-001`, `ADDRESS-001`.
 
-### [ ] BOUNTY-003 — Offline and private-workspace safety controls — P0
+### [x] BOUNTY-003 — Offline and private-workspace safety controls — P0 — **COMPLETE**
 
 Harden bounty commands for untrusted targets and confidential reports.
 
@@ -268,7 +269,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-001`, expands with `BOUNTY-002` and `BOUNTY-006`.
 
-### [ ] BOUNTY-004 — Stable candidates and human review state — P0
+### [ ] BOUNTY-004 — Stable candidates and human review state — P0 — **NEXT**
 
 Store immutable scanner observations separately from explicit reviewer
 decisions.

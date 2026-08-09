@@ -119,6 +119,19 @@ class BountyProfileTests(unittest.TestCase):
                 loaded = load_bounty_profile(profile.path)
             self.assertEqual(loaded.digest, profile.digest)
 
+    @unittest.skipUnless(os.name == "posix", "POSIX permission policy")
+    def test_rejects_workspace_or_profile_readable_by_other_users(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            profile = initialize(root)
+            profile.path.chmod(0o644)
+            with self.assertRaisesRegex(BountyProfileError, "profile permissions"):
+                load_bounty_profile(profile.path)
+            profile.path.chmod(0o600)
+            profile.workspace.chmod(0o755)
+            with self.assertRaisesRegex(BountyProfileError, "workspace permissions"):
+                load_bounty_profile(profile.path)
+
     def test_normalized_schema_is_packaged(self) -> None:
         schema = json.loads(
             files("contract_holes")

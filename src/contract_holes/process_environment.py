@@ -8,9 +8,14 @@ _SENSITIVE_NAMES = frozenset(
         "CI_JOB_JWT",
         "CI_JOB_JWT_V2",
         "DOCKER_AUTH_CONFIG",
+        "DOCKER_CONFIG",
+        "AWS_SHARED_CREDENTIALS_FILE",
+        "AZURE_CONFIG_DIR",
+        "GOOGLE_APPLICATION_CREDENTIALS",
         "GPG_AGENT_INFO",
         "KUBECONFIG",
         "SSH_AUTH_SOCK",
+        "WEB3_PROVIDER_URI",
     }
 )
 _SENSITIVE_SUFFIXES = (

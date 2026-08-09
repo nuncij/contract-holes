@@ -14,6 +14,12 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   policy, unknown-key rejection, and no-overwrite behavior.
 - Kept submission, uploads, remote RPC, transactions, and automatic
   confirmation outside the command surface.
+- Added `holes bounty identify` and `holes bounty scan` with exact clean Git or
+  deterministic directory identity, default-deny scope, symlink/remapping
+  rejection, private tamper-evident records, and relative finding paths.
+- Added staged offline compiler analysis that ignores target Foundry
+  configuration, scrubs native-tool/cloud/CI environment settings, rejects
+  unsafe imports, and accepts only approved literal compiler source units.
 
 ## 1.0.0 — 2026-08-08
 

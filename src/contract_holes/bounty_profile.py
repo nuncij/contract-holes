@@ -176,10 +176,16 @@ def initialize_bounty_workspace(
 
 
 def load_bounty_profile(path: Path | str) -> BountyProfile:
-    supplied = Path(path).resolve()
+    lexical = Path(path)
+    if lexical.is_symlink():
+        raise BountyProfileError(f"bounty profile path must not be a symlink: {lexical}")
+    supplied = lexical.resolve()
     source = supplied / PROFILE_FILENAME if supplied.is_dir() else supplied
+    if source.is_symlink():
+        raise BountyProfileError(f"bounty profile must not be a symlink: {source}")
     if not source.is_file():
         raise BountyProfileError(f"bounty profile does not exist: {source}")
+    _validate_private_permissions(source.parent, source)
     try:
         raw = source.read_bytes()
         text = raw.decode("utf-8")
@@ -264,7 +270,10 @@ def _validate_payload(
     source_root_path = Path(source_root_value)
     if source_root_path.is_absolute():
         raise BountyProfileError("source.root must be relative to the bounty workspace")
-    source_root = (source.parent / source_root_path).resolve()
+    lexical_source_root = source.parent / source_root_path
+    if lexical_source_root.is_symlink():
+        raise BountyProfileError("source.root must not be a symlink")
+    source_root = lexical_source_root.resolve()
     if _is_relative_to(source.parent, source_root):
         raise BountyProfileError("bounty workspace must be outside the target source tree")
     if require_source and not source_root.is_dir():
@@ -447,3 +456,21 @@ def _is_relative_to(path: Path, parent: Path) -> bool:
         return True
     except ValueError:
         return False
+
+
+def _validate_private_permissions(workspace: Path, profile: Path) -> None:
+    if os.name != "posix":
+        return
+    try:
+        workspace_mode = workspace.stat().st_mode & 0o777
+        profile_mode = profile.stat().st_mode & 0o777
+    except OSError as exc:
+        raise BountyProfileError(f"could not inspect bounty workspace permissions: {exc}") from exc
+    if workspace_mode & 0o077:
+        raise BountyProfileError(
+            f"bounty workspace permissions must not allow group/other access: {oct(workspace_mode)}"
+        )
+    if profile_mode & 0o077:
+        raise BountyProfileError(
+            f"bounty profile permissions must not allow group/other access: {oct(profile_mode)}"
+        )

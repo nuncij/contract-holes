@@ -98,7 +98,7 @@ Emit the versioned compatibility policy and locally observed Python, Forge, and
 solc status as JSON. Missing optional compiler tools do not fail this informational
 command. See [toolchain compatibility](COMPATIBILITY.md).
 
-### `holes bounty init|validate`
+### `holes bounty init|validate|identify|scan`
 
 Create or validate a private, human-approved bounty research workspace. `init`
 requires program identity, an HTTPS rules URL and review date, explicit
@@ -108,8 +108,12 @@ offline by default; `--source-only` disables it. `validate` emits the normalized
 profile and its SHA-256 identity.
 
 The workspace must be new and outside the target tree. These commands do not
-scan, submit, upload, send transactions, or contact a remote RPC endpoint. See
-the [bounty profile contract](BOUNTY_PROFILE.md).
+submit, upload, send transactions, or contact a remote RPC endpoint.
+`identify SOURCE --scope PATH` computes a local deterministic source-set digest.
+`scan WORKSPACE` validates an exact clean Git commit or directory digest,
+enforces approved paths and symlink/remapping boundaries, stages only approved
+source, compiles offline under fixed configuration when enabled, and writes
+private source/scan records. See the [bounty profile contract](BOUNTY_PROFILE.md).
 
 ## Configuration precedence
 

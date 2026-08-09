@@ -65,9 +65,15 @@ class CompilationResult:
 class ForgeCompiler:
     """Load solc ASTs through Foundry without writing into the target project."""
 
-    def __init__(self, executable: str = "forge", timeout: float = 120.0):
+    def __init__(
+        self,
+        executable: str = "forge",
+        timeout: float = 120.0,
+        environment_remove_prefixes: tuple[str, ...] = (),
+    ):
         self.executable = executable
         self.timeout = timeout
+        self.environment_remove_prefixes = environment_remove_prefixes
 
     def compile(
         self,
@@ -112,7 +118,9 @@ class ForgeCompiler:
                 process = subprocess.run(
                     command,
                     cwd=root,
-                    env=sanitized_subprocess_environment(),
+                    env=sanitized_subprocess_environment(
+                        remove_prefixes=self.environment_remove_prefixes
+                    ),
                     capture_output=True,
                     text=True,
                     timeout=self.timeout,

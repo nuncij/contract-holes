@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contract-holes.dev/schemas/bounty-scan-1.0.schema.json",
+  "title": "Contract Holes bounty scan record 1.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "command",
+    "status",
+    "scanner_version",
+    "profile_sha256",
+    "source_manifest_sha256",
+    "compiler",
+    "report",
+    "scan_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "command": { "const": "bounty.scan" },
+    "status": { "const": "completed" },
+    "scanner_version": { "type": "string", "minLength": 1 },
+    "profile_sha256": { "$ref": "#/$defs/digest" },
+    "source_manifest_sha256": { "$ref": "#/$defs/digest" },
+    "compiler": { "type": "object" },
+    "report": { "type": "object" },
+    "scan_sha256": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false
+}

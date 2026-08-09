@@ -40,8 +40,15 @@ its deterministic source manifest:
 --content-sha256 HEX_DIGEST
 ```
 
-Manifest construction and byte-level scope validation are implemented by
-`BOUNTY-002`; do not invent this digest by hashing an archive with unstable
+Generate the non-Git identity with the local-only command:
+
+```bash
+holes bounty identify ./source-snapshot --scope contracts
+```
+
+It hashes normalized relative Solidity paths, file bytes, and a safe
+`remappings.txt` when present. Copy `source.source_set_sha256` into
+`--content-sha256`; do not invent a digest from an archive with unstable
 metadata.
 
 Compiler analysis is enabled and offline by default. `--source-only` records an
@@ -105,6 +112,48 @@ inside that target.
 
 The normalized representation is described by the packaged
 `bounty-profile-1.0.schema.json`. TOML remains the editable source of truth.
+
+## Validate scope and scan
+
+```bash
+holes bounty scan ../private-example-review
+```
+
+For Git sources, `source.root` must be the worktree root, `HEAD` must equal the
+exact approved commit, the object must be a commit, and tracked plus untracked
+worktree state must be clean. Directory snapshots must reproduce the recorded
+source-set digest. Missing files, changed bytes, non-Solidity scoped files,
+absolute/traversing paths, symlinks, escaping remappings, and empty scopes fail
+closed.
+
+The command writes two private, deterministic records:
+
+- `source-manifest.json` binds the profile, scanner, source identity, approved
+  relative paths, byte counts and hashes, remappings, and compiler-isolation
+  policy;
+- `scan.json` binds that manifest to the relative-path scanner report and exact
+  compiler policy/version observations.
+
+Records use mode `0600` where supported, are created atomically, and are
+accepted on a repeat run only when their complete bytes are identical. Changed
+or symlinked records are never overwritten.
+
+Source-only mode reads only approved Solidity files. Compiler mode rechecks and
+copies those files into a temporary project, writes a fixed safe
+`foundry.toml`, carries forward only contained `remappings.txt` entries, runs
+Foundry offline, and rejects build information containing any source unit or
+literal bytes outside the approved manifest. The target's `foundry.toml`, tests,
+scripts, hooks, plugins, output, and cache are not loaded or executed.
+
+Imports containing absolute paths, `..`, backslashes, or URLs are rejected
+before Foundry starts. A target needing unsafe or unsupported build behavior is
+reported as an execution error; the bounty workflow does not weaken isolation
+to make it compile.
+
+Packaged schemas `bounty-source-manifest-1.0.schema.json` and
+`bounty-scan-1.0.schema.json` describe these records. Status `0` means a complete
+scan, including one with findings. Status `2` means profile, provenance, scope,
+compiler, record-integrity, or execution failure; it is never a clean result.
 
 ## Trust boundary
 

@@ -45,6 +45,29 @@ are native processes with the caller's permissions. `--scan-timeout`,
 `--compiler-timeout`, and `--max-memory-mb` do not replace OS limits for child
 processes.
 
+## Bounty workspace
+
+Keep each bounty workspace outside its target checkout and outside synchronized,
+shared, or public directories. `holes bounty init` makes it private by default;
+validation refuses group/other-readable POSIX workspaces and profiles. Do not
+relax those permissions or commit generated records.
+
+Use `holes bounty identify` for non-Git snapshots, then `holes bounty scan` to
+revalidate the complete immutable identity. A Git target must be on the exact
+recorded commit with a clean worktree. Treat any identity, symlink, remapping,
+scope, record-integrity, or compiler error as a failed review—not a clean scan.
+
+Bounty compiler mode is stricter than ordinary compiler mode: it stages only
+approved source, ignores target Foundry configuration, rejects unsafe imports,
+runs offline with scrubbed native-tool settings, and checks compiler literal
+content. This can reject projects that ordinary `holes --compile` accepts. Do
+not bypass the restriction inside a bounty workspace; review and adapt a local
+copy under an explicitly documented future workflow instead.
+
+These commands do not verify legal authorization, exploitability, impact,
+uniqueness, or current program terms. Recheck the linked rules before each scan
+and keep all findings private. There is no automatic submission command.
+
 ## Networked commands
 
 Normal source-only scans do not use the network. Network can occur when:
