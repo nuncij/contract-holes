@@ -24,6 +24,10 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   history, enforced state transitions, and reason/impact requirements.
 - Added transparent review-priority scoring with component points and reason
   codes that explicitly cannot claim exploitability, bounty severity, or payout.
+- Added content-addressed candidate proof bundles with explicit setup unknowns,
+  separate impact assertions, offline isolated execution, and tamper checks.
+- Added immutable private report drafts, completeness/staleness gates, explicit
+  human approval, and checksummed redacted local export with no submission path.
 
 ## 1.0.0 — 2026-08-08
 

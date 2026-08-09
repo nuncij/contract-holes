@@ -122,6 +122,19 @@ CANDIDATE_ID` records an explicit transition to `investigating`, `rejected`, or
 an impact. `--at RFC3339` supplies an auditable event time. Generic review cannot
 approve a candidate. See [bounty candidate triage](BOUNTY_TRIAGE.md).
 
+`proof WORKSPACE CANDIDATE_ID` creates a content-addressed isolated proof bundle;
+`--requirement NAME=VALUE` records reviewed setup, `--impact-assertion` records a
+separate impact hypothesis, and `--run` executes supported generated tests
+locally with downloads disabled. Unsupported generators remain explicit.
+
+`report WORKSPACE CANDIDATE_ID` creates an immutable private hypothesis draft or
+uses `--input JSON` for a complete reviewer-authored report; `--proof-sha` binds
+a proof. `approve` requires a complete current report, confirmed human review,
+rules recheck, reviewer/reason, and manual-submission acknowledgement. `export`
+creates a checksummed redacted local directory for an approved report. None of
+these commands contacts a network or submits a report. See
+[bounty proofs and reports](BOUNTY_PROOFS_REPORTS.md).
+
 ## Configuration precedence
 
 An explicit CLI setting wins over the selected/discovered `.holes.toml`, which

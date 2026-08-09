@@ -1,0 +1,40 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contract-holes.dev/schemas/bounty-approval-1.0.schema.json",
+  "title": "Contract Holes report approval 1.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "report_sha256",
+    "profile_sha256",
+    "source_manifest_sha256",
+    "candidates_sha256",
+    "reviews_sha256",
+    "reviewer",
+    "reason",
+    "approved_at",
+    "program_rules_rechecked_on",
+    "submission_policy",
+    "approval_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "candidate_id": { "type": "string", "pattern": "^BNT-[0-9a-f]{24}$" },
+    "report_sha256": { "$ref": "#/$defs/digest" },
+    "profile_sha256": { "$ref": "#/$defs/digest" },
+    "source_manifest_sha256": { "$ref": "#/$defs/digest" },
+    "candidates_sha256": { "$ref": "#/$defs/digest" },
+    "reviews_sha256": { "$ref": "#/$defs/digest" },
+    "reviewer": { "type": "string", "minLength": 1 },
+    "reason": { "type": "string", "minLength": 1 },
+    "approved_at": { "type": "string", "minLength": 1 },
+    "program_rules_rechecked_on": { "type": "string", "format": "date" },
+    "submission_policy": { "type": "object" },
+    "approval_sha256": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false
+}

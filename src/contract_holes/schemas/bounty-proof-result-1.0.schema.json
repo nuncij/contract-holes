@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contract-holes.dev/schemas/bounty-proof-result-1.0.schema.json",
+  "title": "Contract Holes bounty proof result 1.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "proof_sha256",
+    "status",
+    "summary",
+    "results",
+    "result_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "proof_sha256": { "$ref": "#/$defs/digest" },
+    "status": { "enum": ["passed", "failed", "unsupported"] },
+    "summary": { "type": "object" },
+    "results": { "type": "array" },
+    "result_sha256": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "additionalProperties": true
+}

@@ -26,6 +26,7 @@
 - [Evidence-bound AI triage](AI_TRIAGE.md)
 - [Bounty workspace and profile](BOUNTY_PROFILE.md)
 - [Bounty candidate triage](BOUNTY_TRIAGE.md)
+- [Bounty proofs, reports, approval, and export](BOUNTY_PROOFS_REPORTS.md)
 - [M7 Bounty Hunter Mode plan](BOUNTY_HUNTER_PLAN.md)
 
 ## Project governance

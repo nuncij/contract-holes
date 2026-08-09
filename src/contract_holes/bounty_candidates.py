@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from dataclasses import dataclass
 import hashlib
 from pathlib import Path
 from typing import Callable, Sequence
@@ -11,7 +12,7 @@ from .bounty_io import (
     payload_sha256,
     replace_managed_private_json,
 )
-from .bounty_profile import BountyProfileError, load_bounty_profile
+from .bounty_profile import BountyProfile, BountyProfileError, load_bounty_profile
 from .bounty_scope import SCAN_RECORD_FILENAME, SOURCE_MANIFEST_FILENAME
 
 
@@ -41,6 +42,17 @@ _SEVERITY_POINTS = {
     "info": 0,
 }
 _CONFIDENCE_POINTS = {"high": 20, "medium": 10, "low": 0}
+
+
+@dataclass(frozen=True, slots=True)
+class CandidateContext:
+    profile: BountyProfile
+    candidate: dict[str, object]
+    review: dict[str, object] | None
+    candidates_record: dict[str, object]
+    reviews_record: dict[str, object]
+    source_manifest: dict[str, object]
+    scan_record: dict[str, object]
 
 
 def synchronize_candidates(workspace: Path | str) -> dict[str, object]:
@@ -177,6 +189,53 @@ def list_candidates(
         "candidate_count": len(combined),
         "candidates": combined,
     }
+
+
+def load_candidate_context(
+    workspace: Path | str, candidate_id: str
+) -> CandidateContext:
+    profile, scan, source_manifest = _workspace_inputs(workspace)
+    source_digest = _required_digest(
+        source_manifest, "manifest_sha256", "source manifest"
+    )
+    candidates, _ = _load_candidates_if_present(
+        profile.workspace / CANDIDATES_FILENAME,
+        profile.digest,
+        source_digest,
+        required=True,
+    )
+    candidate = next(
+        (
+            item
+            for item in candidates["candidates"]
+            if isinstance(item, dict) and item.get("candidate_id") == candidate_id
+        ),
+        None,
+    )
+    if candidate is None:
+        raise BountyCandidateError(f"unknown candidate ID: {candidate_id}")
+    reviews, _ = _load_reviews_if_present(
+        profile.workspace / REVIEWS_FILENAME,
+        profile.digest,
+        source_digest,
+    )
+    review = next(
+        (
+            item
+            for item in reviews["reviews"]
+            if isinstance(item, dict) and item.get("candidate_id") == candidate_id
+        ),
+        None,
+    )
+    return CandidateContext(
+        profile=profile,
+        candidate=candidate,
+        review=review,
+        candidates_record=candidates,
+        reviews_record=reviews,
+        source_manifest=source_manifest,
+        scan_record=scan,
+    )
 
 
 def review_candidate(

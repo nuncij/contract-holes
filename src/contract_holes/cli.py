@@ -24,6 +24,17 @@ from .bounty_profile import (
     initialize_bounty_workspace,
     load_bounty_profile,
 )
+from .bounty_proof import (
+    BountyProofError,
+    create_bounty_proof,
+    parse_requirements,
+)
+from .bounty_report import (
+    BountyReportError,
+    approve_bounty_report,
+    create_bounty_report,
+    export_approved_report,
+)
 from .bounty_scope import BountyScopeError, identify_source, scan_bounty_workspace
 from .baseline import (
     BaselineError,
@@ -559,6 +570,109 @@ def bounty_parser() -> argparse.ArgumentParser:
         metavar="RFC3339",
         help="event time (defaults to current UTC time)",
     )
+    proof = commands.add_parser(
+        "proof",
+        help="create an isolated candidate proof bundle",
+        description=(
+            "Create a hash-bound local proof bundle. Generated tests prove only "
+            "a primitive; protocol impact remains a reviewed assertion."
+        ),
+    )
+    proof.add_argument("workspace", help="bounty workspace directory")
+    proof.add_argument("candidate_id", help="stable BNT- candidate ID")
+    proof.add_argument(
+        "--requirement",
+        action="append",
+        default=[],
+        metavar="NAME=VALUE",
+        help="reviewer-supplied setup requirement (repeatable)",
+    )
+    proof.add_argument(
+        "--impact-assertion",
+        help="reviewer-supplied protocol impact assertion",
+    )
+    proof.add_argument(
+        "--run",
+        action="store_true",
+        help="run generated tests locally and offline after creation",
+    )
+    proof.add_argument(
+        "--timeout",
+        type=float,
+        default=60.0,
+        metavar="SECONDS",
+        help="per-artifact local execution timeout (default: 60)",
+    )
+    report = commands.add_parser(
+        "report",
+        help="create an immutable private candidate report",
+        description=(
+            "Create a hash-bound private Markdown/JSON report. Without --input "
+            "the result is an explicitly incomplete hypothesis draft."
+        ),
+    )
+    report.add_argument("workspace", help="bounty workspace directory")
+    report.add_argument("candidate_id", help="stable BNT- candidate ID")
+    report.add_argument(
+        "--input",
+        dest="report_input",
+        metavar="JSON",
+        help="complete reviewer-authored report input JSON",
+    )
+    report.add_argument(
+        "--proof-sha",
+        help="bind one candidate proof manifest and optional result",
+    )
+    report.add_argument(
+        "--at",
+        dest="created_at",
+        metavar="RFC3339",
+        help="report creation time (defaults to current UTC time)",
+    )
+    approve = commands.add_parser(
+        "approve",
+        help="approve one complete private report",
+        description=(
+            "Revalidate scope and record explicit human approval. This command "
+            "does not submit, upload, contact a project, or use the network."
+        ),
+    )
+    approve.add_argument("workspace", help="bounty workspace directory")
+    approve.add_argument("candidate_id", help="stable BNT- candidate ID")
+    approve.add_argument("--report-sha", required=True, help="complete report SHA-256")
+    approve.add_argument("--reviewer", required=True, help="approving reviewer identity")
+    approve.add_argument("--reason", required=True, help="approval reasoning")
+    approve.add_argument(
+        "--rules-rechecked-on",
+        required=True,
+        metavar="YYYY-MM-DD",
+        help="date the program rules were rechecked",
+    )
+    approve.add_argument(
+        "--acknowledge-manual-submission",
+        action="store_true",
+        help="acknowledge that any submission remains a separate private manual action",
+    )
+    approve.add_argument(
+        "--at",
+        dest="occurred_at",
+        metavar="RFC3339",
+        help="approval event time (defaults to current UTC time)",
+    )
+    export = commands.add_parser(
+        "export",
+        help="export one approved report to a new local directory",
+        description=(
+            "Create a redacted local export with checksums. No network or "
+            "submission action is performed."
+        ),
+    )
+    export.add_argument("workspace", help="bounty workspace directory")
+    export.add_argument("candidate_id", help="stable BNT- candidate ID")
+    export.add_argument("--report-sha", required=True, help="approved report SHA-256")
+    export.add_argument(
+        "--output", required=True, metavar="DIRECTORY", help="new local export directory"
+    )
     return result
 
 
@@ -942,7 +1056,7 @@ def _bounty_main(argv: Sequence[str]) -> int:
                 payload = result.scan_record
             elif args.bounty_command == "candidates":
                 payload = list_candidates(args.workspace, states=args.state)
-            else:
+            elif args.bounty_command == "review":
                 review = review_candidate(
                     args.workspace,
                     args.candidate_id,
@@ -958,7 +1072,68 @@ def _bounty_main(argv: Sequence[str]) -> int:
                     "status": "recorded",
                     "review": review,
                 }
-    except (BountyProfileError, BountyScopeError, BountyCandidateError) as exc:
+            elif args.bounty_command == "proof":
+                proof = create_bounty_proof(
+                    args.workspace,
+                    args.candidate_id,
+                    requirements=parse_requirements(args.requirement),
+                    impact_assertion=args.impact_assertion,
+                    run=args.run,
+                    timeout_seconds=args.timeout,
+                )
+                payload = {
+                    "schema_version": "1.0",
+                    "command": "bounty.proof",
+                    "status": "created",
+                    "proof_directory": str(proof.directory),
+                    "proof": proof.manifest,
+                    "execution": proof.execution,
+                }
+            elif args.bounty_command == "report":
+                report = create_bounty_report(
+                    args.workspace,
+                    args.candidate_id,
+                    report_input_path=args.report_input,
+                    proof_sha256=args.proof_sha,
+                    created_at=args.created_at,
+                )
+                payload = {
+                    "schema_version": "1.0",
+                    "command": "bounty.report",
+                    "status": report["status"],
+                    "report": report,
+                }
+            elif args.bounty_command == "approve":
+                approval = approve_bounty_report(
+                    args.workspace,
+                    args.candidate_id,
+                    args.report_sha,
+                    reviewer=args.reviewer,
+                    reason=args.reason,
+                    rules_rechecked_on=args.rules_rechecked_on,
+                    acknowledge_manual_submission=args.acknowledge_manual_submission,
+                    occurred_at=args.occurred_at,
+                )
+                payload = {
+                    "schema_version": "1.0",
+                    "command": "bounty.approve",
+                    "status": "approved-locally",
+                    "approval": approval,
+                }
+            else:
+                payload = export_approved_report(
+                    args.workspace,
+                    args.candidate_id,
+                    args.report_sha,
+                    args.output,
+                )
+    except (
+        BountyProfileError,
+        BountyScopeError,
+        BountyCandidateError,
+        BountyProofError,
+        BountyReportError,
+    ) as exc:
         print(f"holes bounty: error: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))

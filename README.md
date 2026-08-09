@@ -76,6 +76,10 @@ holes bounty identify TARGET --scope contracts
 holes bounty scan PRIVATE_WORKSPACE
 holes bounty candidates PRIVATE_WORKSPACE
 holes bounty review --help
+holes bounty proof --help
+holes bounty report --help
+holes bounty approve --help
+holes bounty export --help
 ```
 
 See the [bounty profile contract](docs/BOUNTY_PROFILE.md). There is deliberately
@@ -331,6 +335,8 @@ Project status and future work are tracked explicitly:
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review
   priority, and auditable human state transitions.
+- [Bounty proof and report workflow](docs/BOUNTY_PROOFS_REPORTS.md) — isolated
+  local evidence, private reports, human approval, and checksummed local export.
 - [Contributing guide](CONTRIBUTING.md) — development setup, rule workflow,
   compatibility constraints, tests, and review expectations.
 - [Threat model](docs/THREAT_MODEL.md) and

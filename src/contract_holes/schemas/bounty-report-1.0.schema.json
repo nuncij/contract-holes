@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contract-holes.dev/schemas/bounty-report-1.0.schema.json",
+  "title": "Contract Holes private bounty report 1.0",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "candidate_id",
+    "status",
+    "classification",
+    "created_at",
+    "profile_sha256",
+    "source_manifest_sha256",
+    "candidates_sha256",
+    "reviews_sha256",
+    "report_input_sha256",
+    "target",
+    "finding",
+    "review",
+    "content",
+    "proof",
+    "completeness",
+    "limitations",
+    "report_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.0" },
+    "candidate_id": { "type": "string", "pattern": "^BNT-[0-9a-f]{24}$" },
+    "status": { "enum": ["draft-incomplete", "complete"] },
+    "classification": { "enum": ["review-hypothesis", "human-confirmed-candidate"] },
+    "created_at": { "type": "string", "minLength": 1 },
+    "profile_sha256": { "$ref": "#/$defs/digest" },
+    "source_manifest_sha256": { "$ref": "#/$defs/digest" },
+    "candidates_sha256": { "$ref": "#/$defs/digest" },
+    "reviews_sha256": { "type": ["string", "null"] },
+    "report_input_sha256": { "$ref": "#/$defs/digest" },
+    "target": { "type": "object" },
+    "finding": { "type": "object" },
+    "review": { "type": "object" },
+    "content": { "type": "object" },
+    "proof": { "type": "object" },
+    "completeness": { "type": "object" },
+    "limitations": { "type": "array" },
+    "report_sha256": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" }
+  },
+  "additionalProperties": false
+}

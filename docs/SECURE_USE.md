@@ -68,6 +68,15 @@ These commands do not verify legal authorization, exploitability, impact,
 uniqueness, or current program terms. Recheck the linked rules before each scan
 and keep all findings private. There is no automatic submission command.
 
+Candidate proof bundles retain unknown deployment and impact assumptions. Run
+only generated/reviewed code, offline, in a disposable environment; a passed
+primitive does not establish protocol impact. Report input rejects obvious
+secrets and private paths, but reviewers must still inspect every private and
+exported artifact. Approval and export revalidate hashes and scope but cannot
+detect undisclosed duplicates or determine whether a program will accept a
+report. Any submission remains a separate manual action through the program's
+required private channel.
+
 ## Networked commands
 
 Normal source-only scans do not use the network. Network can occur when:

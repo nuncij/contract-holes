@@ -13,7 +13,7 @@ complete. M7 has an approved development plan and its profile/workspace
 foundation, pinned scope validation, and offline/private execution boundary are
 complete.
 
-Next: **BOUNTY-006 — isolated local proof workspace.**
+Next: **BOUNTY-008 — historical disclosed-vulnerability corpus.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -313,7 +313,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-004`, existing rule catalog and evidence paths.
 
-### [ ] BOUNTY-006 — Isolated local proof workspace — P0 — **NEXT**
+### [x] BOUNTY-006 — Isolated local proof workspace — P0 — **COMPLETE**
 
 Generate a candidate-specific Foundry workspace for locally reproducing a
 primitive or project impact when the reviewer can provide the required setup.
@@ -337,7 +337,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-003`, `BOUNTY-004`, `PROOF-003`, `RUNNER-001`.
 
-### [ ] BOUNTY-007 — Private report, approval, and local export — P0
+### [x] BOUNTY-007 — Private report, approval, and local export — P0 — **COMPLETE**
 
 Render a complete bounty-report draft and require human approval before creating
 shareable local output.
@@ -362,7 +362,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-004`, `BOUNTY-006` when a proof is required.
 
-### [ ] BOUNTY-008 — Historical disclosed-vulnerability corpus — P0
+### [ ] BOUNTY-008 — Historical disclosed-vulnerability corpus — P0 — **NEXT**
 
 Measure usefulness on real, already-public cases without turning the checked-in
 synthetic regression score into a market claim.
