@@ -349,8 +349,7 @@ Project status and future work are tracked explicitly:
 - [Security policy](SECURITY.md) — supported versions, private reporting, and
   coordinated disclosure targets.
 
-The `1.1.0` release candidate completes M7 Bounty Hunter Mode; final signed
-release validation is in progress. The compiler index,
+The latest release is `1.1.0`; M7 Bounty Hunter Mode is complete. The compiler index,
 inheritance resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,
 deterministic inspection JSON, and repeatable benchmark are complete. `SOL008` traces
@@ -372,7 +371,7 @@ provenance, and optional AI annotations are constrained to deterministic evidenc
 The frozen output schemas, per-rule evaluation corpus, supported toolchain policy,
 security boundaries, complete user/contributor documentation, reproducible
 artifacts, and signed release evidence are ready. See the
-[release process](docs/RELEASING.md), [1.1 checklist](release/1.1.0-checklist.md),
+[release process](docs/RELEASING.md), [signed checklist](release/1.1.0-checklist.md),
 and [changelog](CHANGELOG.md).
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch
@@ -455,7 +454,7 @@ as terminal text, JSON, or SARIF 2.1.0.
 
 ## Roadmap
 
-M0 through M6 produced the signed audit-ready `1.0.0` release. M7 implements a
+M0 through M6 produced the signed audit-ready `1.0.0` release. M7 completed a
 human-controlled `1.1.0` bounty research workflow with pinned authorized scope,
 candidate triage, isolated local proofs, private report drafts, historical
 validation, an authorized repository pilot, and an explicit approval gate. It
