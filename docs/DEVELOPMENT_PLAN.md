@@ -2,8 +2,8 @@
 
 Last updated: 2026-08-08  
 Current release: `1.0.0`
-Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — PLANNED**
-Next: **BOUNTY-001 — profile schema, command contract, and workspace model.**
+Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — IN PROGRESS**
+Next: **BOUNTY-002 — pinned source provenance and default-deny scope.**
 
 ## Product goal
 
@@ -249,7 +249,7 @@ back after the user explicitly requests compilation.
 | M4 — Dynamic verification | `0.5.0` | Complete | Reentrancy probes, transaction-sequence fuzzing, protocol invariants, isolated runner |
 | M5 — Team and CI workflow | `0.6.0` | Complete | Configuration, baselines, catalog, CI, limits, address provenance, evidence-bound AI triage |
 | M6 — Audit-ready release | `1.0.0` | Complete | Benchmarked accuracy, stable schemas, compatibility policy, security docs, reproducible signed release evidence |
-| M7 — Bounty Hunter Mode | `1.1.0` | Planned | Authorized scope profiles, candidate triage, isolated local proofs, private reports, and historical validation |
+| M7 — Bounty Hunter Mode | `1.1.0` | In progress | Authorized scope profiles, candidate triage, isolated local proofs, private reports, and historical validation |
 
 ### M2 — Cross-contract analysis (`0.3.0`)
 

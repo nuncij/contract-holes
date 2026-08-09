@@ -3,6 +3,18 @@
 All notable project changes are recorded here. Versions follow semantic
 versioning; public JSON/SARIF schemas have their own compatibility rules.
 
+## Unreleased — `1.1.0`
+
+### Bounty research workflow
+
+- Added the versioned, default-private `bounty.toml` workspace contract and
+  normalized JSON schema.
+- Added `holes bounty init` and `holes bounty validate` with explicit
+  authorization, immutable source identity, normalized scope, offline compiler
+  policy, unknown-key rejection, and no-overwrite behavior.
+- Kept submission, uploads, remote RPC, transactions, and automatic
+  confirmation outside the command surface.
+
 ## 1.0.0 — 2026-08-08
 
 First audit-ready release.

@@ -98,6 +98,19 @@ Emit the versioned compatibility policy and locally observed Python, Forge, and
 solc status as JSON. Missing optional compiler tools do not fail this informational
 command. See [toolchain compatibility](COMPATIBILITY.md).
 
+### `holes bounty init|validate`
+
+Create or validate a private, human-approved bounty research workspace. `init`
+requires program identity, an HTTPS rules URL and review date, explicit
+authorization acknowledgement, a local source, an immutable Git revision or
+directory-manifest digest, in-scope paths, and in-scope impacts. Compiler mode is
+offline by default; `--source-only` disables it. `validate` emits the normalized
+profile and its SHA-256 identity.
+
+The workspace must be new and outside the target tree. These commands do not
+scan, submit, upload, send transactions, or contact a remote RPC endpoint. See
+the [bounty profile contract](BOUNTY_PROFILE.md).
+
 ## Configuration precedence
 
 An explicit CLI setting wins over the selected/discovered `.holes.toml`, which

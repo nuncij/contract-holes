@@ -6,13 +6,13 @@ marked **IN PROGRESS**.
 
 Current release: `1.0.0`
 
-Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — PLANNED**
+Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — IN PROGRESS**
 
 Current position: M0 through M6 and the signed audit-ready 1.0 release are
-complete. M7 has an approved development plan but no implementation work is
-complete yet.
+complete. M7 has an approved development plan and its profile/workspace
+foundation is complete.
 
-Next: **BOUNTY-001 — profile schema, command contract, and workspace model.**
+Next: **BOUNTY-002 — pinned source provenance and default-deny scope.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -203,7 +203,7 @@ scope.
 
 Work in dependency order.
 
-### [ ] BOUNTY-001 — Profile schema, command contract, and workspace model — P0 — **NEXT**
+### [x] BOUNTY-001 — Profile schema, command contract, and workspace model — P0 — **COMPLETE**
 
 Define the versioned bounty profile, private local workspace, and public CLI
 contract before implementing later workflow stages.
@@ -224,7 +224,7 @@ Acceptance criteria:
 
 Depends on: `CONFIG-001`, `SCHEMA-001`, `SECURITY-001`.
 
-### [ ] BOUNTY-002 — Pinned source provenance and default-deny scope — P0
+### [ ] BOUNTY-002 — Pinned source provenance and default-deny scope — P0 — **NEXT**
 
 Resolve approved source identity and ensure the scanner consumes only declared
 in-scope content.

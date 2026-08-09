@@ -25,6 +25,7 @@ class DocumentationTests(unittest.TestCase):
             "docs/RULE_CATALOG.md",
             "docs/CI.md",
             "docs/PROOF_REQUIREMENTS.md",
+            "docs/BOUNTY_PROFILE.md",
         )
 
         for relative in required:
@@ -65,6 +66,7 @@ class DocumentationTests(unittest.TestCase):
             "fetch",
             "explain",
             "compatibility",
+            "bounty",
         ):
             with self.subTest(command=command):
                 self.assertIn(f"holes {command}", readme)

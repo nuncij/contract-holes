@@ -24,6 +24,7 @@
 - [Precision and recall evaluation](EVALUATION.md)
 - [Verified-source ingestion](VERIFIED_SOURCE.md)
 - [Evidence-bound AI triage](AI_TRIAGE.md)
+- [Bounty workspace and profile](BOUNTY_PROFILE.md)
 - [M7 Bounty Hunter Mode plan](BOUNTY_HUNTER_PLAN.md)
 
 ## Project governance

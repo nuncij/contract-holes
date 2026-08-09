@@ -64,6 +64,19 @@ holes contracts/ --format sarif > holes.sarif
 holes contracts/ --minimum-severity medium --fail-on high
 ```
 
+The `1.1` development line adds a private, human-approved bounty research
+workspace. Start by recording reviewed program rules, an immutable source
+revision, explicit scope, and authorization; initialization does not scan or
+contact any external service:
+
+```bash
+holes bounty init --help
+holes bounty validate PRIVATE_WORKSPACE
+```
+
+See the [bounty profile contract](docs/BOUNTY_PROFILE.md). There is deliberately
+no automatic submission or live-network transaction command.
+
 The [CLI reference](docs/CLI_REFERENCE.md) documents every command, exit status,
 output stream, and option group.
 
@@ -310,6 +323,8 @@ Project status and future work are tracked explicitly:
   rule maturity, milestones, and release gates.
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
+- [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
+  identity, scope, and private-workspace schema.
 - [Contributing guide](CONTRIBUTING.md) — development setup, rule workflow,
   compatibility constraints, tests, and review expectations.
 - [Threat model](docs/THREAT_MODEL.md) and

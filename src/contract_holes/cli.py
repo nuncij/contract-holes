@@ -12,6 +12,11 @@ from . import __version__
 from .address_source import AddressSourceError, fetch_and_write_verified_source
 from .ai_triage import AITriageError, explain_report, prepare_evidence_bundle
 from .benchmark import BenchmarkError, benchmark_exit_status, benchmark_paths
+from .bounty_profile import (
+    BountyProfileError,
+    initialize_bounty_workspace,
+    load_bounty_profile,
+)
 from .baseline import (
     BaselineError,
     compare_baseline,
@@ -54,7 +59,8 @@ def parser() -> argparse.ArgumentParser:
             "bundles with 'holes proofs DIRECTORY'. Fetch verified source with "
             "'holes fetch CHAIN_ID ADDRESS --output DIRECTORY', or annotate a "
             "JSON report with 'holes explain REPORT'. Run 'holes compatibility' "
-            "to inspect supported and observed tool versions."
+            "to inspect supported and observed tool versions. Create an "
+            "authorized local research workspace with 'holes bounty init'."
         ),
     )
     result.add_argument("--version", action="version", version=f"%(prog)s {__version__}")
@@ -398,6 +404,87 @@ def compatibility_parser() -> argparse.ArgumentParser:
     )
 
 
+def bounty_parser() -> argparse.ArgumentParser:
+    result = argparse.ArgumentParser(
+        prog="holes bounty",
+        description=(
+            "Manage a private, human-approved bounty research workspace. "
+            "Commands never submit reports or send transactions."
+        ),
+    )
+    commands = result.add_subparsers(dest="bounty_command", required=True)
+    initialize = commands.add_parser(
+        "init",
+        help="create a new private bounty workspace",
+        description="Create a new private bounty workspace outside the target tree.",
+    )
+    initialize.add_argument("workspace", help="new workspace directory")
+    initialize.add_argument("--program", required=True, help="program/project name")
+    initialize.add_argument("--platform", required=True, help="bounty platform name")
+    initialize.add_argument(
+        "--rules-url", required=True, help="HTTPS URL for the reviewed program rules"
+    )
+    initialize.add_argument(
+        "--reviewed-on", required=True, metavar="YYYY-MM-DD", help="rules review date"
+    )
+    initialize.add_argument(
+        "--authorized",
+        action="store_true",
+        help="acknowledge authorization and the selected program rules",
+    )
+    initialize.add_argument(
+        "--authorization-note",
+        required=True,
+        help="short record of why local analysis is authorized",
+    )
+    initialize.add_argument(
+        "--source", required=True, help="local target source directory"
+    )
+    identity = initialize.add_mutually_exclusive_group(required=True)
+    identity.add_argument(
+        "--revision",
+        help="exact lowercase 40- or 64-hex Git commit",
+    )
+    identity.add_argument(
+        "--content-sha256",
+        help="lowercase SHA-256 identity for a non-Git directory manifest",
+    )
+    initialize.add_argument(
+        "--scope",
+        action="append",
+        required=True,
+        metavar="PATH",
+        help="approved relative source path (repeatable)",
+    )
+    initialize.add_argument(
+        "--impact",
+        action="append",
+        required=True,
+        metavar="TEXT",
+        help="in-scope impact description (repeatable)",
+    )
+    initialize.add_argument(
+        "--restriction",
+        action="append",
+        default=[],
+        metavar="TEXT",
+        help="program restriction (repeatable)",
+    )
+    initialize.add_argument(
+        "--source-only",
+        action="store_true",
+        help="disable compiler analysis; bounty compiler mode is offline by default",
+    )
+
+    validate = commands.add_parser(
+        "validate",
+        help="validate an existing bounty profile",
+        description="Validate bounty.toml and emit its normalized identity as JSON.",
+    )
+    validate.add_argument("workspace", help="workspace directory or bounty.toml")
+    return result
+
+
 def main(argv: Sequence[str] | None = None) -> int:
     arguments = list(argv) if argv is not None else sys.argv[1:]
     if arguments and arguments[0] == "inspect":
@@ -416,6 +503,8 @@ def main(argv: Sequence[str] | None = None) -> int:
         return _evaluate_main(arguments[1:])
     if arguments and arguments[0] == "compatibility":
         return _compatibility_main(arguments[1:])
+    if arguments and arguments[0] == "bounty":
+        return _bounty_main(arguments[1:])
     argument_parser = parser()
     args = argument_parser.parse_args(arguments)
     try:
@@ -717,4 +806,45 @@ def _compatibility_main(argv: Sequence[str]) -> int:
     argument_parser = compatibility_parser()
     argument_parser.parse_args(argv)
     print(json.dumps(compatibility_payload(), indent=2, sort_keys=True))
+    return 0
+
+
+def _bounty_main(argv: Sequence[str]) -> int:
+    argument_parser = bounty_parser()
+    args = argument_parser.parse_args(argv)
+    try:
+        if args.bounty_command == "init":
+            profile = initialize_bounty_workspace(
+                args.workspace,
+                program_name=args.program,
+                platform=args.platform,
+                rules_url=args.rules_url,
+                reviewed_on=args.reviewed_on,
+                authorization_acknowledged=args.authorized,
+                authorization_note=args.authorization_note,
+                source_root=args.source,
+                source_revision=args.revision,
+                source_content_sha256=args.content_sha256,
+                scope_paths=args.scope,
+                impacts=args.impact,
+                restrictions=args.restriction,
+                compiler_enabled=not args.source_only,
+            )
+            command = "bounty.init"
+            status = "created"
+        else:
+            profile = load_bounty_profile(args.workspace)
+            command = "bounty.validate"
+            status = "valid"
+    except BountyProfileError as exc:
+        print(f"holes bounty: error: {exc}", file=sys.stderr)
+        return 2
+    payload = {
+        "schema_version": "1.0",
+        "command": command,
+        "status": status,
+        "workspace": str(profile.workspace),
+        "profile": profile.normalized_payload(),
+    }
+    print(json.dumps(payload, indent=2, sort_keys=True))
     return 0
