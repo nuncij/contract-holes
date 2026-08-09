@@ -20,7 +20,7 @@ jobs:
       security-events: write
     env:
       # Replace this with your reviewed package or Git commit pin.
-      CONTRACT_HOLES_INSTALL: contract-holes==1.0.0
+      CONTRACT_HOLES_INSTALL: contract-holes==1.1.0
 
     steps:
       - name: Check out repository

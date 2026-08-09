@@ -78,3 +78,34 @@ Consumers should require a supported major version, tolerate a newer minor
 version, ignore unknown fields, and retain unknown rule IDs/metadata for display.
 Ordering is deterministic for a fixed scan and path representation, but consumers
 must use IDs and fingerprints rather than array position as identity.
+
+## 1.1 bounty records and 1.0 migration
+
+Contract Holes 1.1 does not change the ordinary scanner JSON `1.0` or SARIF
+producer contract. Existing 1.0 scan consumers, baselines, fingerprints, and CI
+gates continue to use the same fields and semantics. Upgrading the package does
+not rewrite an existing report or baseline.
+
+Bounty workspaces introduce separate, explicitly versioned private record
+families. Their packaged schemas cover profiles, source manifests, scans,
+candidates, reviews, proofs/results, reports/inputs, approvals, historical
+evaluation, and the authorized pilot. These records are not additions to the
+ordinary report schema and must not be sent to a generic 1.0 report consumer.
+
+The initial bounty record versions are all `1.0`, independently of package
+version `1.1.0`. Their compatibility policy is:
+
+- an additive optional field requires a record-schema minor version;
+- removing, renaming, or changing a required field or digest definition requires
+  a record-schema major version;
+- immutable records keep their original schema version and digest material;
+- a managed workspace record is never silently migrated or rewritten;
+- a newer scanner may create different candidate IDs because the scanner version
+  is deliberately part of candidate identity, while the old observation remains
+  attributable to its original source and scanner hashes.
+
+There was no released bounty workspace in package 1.0, so no automatic data
+migration is needed. Users of an M7 development checkout should keep the original
+private workspace as evidence and create a new workspace when source, profile,
+scanner version, or a record-schema major changes. Never hand-edit hashes to make
+an old workspace appear current.

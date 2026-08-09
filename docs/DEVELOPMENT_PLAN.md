@@ -1,9 +1,9 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-09
-Current release: `1.0.0`
+Current release: `1.1.0` release candidate
 Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — IN PROGRESS**
-Next: **BOUNTY-010 — documentation and signed `1.1.0` release.**
+Next: **BOUNTY-010 — documentation and signed `1.1.0` release — IN PROGRESS.**
 
 ## Product goal
 
@@ -25,7 +25,7 @@ The scanner is successful when it:
 | Area | Current state |
 | --- | --- |
 | Repository | Local Git repository on `main`, with task-scoped implementation commits |
-| Release | `1.0.0` |
+| Release | `1.1.0` release candidate |
 | Inputs | Solidity files/directories or Etherscan V2 verified source by chain/address |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
@@ -249,7 +249,7 @@ back after the user explicitly requests compilation.
 | M4 — Dynamic verification | `0.5.0` | Complete | Reentrancy probes, transaction-sequence fuzzing, protocol invariants, isolated runner |
 | M5 — Team and CI workflow | `0.6.0` | Complete | Configuration, baselines, catalog, CI, limits, address provenance, evidence-bound AI triage |
 | M6 — Audit-ready release | `1.0.0` | Complete | Benchmarked accuracy, stable schemas, compatibility policy, security docs, reproducible signed release evidence |
-| M7 — Bounty Hunter Mode | `1.1.0` | In progress | Authorized scope profiles, candidate triage, isolated local proofs, private reports, and historical validation |
+| M7 — Bounty Hunter Mode | `1.1.0` | Release validation | Authorized scope profiles, candidate triage, isolated local proofs, private reports, historical validation, and an authorized end-to-end pilot |
 
 ### M2 — Cross-contract analysis (`0.3.0`)
 

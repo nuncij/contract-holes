@@ -45,21 +45,21 @@ record and accepted by the signer.
 ## 3. Commit and sign the checklist
 
 Complete the versioned record in
-[`release/1.0.0-checklist.md`](../release/1.0.0-checklist.md). The maintainer signs
+[`release/1.1.0-checklist.md`](../release/1.1.0-checklist.md). The maintainer signs
 that exact file with a documented long-lived key:
 
 ```bash
 gpg --armor --detach-sign \
-  --output release/1.0.0-checklist.md.asc \
-  release/1.0.0-checklist.md
-gpg --verify release/1.0.0-checklist.md.asc release/1.0.0-checklist.md
-git add release/1.0.0-checklist.md release/1.0.0-checklist.md.asc
-git commit -m "Sign the 1.0.0 release checklist"
+  --output release/1.1.0-checklist.md.asc \
+  release/1.1.0-checklist.md
+gpg --verify release/1.1.0-checklist.md.asc release/1.1.0-checklist.md
+git add release/1.1.0-checklist.md release/1.1.0-checklist.md.asc
+git commit -m "Sign the 1.1.0 release checklist"
 ```
 
 Do not generate an ad-hoc signing identity during release. Publish the signer's
-fingerprint through a channel users already trust. The 1.0 release also includes
-the armored public key at `release/1.0.0-signing-key.asc`; importing that file
+fingerprint through a channel users already trust. The 1.1 release also includes
+the armored public key at `release/1.1.0-signing-key.asc`; importing that file
 does not by itself establish trust, so compare its fingerprint out of band.
 
 ## 4. Build and reproduce
@@ -69,15 +69,16 @@ exports `HEAD` twice, builds both copies independently, and compares wheel/sdist
 SHA-256 digests before copying artifacts:
 
 ```bash
-.venv-release/bin/python scripts/release.py --output dist
-(cd dist && sha256sum -c SHA256SUMS)
+.venv-release/bin/python scripts/release.py --output dist/1.1.0
+(cd dist/1.1.0 && sha256sum -c SHA256SUMS)
 ```
 
-`dist/release-manifest.json` records the commit, source timestamp, exact build
+`dist/1.1.0/release-manifest.json` records the commit, source timestamp, exact build
 tools, artifact sizes/digests, byte-for-byte comparison, and wheel smoke result.
-`SHA256SUMS` covers both distributions and that manifest. The generated `dist/`
-directory is intentionally ignored by Git and should be attached unchanged to
-the release.
+`SHA256SUMS` covers both distributions and that manifest. The generated version
+directory under `dist/` is intentionally ignored by Git and should be attached
+unchanged to the release. Versioned output preserves older local artifacts while
+keeping each build destination new.
 
 To reproduce, check out the recorded commit, install the same
 `requirements/release.txt`, rerun the command in an empty output directory, and
@@ -89,10 +90,12 @@ generated release manifest itself is not expected to be identical across hosts.
 Create a signed tag over the commit containing the signed checklist:
 
 ```bash
-git tag -s v1.0.0 -m "Contract Holes 1.0.0"
-git tag -v v1.0.0
-gpg --armor --detach-sign --output dist/SHA256SUMS.asc dist/SHA256SUMS
-gpg --verify dist/SHA256SUMS.asc dist/SHA256SUMS
+git tag -s v1.1.0 -m "Contract Holes 1.1.0"
+git tag -v v1.1.0
+gpg --armor --detach-sign \
+  --output dist/1.1.0/SHA256SUMS.asc \
+  dist/1.1.0/SHA256SUMS
+gpg --verify dist/1.1.0/SHA256SUMS.asc dist/1.1.0/SHA256SUMS
 ```
 
 The signed tag authenticates source and checklist; the detached checksum

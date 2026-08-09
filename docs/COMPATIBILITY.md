@@ -77,7 +77,7 @@ review signal tied to the deployment environment.
 
 Linux GitHub-hosted runners are the published CI reference environment. Other
 operating systems may work when a supported CPython and Foundry build is
-available, but are not part of the 1.0 compatibility commitment.
+available, but are not part of the 1.x compatibility commitment.
 
 When reporting a compatibility problem, include the output of
 `holes compatibility`, the project compiler/EVM settings, and the smallest source

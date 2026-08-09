@@ -283,6 +283,9 @@ def _validate_wheel(path: Path, version: str) -> None:
     required = {
         "contract_holes/__init__.py",
         "contract_holes/cli.py",
+        "contract_holes/bounty_pilot.py",
+        "contract_holes/schemas/bounty-pilot-result-1.0.schema.json",
+        "contract_holes/schemas/bounty-profile-1.0.schema.json",
         "contract_holes/schemas/report-1.0.schema.json",
         "contract_holes/schemas/sarif-2.1.0-profile.schema.json",
         metadata_name,
@@ -310,10 +313,14 @@ def _validate_sdist(path: Path, version: str) -> None:
         f"{prefix}LICENSE",
         f"{prefix}README.md",
         f"{prefix}SECURITY.md",
+        f"{prefix}docs/BOUNTY_PILOT.md",
         f"{prefix}docs/INSTALLATION.md",
+        f"{prefix}evaluation/bounty-history-1.0.json",
+        f"{prefix}evaluation/bounty-pilot-1.0.json",
         f"{prefix}pyproject.toml",
         f"{prefix}src/contract_holes/schemas/report-1.0.schema.json",
         f"{prefix}tests/test_scanner.py",
+        f"{prefix}tests/fixtures/bounty_pilot/manifest.json",
     }
     with tarfile.open(path, mode="r:gz") as archive:
         names = set(archive.getnames())

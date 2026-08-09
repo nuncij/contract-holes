@@ -379,8 +379,8 @@
     ],
     "statement": "Contract Holes produced useful investigation evidence for at least three independent historical supported cases. Human validation is still required."
   },
-  "result_sha256": "f952dacf214ffdcb45b8747101f46f783dc3352566b69aef0b2d593f89ac2b52",
-  "scanner_version": "1.0.0",
+  "result_sha256": "301f5ba17e7145d74232e55b6a17d21481495c8fbd858564c86c8c3ef699dc2a",
+  "scanner_version": "1.1.0",
   "schema_version": "1.0",
   "solc_version": "0.8.25",
   "split_metrics": {

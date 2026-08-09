@@ -2,7 +2,7 @@
 
 Last updated: 2026-08-09
 Target release: `1.1.0`
-Status: **In progress**
+Status: **Release validation**
 
 ## Goal
 

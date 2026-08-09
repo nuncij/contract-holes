@@ -3,7 +3,15 @@
 All notable project changes are recorded here. Versions follow semantic
 versioning; public JSON/SARIF schemas have their own compatibility rules.
 
-## Unreleased — `1.1.0`
+## Unreleased
+
+No changes yet.
+
+## 1.1.0 — 2026-08-09
+
+M7 adds a local bounty research assistant with mandatory human decisions. It
+does not claim audit completeness, automatic confirmation or submission,
+exploitability, program eligibility, payout likelihood, or expected income.
 
 ### Bounty research workflow
 

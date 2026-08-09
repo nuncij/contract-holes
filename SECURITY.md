@@ -51,10 +51,11 @@ users to update.
 
 ## Scope
 
-In scope are vulnerabilities in the scanner, CLI, report generation, verified
-source ingestion, AI evidence binding, proof generation/runner, packaging, and
-official CI examples. Examples include command execution that crosses a documented
-boundary, path traversal or overwrite, secret disclosure, schema/gate bypass,
+In scope are vulnerabilities in the scanner, CLI, bounty profile/scope and
+private-workspace workflow, report generation/export, verified source ingestion,
+AI evidence binding, proof generation/runner, packaging, and official CI examples.
+Examples include command execution that crosses a documented boundary, path
+traversal or overwrite, secret disclosure, authorization/schema/gate bypass,
 unsafe proof execution, and materially incorrect security results caused by an
 implementation defect.
 
