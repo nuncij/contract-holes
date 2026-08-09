@@ -135,6 +135,13 @@ creates a checksummed redacted local directory for an approved report. None of
 these commands contacts a network or submits a report. See
 [bounty proofs and reports](BOUNTY_PROOFS_REPORTS.md).
 
+`history MANIFEST` runs the frozen historical usefulness gate. It validates the
+compiler configuration, fixture hashes, immutable source metadata, provenance,
+calibration/holdout split, and supported/out-of-model labels before compiling
+locally. The command is offline by default; `--allow-downloads` permits only the
+pinned solc download. Exit `1` is a completed no-go result, not an execution
+error. See [historical bounty evaluation](BOUNTY_HISTORY.md).
+
 ## Configuration precedence
 
 An explicit CLI setting wins over the selected/discovered `.holes.toml`, which

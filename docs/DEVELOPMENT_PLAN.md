@@ -3,7 +3,7 @@
 Last updated: 2026-08-08  
 Current release: `1.0.0`
 Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — IN PROGRESS**
-Next: **BOUNTY-008 — historical disclosed-vulnerability corpus.**
+Next: **BOUNTY-009 — authorized end-to-end pilot.**
 
 ## Product goal
 

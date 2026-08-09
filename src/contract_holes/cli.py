@@ -19,6 +19,11 @@ from .bounty_candidates import (
     review_candidate,
     synchronize_candidates,
 )
+from .bounty_history import (
+    BountyHistoryError,
+    bounty_history_exit_status,
+    evaluate_bounty_history,
+)
 from .bounty_profile import (
     BountyProfileError,
     initialize_bounty_workspace,
@@ -673,6 +678,20 @@ def bounty_parser() -> argparse.ArgumentParser:
     export.add_argument(
         "--output", required=True, metavar="DIRECTORY", help="new local export directory"
     )
+    history = commands.add_parser(
+        "history",
+        help="evaluate the frozen historical vulnerability corpus",
+        description=(
+            "Run the versioned historical usefulness gate locally. Remote provenance "
+            "references are not fetched and no live target is contacted."
+        ),
+    )
+    history.add_argument("manifest", help="historical corpus manifest JSON")
+    history.add_argument(
+        "--allow-downloads",
+        action="store_true",
+        help="allow Foundry to download the pinned compiler (offline by default)",
+    )
     return result
 
 
@@ -1049,6 +1068,11 @@ def _bounty_main(argv: Sequence[str]) -> int:
                 "status": "identified",
                 "source": identity.public_payload(),
             }
+        elif args.bounty_command == "history":
+            payload = evaluate_bounty_history(
+                args.manifest,
+                offline=not args.allow_downloads,
+            )
         else:
             if args.bounty_command == "scan":
                 result = scan_bounty_workspace(args.workspace)
@@ -1131,10 +1155,15 @@ def _bounty_main(argv: Sequence[str]) -> int:
         BountyProfileError,
         BountyScopeError,
         BountyCandidateError,
+        BountyHistoryError,
         BountyProofError,
         BountyReportError,
     ) as exc:
         print(f"holes bounty: error: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))
-    return 0
+    return (
+        bounty_history_exit_status(payload)
+        if args.bounty_command == "history"
+        else 0
+    )

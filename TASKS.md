@@ -13,7 +13,7 @@ complete. M7 has an approved development plan and its profile/workspace
 foundation, pinned scope validation, and offline/private execution boundary are
 complete.
 
-Next: **BOUNTY-008 — historical disclosed-vulnerability corpus.**
+Next: **BOUNTY-009 — authorized end-to-end pilot.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -362,7 +362,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-004`, `BOUNTY-006` when a proof is required.
 
-### [ ] BOUNTY-008 — Historical disclosed-vulnerability corpus — P0 — **NEXT**
+### [x] BOUNTY-008 — Historical disclosed-vulnerability corpus — P0 — **COMPLETE**
 
 Measure usefulness on real, already-public cases without turning the checked-in
 synthetic regression score into a market claim.
@@ -388,7 +388,7 @@ Acceptance criteria:
 Depends on: can begin after `BOUNTY-001`; evaluation completes after
 `BOUNTY-005` and may exercise `BOUNTY-006`.
 
-### [ ] BOUNTY-009 — Authorized end-to-end pilot — P1
+### [ ] BOUNTY-009 — Authorized end-to-end pilot — P1 — **NEXT**
 
 Exercise the complete local workflow against one explicitly authorized target
 without requiring a bounty submission.

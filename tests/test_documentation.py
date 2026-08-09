@@ -28,6 +28,7 @@ class DocumentationTests(unittest.TestCase):
             "docs/BOUNTY_PROFILE.md",
             "docs/BOUNTY_TRIAGE.md",
             "docs/BOUNTY_PROOFS_REPORTS.md",
+            "docs/BOUNTY_HISTORY.md",
         )
 
         for relative in required:

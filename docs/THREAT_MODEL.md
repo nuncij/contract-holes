@@ -139,6 +139,14 @@ duplicate or out-of-scope reports, native toolchain compromise, and disclosure
 after the local export leaves the workspace. Hashes show which local inputs were
 used; they do not attest truth, exploitability, ownership, or program acceptance.
 
+The historical gate hashes local reductions and records immutable upstream
+identities without downloading them at evaluation time. This removes live-source
+drift and third-party code redistribution from the test path, but reductions can
+omit material protocol behavior. Calibration and holdout separation, frozen
+supported/out-of-model labels, raw rejected candidates, and an explicit no-go
+state limit score tuning. The result remains evidence about these ten reductions,
+not a population-wide accuracy or bounty-income claim.
+
 ### Reports, baselines, suppressions, and CI
 
 Reports may contain source excerpts and local paths. A baseline can hide an

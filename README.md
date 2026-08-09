@@ -80,6 +80,7 @@ holes bounty proof --help
 holes bounty report --help
 holes bounty approve --help
 holes bounty export --help
+holes bounty history tests/fixtures/bounty_history/manifest.json
 ```
 
 See the [bounty profile contract](docs/BOUNTY_PROFILE.md). There is deliberately
@@ -414,6 +415,19 @@ It currently covers 33 positive and 31 safe labels across `SOL001`–`SOL013` an
 reports TP/FP/FN plus macro/micro precision and recall. Its perfect checked-in
 regression score is not a real-world accuracy claim; see
 [precision and recall evaluation](docs/EVALUATION.md).
+
+M7 also freezes ten already-public cases from ten independent projects, with
+calibration/holdout splits and explicit supported/out-of-model labels:
+
+```bash
+holes bounty history tests/fixtures/bounty_history/manifest.json
+```
+
+The checked result records 16 investigation candidates, two reviewer rejections,
+87.5% candidate precision, 100% supported-label recall, and useful evidence for
+five independent supported cases. This is a bounded research-assistant claim,
+not exploit confirmation or expected bounty performance; see the
+[historical bounty evaluation](docs/BOUNTY_HISTORY.md).
 
 The fallback parser masks comments and string contents while preserving offsets,
 then identifies contract and function regions. With `--compile`, solc source maps,

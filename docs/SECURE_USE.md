@@ -77,6 +77,13 @@ detect undisclosed duplicates or determine whether a program will accept a
 report. Any submission remains a separate manual action through the program's
 required private channel.
 
+`holes bounty history` is a local evaluation command, not a target scanner. It
+verifies and compiles checked-in MIT reductions and never fetches the public
+source/disclosure URLs recorded in the manifest. Treat those links as provenance
+to review manually, not as trusted build inputs. Do not replace the corpus with
+current live targets or private reports; create a separately reviewed corpus
+version and keep confidential material out of Git.
+
 ## Networked commands
 
 Normal source-only scans do not use the network. Network can occur when:

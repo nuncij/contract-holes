@@ -28,6 +28,9 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   separate impact assertions, offline isolated execution, and tamper checks.
 - Added immutable private report drafts, completeness/staleness gates, explicit
   human approval, and checksummed redacted local export with no submission path.
+- Added a frozen ten-project historical corpus, calibration/holdout labels,
+  tamper-evident offline evaluation, raw rejected-candidate metrics, and an
+  explicit go/no-go product-claim gate via `holes bounty history`.
 
 ## 1.0.0 — 2026-08-08
 

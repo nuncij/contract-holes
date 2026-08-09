@@ -1,0 +1,409 @@
+{
+  "cases": [
+    {
+      "candidates": [
+        {
+          "column": 9,
+          "confidence": "medium",
+          "evidence": "compiler-authorization-reachability",
+          "fingerprint": "0cfa8b896e4c914c",
+          "issue_kind": null,
+          "line": 9,
+          "path": "src/ParityLibrary2017.sol",
+          "rule_id": "SOL009",
+          "severity": "high"
+        },
+        {
+          "column": 9,
+          "confidence": "medium",
+          "evidence": "compiler-proxy-upgrade-analysis",
+          "fingerprint": "4f4cf033d680d095",
+          "issue_kind": "unguarded-initializer",
+          "line": 9,
+          "path": "src/ParityLibrary2017.sol",
+          "rule_id": "SOL011",
+          "severity": "high"
+        },
+        {
+          "column": 9,
+          "confidence": "high",
+          "evidence": "source-pattern",
+          "fingerprint": "6a21ccaa208262ed",
+          "issue_kind": null,
+          "line": 14,
+          "path": "src/ParityLibrary2017.sol",
+          "rule_id": "SOL004",
+          "severity": "high"
+        }
+      ],
+      "case_id": "PARITY-2017-LIBRARY",
+      "expected_candidates": 3,
+      "investigation_count": 3,
+      "matched_candidates": 3,
+      "missed_labels": [],
+      "model_status": "supported",
+      "project": "Parity Technologies",
+      "rejected_candidates": 0,
+      "split": "calibration",
+      "status": "evidence-produced",
+      "support_limit": "Findings expose the unguarded privileged initialization and self-destruct primitive; they do not establish affected deployments or locked value."
+    },
+    {
+      "candidates": [
+        {
+          "column": 17,
+          "confidence": "medium",
+          "evidence": "compiler-interprocedural-data-flow",
+          "fingerprint": "cd3938dc53e7c2e3",
+          "issue_kind": null,
+          "line": 18,
+          "path": "src/CreamAmp2021.sol",
+          "rule_id": "SOL005",
+          "severity": "high"
+        }
+      ],
+      "case_id": "CREAM-2021-AMP",
+      "expected_candidates": 1,
+      "investigation_count": 1,
+      "matched_candidates": 1,
+      "missed_labels": [],
+      "model_status": "supported",
+      "project": "C.R.E.A.M. Finance",
+      "rejected_candidates": 0,
+      "split": "calibration",
+      "status": "evidence-produced",
+      "support_limit": "The finding captures interaction-before-accounting evidence, not cross-market collateral impact or exploit profitability."
+    },
+    {
+      "candidates": [
+        {
+          "column": 37,
+          "confidence": "medium",
+          "evidence": "compiler-interprocedural-data-flow",
+          "fingerprint": "59aa2202433e68f6",
+          "issue_kind": null,
+          "line": 13,
+          "path": "src/EnzymeIdle2021.sol",
+          "rule_id": "SOL005",
+          "severity": "high"
+        },
+        {
+          "column": 37,
+          "confidence": "medium",
+          "evidence": "compiler-interprocedural-target-taint",
+          "fingerprint": "81b557ed13ef9614",
+          "issue_kind": null,
+          "line": 13,
+          "path": "src/EnzymeIdle2021.sol",
+          "rule_id": "SOL008",
+          "severity": "high"
+        }
+      ],
+      "case_id": "ENZYME-2021-IDLE-PRICE",
+      "expected_candidates": 0,
+      "investigation_count": 2,
+      "matched_candidates": 0,
+      "missed_labels": [],
+      "model_status": "out-of-model",
+      "project": "Enzyme Finance",
+      "rejected_candidates": 2,
+      "split": "calibration",
+      "status": "out-of-model-recorded",
+      "support_limit": "The market detector models named oracle, AMM, TWAP, and swap flows, not protocol-specific share-supply economics."
+    },
+    {
+      "candidates": [],
+      "case_id": "NOMAD-2022-ZERO-ROOT",
+      "expected_candidates": 0,
+      "investigation_count": 0,
+      "matched_candidates": 0,
+      "missed_labels": [],
+      "model_status": "out-of-model",
+      "project": "Nomad",
+      "rejected_candidates": 0,
+      "split": "calibration",
+      "status": "out-of-model-recorded",
+      "support_limit": "The scanner does not model application-specific Merkle-root authentication invariants or deployment arguments."
+    },
+    {
+      "candidates": [],
+      "case_id": "BELT-2021-SHARES",
+      "expected_candidates": 0,
+      "investigation_count": 0,
+      "matched_candidates": 0,
+      "missed_labels": [],
+      "model_status": "out-of-model",
+      "project": "Belt Finance",
+      "rejected_candidates": 0,
+      "split": "calibration",
+      "status": "out-of-model-recorded",
+      "support_limit": "The scanner does not model protocol-specific share accounting across strategies."
+    },
+    {
+      "candidates": [
+        {
+          "column": 9,
+          "confidence": "medium",
+          "evidence": "compiler-authorization-reachability",
+          "fingerprint": "352281c6e8fee49a",
+          "issue_kind": null,
+          "line": 9,
+          "path": "src/WormholeProxy2022.sol",
+          "rule_id": "SOL009",
+          "severity": "high"
+        },
+        {
+          "column": 9,
+          "confidence": "medium",
+          "evidence": "compiler-proxy-upgrade-analysis",
+          "fingerprint": "9105a4edeedcfd4b",
+          "issue_kind": "unguarded-initializer",
+          "line": 9,
+          "path": "src/WormholeProxy2022.sol",
+          "rule_id": "SOL011",
+          "severity": "high"
+        },
+        {
+          "column": 28,
+          "confidence": "medium",
+          "evidence": "compiler-interprocedural-target-taint",
+          "fingerprint": "0624473db756334b",
+          "issue_kind": null,
+          "line": 14,
+          "path": "src/WormholeProxy2022.sol",
+          "rule_id": "SOL008",
+          "severity": "high"
+        },
+        {
+          "column": 28,
+          "confidence": "medium",
+          "evidence": "compiler-proxy-upgrade-analysis",
+          "fingerprint": "2b4e17a3b1f42044",
+          "issue_kind": "proxy-storage-collision",
+          "line": 14,
+          "path": "src/WormholeProxy2022.sol",
+          "rule_id": "SOL011",
+          "severity": "high"
+        },
+        {
+          "column": 34,
+          "confidence": "medium",
+          "evidence": "source-pattern",
+          "fingerprint": "4089ce505e553d78",
+          "issue_kind": null,
+          "line": 14,
+          "path": "src/WormholeProxy2022.sol",
+          "rule_id": "SOL003",
+          "severity": "high"
+        }
+      ],
+      "case_id": "WORMHOLE-2022-UNINITIALIZED",
+      "expected_candidates": 5,
+      "investigation_count": 5,
+      "matched_candidates": 5,
+      "missed_labels": [],
+      "model_status": "supported",
+      "project": "Wormhole",
+      "rejected_candidates": 0,
+      "split": "holdout",
+      "status": "evidence-produced",
+      "support_limit": "Findings expose initialization, authorization, target-taint, delegatecall, and storage hazards; guardian-message feasibility and deployed state remain manual checks."
+    },
+    {
+      "candidates": [
+        {
+          "column": 9,
+          "confidence": "medium",
+          "evidence": "compiler-proxy-upgrade-analysis",
+          "fingerprint": "bc2c84b1db3eb428",
+          "issue_kind": "unguarded-initializer",
+          "line": 10,
+          "path": "src/HarvestProxy2021.sol",
+          "rule_id": "SOL011",
+          "severity": "high"
+        },
+        {
+          "column": 28,
+          "confidence": "medium",
+          "evidence": "compiler-proxy-upgrade-analysis",
+          "fingerprint": "2e31248fc5e2133e",
+          "issue_kind": "proxy-storage-collision",
+          "line": 16,
+          "path": "src/HarvestProxy2021.sol",
+          "rule_id": "SOL011",
+          "severity": "high"
+        },
+        {
+          "column": 38,
+          "confidence": "medium",
+          "evidence": "source-pattern",
+          "fingerprint": "b3b55675c2ec8585",
+          "issue_kind": null,
+          "line": 16,
+          "path": "src/HarvestProxy2021.sol",
+          "rule_id": "SOL003",
+          "severity": "high"
+        }
+      ],
+      "case_id": "HARVEST-2021-UNINITIALIZED",
+      "expected_candidates": 3,
+      "investigation_count": 3,
+      "matched_candidates": 3,
+      "missed_labels": [],
+      "model_status": "supported",
+      "project": "Harvest Finance",
+      "rejected_candidates": 0,
+      "split": "holdout",
+      "status": "evidence-produced",
+      "support_limit": "Findings identify the unguarded initializer and delegatecall/storage primitives, not on-chain initialization history or funds at risk."
+    },
+    {
+      "candidates": [
+        {
+          "column": 28,
+          "confidence": "medium",
+          "evidence": "compiler-interprocedural-target-taint",
+          "fingerprint": "ba2f15fe20814a66",
+          "issue_kind": null,
+          "line": 7,
+          "path": "src/AuroraInflation2022.sol",
+          "rule_id": "SOL008",
+          "severity": "high"
+        },
+        {
+          "column": 42,
+          "confidence": "medium",
+          "evidence": "source-pattern",
+          "fingerprint": "3a756fdf0d41b0da",
+          "issue_kind": null,
+          "line": 7,
+          "path": "src/AuroraInflation2022.sol",
+          "rule_id": "SOL003",
+          "severity": "high"
+        }
+      ],
+      "case_id": "AURORA-2022-INFLATION",
+      "expected_candidates": 2,
+      "investigation_count": 2,
+      "matched_candidates": 2,
+      "missed_labels": [],
+      "model_status": "supported",
+      "project": "Aurora",
+      "rejected_candidates": 0,
+      "split": "holdout",
+      "status": "evidence-produced",
+      "support_limit": "SOL003 and SOL008 expose a caller-controlled delegatecall boundary only; they do not model Aurora Engine precompile balance semantics or prove inflation."
+    },
+    {
+      "candidates": [],
+      "case_id": "BEANSTALK-2022-GOVERNANCE",
+      "expected_candidates": 0,
+      "investigation_count": 0,
+      "matched_candidates": 0,
+      "missed_labels": [],
+      "model_status": "out-of-model",
+      "project": "Beanstalk",
+      "rejected_candidates": 0,
+      "split": "holdout",
+      "status": "out-of-model-recorded",
+      "support_limit": "The scanner does not model governance voting economics, flash-loan composability, proposal payload intent, or temporal voting snapshots."
+    },
+    {
+      "candidates": [],
+      "case_id": "EULER-2023-DONATION",
+      "expected_candidates": 0,
+      "investigation_count": 0,
+      "matched_candidates": 0,
+      "missed_labels": [],
+      "model_status": "out-of-model",
+      "project": "Euler Finance",
+      "rejected_candidates": 0,
+      "split": "holdout",
+      "status": "out-of-model-recorded",
+      "support_limit": "The scanner does not model Euler's health, liquidation, reserve, and exchange-rate invariants."
+    }
+  ],
+  "corpus": {
+    "cases": 10,
+    "files_scanned": 10,
+    "out_of_model_cases": [
+      "ENZYME-2021-IDLE-PRICE",
+      "NOMAD-2022-ZERO-ROOT",
+      "BELT-2021-SHARES",
+      "BEANSTALK-2022-GOVERNANCE",
+      "EULER-2023-DONATION"
+    ],
+    "projects": 10,
+    "splits": {
+      "calibration": 5,
+      "holdout": 5
+    },
+    "supported_cases": 5
+  },
+  "corpus_version": "m7-history-1",
+  "evaluation_version": "1.0",
+  "execution_policy": {
+    "funded_credentials": false,
+    "network_writes": false,
+    "offline": true
+  },
+  "gate_checks": {
+    "candidate_precision": true,
+    "evidence_completeness": true,
+    "independent_supported_cases": true,
+    "supported_class_recall": true
+  },
+  "labels_frozen_on": "2026-08-09",
+  "labels_sha256": "93bc187f2640489f2a04b3c59b046984cc9be1bbda5383cf206849ff1bfaf6e6",
+  "limitations": [
+    "Fixtures are locally authored reductions, not the complete historical deployments.",
+    "A matched rule is useful investigation evidence, not proof of the disclosed impact.",
+    "Out-of-model labels are preserved even when generic candidates require rejection.",
+    "Remote references are provenance metadata and are not fetched during evaluation."
+  ],
+  "metrics": {
+    "candidate_precision": 0.875,
+    "compiler_evidence_rate": 0.75,
+    "evidence_completeness": 1.0,
+    "investigation_count": 16,
+    "rejected_candidates": 2,
+    "supported_cases_with_evidence": 5,
+    "supported_class_recall": 1.0
+  },
+  "product_claim": {
+    "decision": "go",
+    "does_not_mean": [
+      "the historical vulnerabilities were automatically confirmed",
+      "the scanner is complete or equivalent to an audit",
+      "a finding is exploitable, in scope, unique, or eligible for payout"
+    ],
+    "statement": "Contract Holes produced useful investigation evidence for at least three independent historical supported cases. Human validation is still required."
+  },
+  "result_sha256": "f952dacf214ffdcb45b8747101f46f783dc3352566b69aef0b2d593f89ac2b52",
+  "scanner_version": "1.0.0",
+  "schema_version": "1.0",
+  "solc_version": "0.8.25",
+  "split_metrics": {
+    "calibration": {
+      "candidate_precision": 0.666667,
+      "cases": 5,
+      "investigation_count": 6,
+      "rejected_candidates": 2,
+      "supported_class_recall": 1.0
+    },
+    "holdout": {
+      "candidate_precision": 1.0,
+      "cases": 5,
+      "investigation_count": 10,
+      "rejected_candidates": 0,
+      "supported_class_recall": 1.0
+    }
+  },
+  "status": "passed",
+  "thresholds": {
+    "minimum_candidate_precision": 0.8,
+    "minimum_evidence_completeness": 0.9,
+    "minimum_supported_cases_with_evidence": 3,
+    "minimum_supported_recall": 0.8
+  }
+}
