@@ -1,0 +1,296 @@
+{
+  "schema_version": "1.0",
+  "evaluation_version": "1.0",
+  "corpus_version": "m7-history-1",
+  "labels_frozen_on": "2026-08-09",
+  "solc_version": "0.8.25",
+  "compiler_config": "foundry.toml",
+  "compiler_config_sha256": "84e0b3bcd7afeb622e10f07424fc2775049f548664af7234aac40e40d94fd021",
+  "thresholds": {
+    "minimum_candidate_precision": 0.8,
+    "minimum_supported_recall": 0.8,
+    "minimum_evidence_completeness": 0.9,
+    "minimum_supported_cases_with_evidence": 3
+  },
+  "methodology": {
+    "fixture_policy": "Locally authored reductions preserve only the disclosed root-cause shape; no upstream source is copied.",
+    "label_policy": "Labels are reviewed and frozen before scanner results are evaluated.",
+    "claim": "Useful investigation evidence, not exploit confirmation, audit equivalence, completeness, or payout likelihood."
+  },
+  "cases": [
+    {
+      "case_id": "PARITY-2017-LIBRARY",
+      "split": "calibration",
+      "project": "Parity Technologies",
+      "title": "Uninitialized multisig library self-destruct",
+      "incident_on": "2017-11-06",
+      "disclosed_on": "2017-11-15",
+      "root_cause": "The shared wallet library remained initializable and retained an owner-gated self-destruct path, allowing a caller to become owner and destroy the library.",
+      "model_status": "supported",
+      "support_limit": "Findings expose the unguarded privileged initialization and self-destruct primitive; they do not establish affected deployments or locked value.",
+      "expected_findings": [
+        {"rule_id": "SOL009"},
+        {"rule_id": "SOL011", "metadata": {"issue_kind": "unguarded-initializer"}},
+        {"rule_id": "SOL004"}
+      ],
+      "fixture": "src/ParityLibrary2017.sol",
+      "fixture_sha256": "04d7670119c1955f7699ecc1c94304f210e060dd0344716bba284a69be705888",
+      "source": {
+        "kind": "onchain-contract",
+        "url": "https://etherscan.io/address/0x863df6bfa4469f3ead0be8f9f2aae51c91a907b4",
+        "immutable_id": "eip155:1:address:0x863df6bfa4469f3ead0be8f9f2aae51c91a907b4",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "Parity Technologies",
+        "url": "https://medium.com/paritytech/a-postmortem-on-the-parity-multi-sig-library-self-destruct-63daca3a4cf7",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "CREAM-2021-AMP",
+      "split": "calibration",
+      "project": "C.R.E.A.M. Finance",
+      "title": "AMP transfer-hook reentrancy",
+      "incident_on": "2021-08-31",
+      "disclosed_on": "2021-09-01",
+      "root_cause": "Borrowed tokens were transferred before the borrower's debt was updated, allowing an ERC-777-style recipient hook to reenter a related borrow path.",
+      "model_status": "supported",
+      "support_limit": "The finding captures interaction-before-accounting evidence, not cross-market collateral impact or exploit profitability.",
+      "expected_findings": [{"rule_id": "SOL005"}],
+      "fixture": "src/CreamAmp2021.sol",
+      "fixture_sha256": "010f33bca6bf7b702cf2c5616d1cc9d367397db39d632a5fa258c2a2816a0bcc",
+      "source": {
+        "kind": "pinned-repository-and-transaction",
+        "url": "https://github.com/CreamFi/compound-protocol/tree/23214f681bb947cfd0e34303356dac17664a054a",
+        "immutable_id": "git:23214f681bb947cfd0e34303356dac17664a054a;tx:0x0016745693d68d734faa408b94cdf2d6c95f511b50f47b03909dc599c1dd9ff6",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "C.R.E.A.M. Finance",
+        "url": "https://medium.com/cream-finance/c-r-e-a-m-finance-post-mortem-amp-exploit-6ceb20a630c5",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "ENZYME-2021-IDLE-PRICE",
+      "split": "calibration",
+      "project": "Enzyme Finance",
+      "title": "Mutable Idle supply used in share pricing",
+      "incident_on": "2021-11-17",
+      "disclosed_on": "2021-11-25",
+      "root_cause": "An integration priced Idle shares from total net asset value divided by a total supply that a flash loan could change inside one transaction.",
+      "model_status": "out-of-model",
+      "support_limit": "The market detector models named oracle, AMM, TWAP, and swap flows, not protocol-specific share-supply economics.",
+      "expected_findings": [],
+      "fixture": "src/EnzymeIdle2021.sol",
+      "fixture_sha256": "a57898e3000fb1bfe66ebe626c0317b85747049f0d6c7f1e9c7c75dc83abc900",
+      "source": {
+        "kind": "pinned-repository",
+        "url": "https://github.com/enzymefinance/protocol/tree/2b652b2442b25382d92e639e79e9f58f2da52880",
+        "immutable_id": "git:2b652b2442b25382d92e639e79e9f58f2da52880",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "Immunefi",
+        "url": "https://immunefi.com/blog/bug-fix-reviews/enzyme-finance-price-oracle-manipulation-bugfix-review/",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "NOMAD-2022-ZERO-ROOT",
+      "split": "calibration",
+      "project": "Nomad",
+      "title": "Zero root accepted after Replica initialization",
+      "incident_on": "2022-08-01",
+      "disclosed_on": "2022-08-05",
+      "root_cause": "Initialization pre-approved the zero root, while unproven messages also resolved to the zero root, causing unauthenticated messages to pass the acceptable-root check.",
+      "model_status": "out-of-model",
+      "support_limit": "The scanner does not model application-specific Merkle-root authentication invariants or deployment arguments.",
+      "expected_findings": [],
+      "fixture": "src/NomadReplica2022.sol",
+      "fixture_sha256": "12177bf2c3d7c4a3578761e277a0d8ffc939ccba58372661808c7a8943a82c56",
+      "source": {
+        "kind": "pinned-fix-commit",
+        "url": "https://github.com/nomad-xyz/monorepo/commit/0e02cc1f09d16f809f5d2d8f05abbeea6d1af04e",
+        "immutable_id": "git:0e02cc1f09d16f809f5d2d8f05abbeea6d1af04e",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "Nomad",
+        "url": "https://medium.com/nomad-xyz-blog/nomad-bridge-hack-root-cause-analysis-875ad2e5aacd",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "BELT-2021-SHARES",
+      "split": "calibration",
+      "project": "Belt Finance",
+      "title": "Incorrect strategy balance issued excess shares",
+      "incident_on": "2021-08-10",
+      "disclosed_on": "2021-09-30",
+      "root_cause": "A strategy balance accounting error made the system believe it held fewer assets and issue excess shares to a new depositor.",
+      "model_status": "out-of-model",
+      "support_limit": "The scanner does not model protocol-specific share accounting across strategies.",
+      "expected_findings": [],
+      "fixture": "src/BeltShares2021.sol",
+      "fixture_sha256": "126b8c7eb3cdc0d5beb878a6baad300d1c21771d3fa060ae0f074b337c2eda13",
+      "source": {
+        "kind": "pinned-fix-commit",
+        "url": "https://github.com/BeltFi/belt-contract/commit/064282d554a424ca95ab7f87d8ec04c5f92cf343",
+        "immutable_id": "git:064282d554a424ca95ab7f87d8ec04c5f92cf343",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "Immunefi",
+        "url": "https://immunefi.com/blog/bug-fix-reviews/belt-finance-logic-error-bugfix-review-largest-ever-bounty-payout/",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "WORMHOLE-2022-UNINITIALIZED",
+      "split": "holdout",
+      "project": "Wormhole",
+      "title": "Uninitialized proxy implementation",
+      "incident_on": "2022-02-24",
+      "disclosed_on": "2022-05-20",
+      "root_cause": "A core bridge implementation remained uninitialized, so a caller could install a controlled guardian set and reach an upgrade delegatecall capable of destroying the implementation.",
+      "model_status": "supported",
+      "support_limit": "Findings expose initialization, authorization, target-taint, delegatecall, and storage hazards; guardian-message feasibility and deployed state remain manual checks.",
+      "expected_findings": [
+        {"rule_id": "SOL009"},
+        {"rule_id": "SOL011", "metadata": {"issue_kind": "unguarded-initializer"}},
+        {"rule_id": "SOL008"},
+        {"rule_id": "SOL011", "metadata": {"issue_kind": "proxy-storage-collision"}},
+        {"rule_id": "SOL003"}
+      ],
+      "fixture": "src/WormholeProxy2022.sol",
+      "fixture_sha256": "fe6f634c5b9872c25e7cc8d4f51b41381e77fd24ea6ce194aeb7f680c292caf4",
+      "source": {
+        "kind": "pinned-repository-and-onchain-contract",
+        "url": "https://github.com/wormhole-foundation/wormhole/tree/02848a6560268805cea9629ee7732d23757766f9",
+        "immutable_id": "git:02848a6560268805cea9629ee7732d23757766f9;eip155:1:address:0x736d2a394f7810c17b3c6fed017d5bc7d60c077d",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "Immunefi",
+        "url": "https://immunefi.com/blog/bug-fix-reviews/wormhole-uninitialized-proxy-bugfix-review/",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "HARVEST-2021-UNINITIALIZED",
+      "split": "holdout",
+      "project": "Harvest Finance",
+      "title": "Uninitialized vault proxy implementations",
+      "incident_on": "2021-10-20",
+      "disclosed_on": "2021-11-12",
+      "root_cause": "Uninitialized implementation contracts allowed control of a hard-worker delegatecall path that could destroy implementation code and incapacitate dependent proxies.",
+      "model_status": "supported",
+      "support_limit": "Findings identify the unguarded initializer and delegatecall/storage primitives, not on-chain initialization history or funds at risk.",
+      "expected_findings": [
+        {"rule_id": "SOL011", "metadata": {"issue_kind": "unguarded-initializer"}},
+        {"rule_id": "SOL011", "metadata": {"issue_kind": "proxy-storage-collision"}},
+        {"rule_id": "SOL003"}
+      ],
+      "fixture": "src/HarvestProxy2021.sol",
+      "fixture_sha256": "09bd0c9eccb4b3464a68493652128e9c20dc665372309dcb47cb4cd1a8e8490a",
+      "source": {
+        "kind": "onchain-bytecode",
+        "url": "https://contract-library.com/contracts/Ethereum/392A5C02635DCDBD4C945785CE530A9A69DDA6C2",
+        "immutable_id": "eip155:1:addresses:0x392a5c02635dcdbd4c945785ce530a9a69dda6c2,0x47228860c3ebeb999ae6cc43286fd94df264a143,0xe41e27cd5c99bf93466fce3f797cf038efc3c37d",
+        "redistribution": "metadata-only; upstream source was unverified bytecode"
+      },
+      "disclosure": {
+        "publisher": "Immunefi",
+        "url": "https://immunefi.com/blog/bug-fix-reviews/harvest-finance-uninitialized-proxies-bugfix-review-200k-bounty/",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "AURORA-2022-INFLATION",
+      "split": "holdout",
+      "project": "Aurora",
+      "title": "Delegatecall to exit precompile retained EVM balance",
+      "incident_on": "2022-04-26",
+      "disclosed_on": "2022-06-07",
+      "root_cause": "Delegatecall into exit precompiles used hardcoded address assumptions, scheduling an external withdrawal without consuming the caller's EVM balance.",
+      "model_status": "supported",
+      "support_limit": "SOL003 and SOL008 expose a caller-controlled delegatecall boundary only; they do not model Aurora Engine precompile balance semantics or prove inflation.",
+      "expected_findings": [{"rule_id": "SOL008"}, {"rule_id": "SOL003"}],
+      "fixture": "src/AuroraInflation2022.sol",
+      "fixture_sha256": "cdd658bb504cdc14c7ac5947ec9d8d938780aed719f61f7cf7da279a03dffdea",
+      "source": {
+        "kind": "pinned-fix-release",
+        "url": "https://github.com/aurora-is-near/aurora-engine/commit/f95e32f53fdb622de2c6eb32c9ecc094c638c773",
+        "immutable_id": "git:f95e32f53fdb622de2c6eb32c9ecc094c638c773",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "Aurora Labs",
+        "url": "https://aurora.dev/blog/aurora-mitigates-its-inflation-vulnerability",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "BEANSTALK-2022-GOVERNANCE",
+      "split": "holdout",
+      "project": "Beanstalk",
+      "title": "Flash-loan governance takeover",
+      "incident_on": "2022-04-17",
+      "disclosed_on": "2022-04-19",
+      "root_cause": "Voting power could be acquired with flash-loaned assets and used to emergency-commit a malicious proposal without a resistant snapshot or delay model.",
+      "model_status": "out-of-model",
+      "support_limit": "The scanner does not model governance voting economics, flash-loan composability, proposal payload intent, or temporal voting snapshots.",
+      "expected_findings": [],
+      "fixture": "src/BeanstalkGovernance2022.sol",
+      "fixture_sha256": "2409848e0113b3f30883da7c0cf4df718dffe4f1905026c0acf8ea240fc59bce",
+      "source": {
+        "kind": "pinned-repository",
+        "url": "https://github.com/BeanstalkFarms/Beanstalk/tree/e9f49910e287e7a7afaa6db8f536b7194728b0af",
+        "immutable_id": "git:e9f49910e287e7a7afaa6db8f536b7194728b0af",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "Beanstalk Farms",
+        "url": "https://bean.money/blog/beanstalk-governance-exploit",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    },
+    {
+      "case_id": "EULER-2023-DONATION",
+      "split": "holdout",
+      "project": "Euler Finance",
+      "title": "Donation path omitted account health check",
+      "incident_on": "2023-03-13",
+      "disclosed_on": "2023-04-04",
+      "root_cause": "donateToReserves could make an account unhealthy without a health check, enabling self-liquidation with a bonus larger than the donation loss.",
+      "model_status": "out-of-model",
+      "support_limit": "The scanner does not model Euler's health, liquidation, reserve, and exchange-rate invariants.",
+      "expected_findings": [],
+      "fixture": "src/EulerDonation2023.sol",
+      "fixture_sha256": "93c813116a97f40660379c6a095be945c59ce2b348d1836d3c5dfa56866bc811",
+      "source": {
+        "kind": "pinned-repository",
+        "url": "https://github.com/euler-xyz/euler-contracts/tree/dfaa7788b17ac7c2a826a3ed242d7181998a778f",
+        "immutable_id": "git:dfaa7788b17ac7c2a826a3ed242d7181998a778f",
+        "redistribution": "metadata-only"
+      },
+      "disclosure": {
+        "publisher": "Euler Finance",
+        "url": "https://www.euler.finance/blog/war-peace-behind-the-scenes-of-eulers-240m-exploit-recovery",
+        "retrieved_on": "2026-08-09"
+      },
+      "provenance": {"fixture_kind": "locally-authored-reduction", "fixture_license": "MIT", "upstream_code_copied": false}
+    }
+  ]
+}
