@@ -20,6 +20,10 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 - Added staged offline compiler analysis that ignores target Foundry
   configuration, scrubs native-tool/cloud/CI environment settings, rejects
   unsafe imports, and accepts only approved literal compiler source units.
+- Added stable `BNT-` candidate observations, separately hash-bound human review
+  history, enforced state transitions, and reason/impact requirements.
+- Added transparent review-priority scoring with component points and reason
+  codes that explicitly cannot claim exploitability, bounty severity, or payout.
 
 ## 1.0.0 — 2026-08-08
 

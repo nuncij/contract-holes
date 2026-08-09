@@ -12,6 +12,13 @@ from . import __version__
 from .address_source import AddressSourceError, fetch_and_write_verified_source
 from .ai_triage import AITriageError, explain_report, prepare_evidence_bundle
 from .benchmark import BenchmarkError, benchmark_exit_status, benchmark_paths
+from .bounty_candidates import (
+    BountyCandidateError,
+    REVIEW_STATES,
+    list_candidates,
+    review_candidate,
+    synchronize_candidates,
+)
 from .bounty_profile import (
     BountyProfileError,
     initialize_bounty_workspace,
@@ -508,6 +515,50 @@ def bounty_parser() -> argparse.ArgumentParser:
         ),
     )
     scan.add_argument("workspace", help="bounty workspace directory")
+    candidates = commands.add_parser(
+        "candidates",
+        help="list ranked candidates and human review state",
+        description=(
+            "List immutable scan candidates with transparent review-priority "
+            "components and separate human review state."
+        ),
+    )
+    candidates.add_argument("workspace", help="bounty workspace directory")
+    candidates.add_argument(
+        "--state",
+        action="append",
+        choices=tuple(sorted(REVIEW_STATES)),
+        default=[],
+        help="include only a review state (repeatable)",
+    )
+    review = commands.add_parser(
+        "review",
+        help="record an explicit human candidate decision",
+        description=(
+            "Record an auditable human state transition. Approval is handled "
+            "separately by the report workflow."
+        ),
+    )
+    review.add_argument("workspace", help="bounty workspace directory")
+    review.add_argument("candidate_id", help="stable BNT- candidate ID")
+    review.add_argument(
+        "--state",
+        required=True,
+        choices=("investigating", "rejected", "confirmed"),
+        help="new human review state",
+    )
+    review.add_argument("--reason", required=True, help="review reasoning")
+    review.add_argument("--reviewer", required=True, help="reviewer identity label")
+    review.add_argument(
+        "--impact",
+        help="confirmed in-scope impact (required for confirmed)",
+    )
+    review.add_argument(
+        "--at",
+        dest="occurred_at",
+        metavar="RFC3339",
+        help="event time (defaults to current UTC time)",
+    )
     return result
 
 
@@ -885,9 +936,29 @@ def _bounty_main(argv: Sequence[str]) -> int:
                 "source": identity.public_payload(),
             }
         else:
-            result = scan_bounty_workspace(args.workspace)
-            payload = result.scan_record
-    except (BountyProfileError, BountyScopeError) as exc:
+            if args.bounty_command == "scan":
+                result = scan_bounty_workspace(args.workspace)
+                synchronize_candidates(args.workspace)
+                payload = result.scan_record
+            elif args.bounty_command == "candidates":
+                payload = list_candidates(args.workspace, states=args.state)
+            else:
+                review = review_candidate(
+                    args.workspace,
+                    args.candidate_id,
+                    state=args.state,
+                    reason=args.reason,
+                    reviewer=args.reviewer,
+                    impact=args.impact,
+                    occurred_at=args.occurred_at,
+                )
+                payload = {
+                    "schema_version": "1.0",
+                    "command": "bounty.review",
+                    "status": "recorded",
+                    "review": review,
+                }
+    except (BountyProfileError, BountyScopeError, BountyCandidateError) as exc:
         print(f"holes bounty: error: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))

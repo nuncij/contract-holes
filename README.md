@@ -74,6 +74,8 @@ holes bounty init --help
 holes bounty validate PRIVATE_WORKSPACE
 holes bounty identify TARGET --scope contracts
 holes bounty scan PRIVATE_WORKSPACE
+holes bounty candidates PRIVATE_WORKSPACE
+holes bounty review --help
 ```
 
 See the [bounty profile contract](docs/BOUNTY_PROFILE.md). There is deliberately
@@ -327,6 +329,8 @@ Project status and future work are tracked explicitly:
   completed work, and the single next task.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
+- [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review
+  priority, and auditable human state transitions.
 - [Contributing guide](CONTRIBUTING.md) — development setup, rule workflow,
   compatibility constraints, tests, and review expectations.
 - [Threat model](docs/THREAT_MODEL.md) and

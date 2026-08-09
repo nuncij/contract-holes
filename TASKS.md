@@ -13,7 +13,7 @@ complete. M7 has an approved development plan and its profile/workspace
 foundation, pinned scope validation, and offline/private execution boundary are
 complete.
 
-Next: **BOUNTY-004 — stable candidates and human review state.**
+Next: **BOUNTY-006 — isolated local proof workspace.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -269,7 +269,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-001`, expands with `BOUNTY-002` and `BOUNTY-006`.
 
-### [ ] BOUNTY-004 — Stable candidates and human review state — P0 — **NEXT**
+### [x] BOUNTY-004 — Stable candidates and human review state — P0 — **COMPLETE**
 
 Store immutable scanner observations separately from explicit reviewer
 decisions.
@@ -292,7 +292,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-002`, `AI-001` only as an optional explanatory input.
 
-### [ ] BOUNTY-005 — Explainable review-priority ranking — P1
+### [x] BOUNTY-005 — Explainable review-priority ranking — P1 — **COMPLETE**
 
 Order candidates for investigation without claiming exploitability, bounty
 severity, or expected payout.
@@ -313,7 +313,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-004`, existing rule catalog and evidence paths.
 
-### [ ] BOUNTY-006 — Isolated local proof workspace — P0
+### [ ] BOUNTY-006 — Isolated local proof workspace — P0 — **NEXT**
 
 Generate a candidate-specific Foundry workspace for locally reproducing a
 primitive or project impact when the reviewer can provide the required setup.

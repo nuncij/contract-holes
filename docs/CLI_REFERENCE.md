@@ -115,6 +115,13 @@ enforces approved paths and symlink/remapping boundaries, stages only approved
 source, compiles offline under fixed configuration when enabled, and writes
 private source/scan records. See the [bounty profile contract](BOUNTY_PROFILE.md).
 
+`candidates WORKSPACE [--state STATE]` lists stable observations, current human
+review state, and transparent review-priority components. `review WORKSPACE
+CANDIDATE_ID` records an explicit transition to `investigating`, `rejected`, or
+`confirmed`; it requires a reason and reviewer, and confirmation also requires
+an impact. `--at RFC3339` supplies an auditable event time. Generic review cannot
+approve a candidate. See [bounty candidate triage](BOUNTY_TRIAGE.md).
+
 ## Configuration precedence
 
 An explicit CLI setting wins over the selected/discovered `.holes.toml`, which

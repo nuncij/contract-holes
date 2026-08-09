@@ -78,6 +78,54 @@ def write_private_json_new_or_identical(path: Path, payload: object) -> bool:
         temporary.unlink(missing_ok=True)
 
 
+def replace_managed_private_json(
+    path: Path,
+    payload: object,
+    *,
+    expected_existing_sha256: str | None,
+) -> None:
+    """Atomically replace a tool-managed record after optimistic integrity check."""
+    if path.is_symlink():
+        raise BountyWorkspaceError(f"refusing symlink private record: {path}")
+    destination = path.resolve()
+    content = rendered_json_bytes(payload)
+    if len(content) > MAX_PRIVATE_RECORD_BYTES:
+        raise BountyWorkspaceError(
+            f"private record exceeds {MAX_PRIVATE_RECORD_BYTES} bytes: {path.name}"
+        )
+    if destination.exists():
+        try:
+            existing = destination.read_bytes()
+        except OSError as exc:
+            raise BountyWorkspaceError(
+                f"could not inspect managed record {destination}: {exc}"
+            ) from exc
+        existing_digest = hashlib.sha256(existing).hexdigest()
+        if expected_existing_sha256 is None or existing_digest != expected_existing_sha256:
+            raise BountyWorkspaceError(
+                f"managed record changed concurrently or outside the workflow: {destination}"
+            )
+    elif expected_existing_sha256 is not None:
+        raise BountyWorkspaceError(f"managed record disappeared: {destination}")
+    descriptor, temporary_name = tempfile.mkstemp(
+        prefix=f".{destination.name}.", suffix=".tmp", dir=destination.parent
+    )
+    temporary = Path(temporary_name)
+    try:
+        os.fchmod(descriptor, 0o600)
+        with os.fdopen(descriptor, "wb") as handle:
+            handle.write(content)
+            handle.flush()
+            os.fsync(handle.fileno())
+        os.replace(temporary, destination)
+    except OSError as exc:
+        raise BountyWorkspaceError(
+            f"could not replace managed record {destination}: {exc}"
+        ) from exc
+    finally:
+        temporary.unlink(missing_ok=True)
+
+
 def load_private_json(path: Path) -> dict[str, object]:
     if path.is_symlink():
         raise BountyWorkspaceError(f"private record is not a regular file: {path}")
