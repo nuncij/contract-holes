@@ -81,6 +81,7 @@ holes bounty report --help
 holes bounty approve --help
 holes bounty export --help
 holes bounty history tests/fixtures/bounty_history/manifest.json
+holes bounty pilot tests/fixtures/bounty_pilot/manifest.json --output ../private-pilot
 ```
 
 See the [bounty profile contract](docs/BOUNTY_PROFILE.md). There is deliberately
@@ -338,6 +339,8 @@ Project status and future work are tracked explicitly:
   priority, and auditable human state transitions.
 - [Bounty proof and report workflow](docs/BOUNTY_PROOFS_REPORTS.md) — isolated
   local evidence, private reports, human approval, and checksummed local export.
+- [Authorized bounty pilot](docs/BOUNTY_PILOT.md) — reproducible full-workflow
+  evaluation, measured friction, and local-only safety checks.
 - [Contributing guide](CONTRIBUTING.md) — development setup, rule workflow,
   compatibility constraints, tests, and review expectations.
 - [Threat model](docs/THREAT_MODEL.md) and
@@ -429,6 +432,21 @@ five independent supported cases. This is a bounded research-assistant claim,
 not exploit confirmation or expected bounty performance; see the
 [historical bounty evaluation](docs/BOUNTY_HISTORY.md).
 
+The authorized end-to-end gate uses a repository-owned target and a frozen
+human-reviewed manifest:
+
+```bash
+holes bounty pilot tests/fixtures/bounty_pilot/manifest.json \
+  --output ../private-bounty-pilot-run
+```
+
+It exercises profile validation, pinned scope, two candidate decisions, an
+unsupported proof decision, a complete private report, explicit approval, and
+checksummed local export. It records 12 minutes of operator-event timeline,
+three workflow-friction observations, and two successfully blocked unsafe
+actions with zero safety failures. No target, network, chain, platform, or
+submission action occurs; see the [authorized bounty pilot](docs/BOUNTY_PILOT.md).
+
 The fallback parser masks comments and string contents while preserving offsets,
 then identifies contract and function regions. With `--compile`, solc source maps,
 exact state declarations, function boundaries, and expression types take
@@ -440,8 +458,9 @@ as terminal text, JSON, or SARIF 2.1.0.
 M0 through M6 produced the signed audit-ready `1.0.0` release. M7 targets a
 human-controlled bounty research workflow with pinned authorized scope,
 candidate triage, isolated local proofs, private report drafts, historical
-validation, and an explicit approval gate. It will not submit reports or touch
-live networks. See the [M7 Bounty Hunter Mode plan](docs/BOUNTY_HUNTER_PLAN.md),
+validation, an authorized repository pilot, and an explicit approval gate. It
+will not submit reports or touch live networks. See the
+[M7 Bounty Hunter Mode plan](docs/BOUNTY_HUNTER_PLAN.md),
 [development plan](docs/DEVELOPMENT_PLAN.md), and [TASKS.md](TASKS.md).
 
 Only scan contracts you own or are authorized to assess. Start untrusted code in

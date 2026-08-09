@@ -1,0 +1,194 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contract-holes.dev/schemas/bounty-pilot-manifest-1.0.schema.json",
+  "title": "Contract Holes authorized bounty pilot manifest 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evaluation_version",
+    "pilot_id",
+    "program",
+    "target",
+    "decisions",
+    "proof",
+    "report_input",
+    "approval",
+    "timeline"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "evaluation_version": {"const": "1.0"},
+    "pilot_id": {"type": "string", "minLength": 1},
+    "program": {"$ref": "#/$defs/program"},
+    "target": {"$ref": "#/$defs/target"},
+    "decisions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["confirm", "reject"],
+      "properties": {
+        "confirm": {"$ref": "#/$defs/confirmDecision"},
+        "reject": {"$ref": "#/$defs/rejectDecision"}
+      }
+    },
+    "proof": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "requirements", "impact_assertion"],
+      "properties": {
+        "rule_id": {"$ref": "#/$defs/ruleId"},
+        "requirements": {
+          "type": "object",
+          "additionalProperties": {"type": "string", "minLength": 1}
+        },
+        "impact_assertion": {"type": "string", "minLength": 1}
+      }
+    },
+    "report_input": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "summary",
+        "technical_details",
+        "preconditions",
+        "reproduction_steps",
+        "remediation",
+        "limitations",
+        "unresolved_questions",
+        "duplicate_check",
+        "proof_status_explanation",
+        "program_rules_rechecked_on"
+      ],
+      "properties": {
+        "summary": {"type": "string", "minLength": 1},
+        "technical_details": {"type": "string", "minLength": 1},
+        "preconditions": {"$ref": "#/$defs/nonemptyTextArray"},
+        "reproduction_steps": {"$ref": "#/$defs/nonemptyTextArray"},
+        "remediation": {"type": "string", "minLength": 1},
+        "limitations": {"$ref": "#/$defs/nonemptyTextArray"},
+        "unresolved_questions": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "duplicate_check": {"type": "string", "minLength": 1},
+        "proof_status_explanation": {"type": "string", "minLength": 1},
+        "program_rules_rechecked_on": {"type": "string", "format": "date"}
+      }
+    },
+    "approval": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["reviewer", "reason", "acknowledge_manual_submission"],
+      "properties": {
+        "reviewer": {"type": "string", "minLength": 1},
+        "reason": {"type": "string", "minLength": 1},
+        "acknowledge_manual_submission": {"const": true}
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "started_at",
+        "confirm_investigating_at",
+        "reject_investigating_at",
+        "confirm_decided_at",
+        "reject_decided_at",
+        "report_created_at",
+        "approved_at",
+        "finished_at"
+      ],
+      "properties": {
+        "started_at": {"$ref": "#/$defs/timestamp"},
+        "confirm_investigating_at": {"$ref": "#/$defs/timestamp"},
+        "reject_investigating_at": {"$ref": "#/$defs/timestamp"},
+        "confirm_decided_at": {"$ref": "#/$defs/timestamp"},
+        "reject_decided_at": {"$ref": "#/$defs/timestamp"},
+        "report_created_at": {"$ref": "#/$defs/timestamp"},
+        "approved_at": {"$ref": "#/$defs/timestamp"},
+        "finished_at": {"$ref": "#/$defs/timestamp"}
+      }
+    }
+  },
+  "$defs": {
+    "program": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "platform",
+        "rules_url",
+        "rules_document",
+        "rules_document_sha256",
+        "reviewed_on",
+        "authorization_acknowledged",
+        "authorization_note",
+        "impacts",
+        "restrictions"
+      ],
+      "properties": {
+        "name": {"type": "string", "minLength": 1},
+        "platform": {"type": "string", "minLength": 1},
+        "rules_url": {"type": "string", "format": "uri", "pattern": "^https://"},
+        "rules_document": {"type": "string", "minLength": 1},
+        "rules_document_sha256": {"$ref": "#/$defs/digest"},
+        "reviewed_on": {"type": "string", "format": "date"},
+        "authorization_acknowledged": {"const": true},
+        "authorization_note": {"type": "string", "minLength": 1},
+        "impacts": {"$ref": "#/$defs/nonemptyTextArray"},
+        "restrictions": {"$ref": "#/$defs/nonemptyTextArray"}
+      }
+    },
+    "target": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["root", "content_sha256", "scope_paths"],
+      "properties": {
+        "root": {"type": "string", "minLength": 1},
+        "content_sha256": {"$ref": "#/$defs/digest"},
+        "scope_paths": {"$ref": "#/$defs/nonemptyTextArray"}
+      }
+    },
+    "decisionBase": {
+      "type": "object",
+      "properties": {
+        "rule_id": {"$ref": "#/$defs/ruleId"},
+        "reviewer": {"type": "string", "minLength": 1},
+        "investigation_reason": {"type": "string", "minLength": 1},
+        "decision_reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "confirmDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "reviewer", "investigation_reason", "decision_reason", "impact"],
+      "properties": {
+        "rule_id": {"$ref": "#/$defs/ruleId"},
+        "reviewer": {"type": "string", "minLength": 1},
+        "investigation_reason": {"type": "string", "minLength": 1},
+        "decision_reason": {"type": "string", "minLength": 1},
+        "impact": {"type": "string", "minLength": 1}
+      }
+    },
+    "rejectDecision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["rule_id", "reviewer", "investigation_reason", "decision_reason"],
+      "properties": {
+        "rule_id": {"$ref": "#/$defs/ruleId"},
+        "reviewer": {"type": "string", "minLength": 1},
+        "investigation_reason": {"type": "string", "minLength": 1},
+        "decision_reason": {"type": "string", "minLength": 1}
+      }
+    },
+    "nonemptyTextArray": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"},
+    "ruleId": {"type": "string", "pattern": "^SOL[0-9]{3}$"},
+    "timestamp": {"type": "string", "format": "date-time", "pattern": "Z$"}
+  }
+}

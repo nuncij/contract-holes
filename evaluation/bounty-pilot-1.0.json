@@ -1,0 +1,151 @@
+{
+  "authorization": {
+    "acknowledged": true,
+    "impact_count": 1,
+    "restriction_count": 4,
+    "reviewed_on": "2026-08-09",
+    "scope_paths": [
+      "src/AuthorizedPilotVault.sol"
+    ]
+  },
+  "evaluation_version": "1.0",
+  "execution_policy": {
+    "automatic_submission": false,
+    "live_network_transaction": false,
+    "local_chain_execution": false,
+    "offline": true,
+    "platform_interaction": false,
+    "public_testnet_execution": false,
+    "source_only": true,
+    "submitted": false,
+    "target_contact": false
+  },
+  "export": {
+    "files": [
+      "SHA256SUMS",
+      "approval.json",
+      "report.json",
+      "report.md"
+    ],
+    "network_action": false,
+    "status": "exported-locally",
+    "submitted": false
+  },
+  "friction": [
+    {
+      "code": "automatic-proof-unsupported",
+      "observation": "Manual local reproduction remains necessary for this rule.",
+      "stage": "proof-decision"
+    },
+    {
+      "code": "operator-authored-report-context",
+      "observation": "Scope, duplicate, impact, and reproduction context required human input.",
+      "stage": "private-report-draft"
+    },
+    {
+      "code": "separate-manual-approval",
+      "observation": "Local export required a current report and explicit manual-submission acknowledgement.",
+      "stage": "human-approval"
+    }
+  ],
+  "gate_checks": {
+    "approval_recorded": true,
+    "expected_candidates_triaged": true,
+    "local_export_completed": true,
+    "no_network_transaction_contact_or_submission": true,
+    "profile_validated": true,
+    "proof_decision_recorded": true,
+    "report_complete": true,
+    "safety_guards_exercised": true,
+    "scope_scan_completed": true
+  },
+  "limitations": [
+    "The authorized target is a repository-owned fixture, not a live bounty program.",
+    "One human-confirmed fixture flaw does not establish exploitability or payout eligibility elsewhere.",
+    "The recorded timeline measures operator events, not automated process runtime.",
+    "Any real submission remains a separate manual decision under the selected program rules."
+  ],
+  "manifest_sha256": "87d94616415ccce1610dfc84ade3380e6ec90973e270ef57b18d481678b5dc97",
+  "metrics": {
+    "approved_count": 1,
+    "candidate_count": 2,
+    "confirmed_count": 1,
+    "files_scanned": 1,
+    "investigated_count": 2,
+    "proof_generated_count": 0,
+    "proof_unsupported_count": 1,
+    "rejected_count": 1,
+    "safety_checks_exercised": 2,
+    "safety_failure_count": 0
+  },
+  "pilot_id": "contract-holes-repository-pilot-1.0",
+  "result_sha256": "a28692ef5965d0bdb620f3856fa43e67fae64698e43dcaaa22a4f7485dd498d7",
+  "review_decisions": [
+    {
+      "decision_source": "human",
+      "final_state": "approved",
+      "rule_id": "SOL001"
+    },
+    {
+      "decision_source": "human",
+      "final_state": "rejected",
+      "rule_id": "SOL002"
+    }
+  ],
+  "rules_document_sha256": "00f9b1f016f64b67a3441326ed883c80f4756e0ff3e73d129ee1ecb07eabd6fa",
+  "safety": {
+    "expected_blocks": [
+      {
+        "check": "export-before-approval",
+        "diagnostic": "candidate is not approved for local export",
+        "status": "blocked"
+      },
+      {
+        "check": "approval-without-manual-submission-ack",
+        "diagnostic": "approval requires acknowledgement that submission remains manual and private",
+        "status": "blocked"
+      }
+    ],
+    "failures": []
+  },
+  "scanner_version": "1.0.0",
+  "schema_version": "1.0",
+  "source_set_sha256": "beda1aa739133a3995e875ed4da5dbd195b019f8f650131b8fad399130cedb46",
+  "status": "passed",
+  "workflow": {
+    "finished_at": "2026-08-09T10:12:00Z",
+    "recorded_elapsed_seconds": 720,
+    "stages": [
+      {
+        "stage": "profile-validation",
+        "status": "completed"
+      },
+      {
+        "stage": "scope-scan",
+        "status": "completed"
+      },
+      {
+        "stage": "candidate-triage",
+        "status": "completed"
+      },
+      {
+        "stage": "proof-decision",
+        "status": "unsupported"
+      },
+      {
+        "stage": "private-report-draft",
+        "status": "complete"
+      },
+      {
+        "stage": "human-approval",
+        "status": "approved-locally"
+      },
+      {
+        "stage": "local-export",
+        "status": "exported-locally"
+      }
+    ],
+    "started_at": "2026-08-09T10:00:00Z",
+    "time_basis": "operator event timeline"
+  }
+}

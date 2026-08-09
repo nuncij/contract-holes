@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contract-holes.dev/schemas/bounty-pilot-result-1.0.schema.json",
+  "title": "Contract Holes authorized bounty pilot result 1.0",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "evaluation_version",
+    "pilot_id",
+    "scanner_version",
+    "manifest_sha256",
+    "rules_document_sha256",
+    "source_set_sha256",
+    "authorization",
+    "execution_policy",
+    "workflow",
+    "metrics",
+    "review_decisions",
+    "friction",
+    "safety",
+    "export",
+    "gate_checks",
+    "limitations",
+    "status",
+    "result_sha256"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "evaluation_version": {"const": "1.0"},
+    "pilot_id": {"type": "string", "minLength": 1},
+    "scanner_version": {"type": "string", "minLength": 1},
+    "manifest_sha256": {"$ref": "#/$defs/digest"},
+    "rules_document_sha256": {"$ref": "#/$defs/digest"},
+    "source_set_sha256": {"$ref": "#/$defs/digest"},
+    "authorization": {"type": "object"},
+    "execution_policy": {
+      "type": "object",
+      "required": [
+        "offline",
+        "live_network_transaction",
+        "public_testnet_execution",
+        "target_contact",
+        "platform_interaction",
+        "automatic_submission",
+        "submitted"
+      ],
+      "properties": {
+        "offline": {"const": true},
+        "live_network_transaction": {"const": false},
+        "public_testnet_execution": {"const": false},
+        "target_contact": {"const": false},
+        "platform_interaction": {"const": false},
+        "automatic_submission": {"const": false},
+        "submitted": {"const": false}
+      }
+    },
+    "workflow": {"type": "object"},
+    "metrics": {"type": "object"},
+    "review_decisions": {"type": "array", "minItems": 2},
+    "friction": {"type": "array", "minItems": 1},
+    "safety": {"type": "object"},
+    "export": {"type": "object"},
+    "gate_checks": {
+      "type": "object",
+      "additionalProperties": {"type": "boolean"}
+    },
+    "limitations": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "status": {"enum": ["passed", "failed"]},
+    "result_sha256": {"$ref": "#/$defs/digest"}
+  },
+  "$defs": {
+    "digest": {"type": "string", "pattern": "^[0-9a-f]{64}$"}
+  }
+}

@@ -84,6 +84,15 @@ to review manually, not as trusted build inputs. Do not replace the corpus with
 current live targets or private reports; create a separately reviewed corpus
 version and keep confidential material out of Git.
 
+`holes bounty pilot` is also an evaluation command. Its checked target is owned
+by this repository, its review and approval decisions were authored before the
+run, and its `example.test` URL is only a reserved fixture identifier. Do not
+treat the replay as automatic confirmation for a real target. A pilot output
+contains a complete private workspace and report even though the checked result
+is path-free; keep the whole output directory private and remove it according to
+your local retention policy. Use the individual workflow commands and new,
+target-specific human decisions for any genuinely authorized program.
+
 ## Networked commands
 
 Normal source-only scans do not use the network. Network can occur when:

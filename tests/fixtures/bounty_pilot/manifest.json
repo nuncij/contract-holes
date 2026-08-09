@@ -1,0 +1,90 @@
+{
+  "schema_version": "1.0",
+  "evaluation_version": "1.0",
+  "pilot_id": "contract-holes-repository-pilot-1.0",
+  "program": {
+    "name": "Contract Holes repository-owned pilot",
+    "platform": "Local evaluation only",
+    "rules_url": "https://example.test/contract-holes-authorized-pilot-rules/1.0",
+    "rules_document": "RULES.md",
+    "rules_document_sha256": "00f9b1f016f64b67a3441326ed883c80f4756e0ff3e73d129ee1ecb07eabd6fa",
+    "reviewed_on": "2026-08-09",
+    "authorization_acknowledged": true,
+    "authorization_note": "The Contract Holes repository owns this synthetic target and authorizes the local M7 workflow.",
+    "impacts": [
+      "Unauthorized privileged state change in the repository-owned pilot fixture"
+    ],
+    "restrictions": [
+      "Analyze only the pinned repository fixture",
+      "No live-network or public-testnet execution",
+      "No target or bounty-platform contact",
+      "No automatic submission or public disclosure"
+    ]
+  },
+  "target": {
+    "root": "target",
+    "content_sha256": "beda1aa739133a3995e875ed4da5dbd195b019f8f650131b8fad399130cedb46",
+    "scope_paths": [
+      "src/AuthorizedPilotVault.sol"
+    ]
+  },
+  "decisions": {
+    "confirm": {
+      "rule_id": "SOL001",
+      "reviewer": "Nunc",
+      "investigation_reason": "Trace whether an intermediary can preserve the owner as tx.origin.",
+      "decision_reason": "The repository-owned fixture intentionally authorizes a state change with tx.origin, so an owner-originated intermediary call satisfies the check.",
+      "impact": "Unauthorized privileged state change through an intermediary contract in the pilot fixture"
+    },
+    "reject": {
+      "rule_id": "SOL002",
+      "reviewer": "Nunc",
+      "investigation_reason": "Determine whether the ignored diagnostic call result can make persistent state inconsistent.",
+      "decision_reason": "The best-effort diagnostic call is deliberate and no success-dependent or persistent state transition follows it in this fixture."
+    }
+  },
+  "proof": {
+    "rule_id": "SOL001",
+    "requirements": {
+      "actors": "owner, intermediary contract, and unprivileged caller",
+      "deployment": "deploy only the repository-owned fixture on a private local EVM"
+    },
+    "impact_assertion": "An owner-originated intermediary call can perform the protected counter update."
+  },
+  "report_input": {
+    "summary": "The privileged state transition relies on tx.origin and can accept an intermediary contract call initiated by the owner.",
+    "technical_details": "privilegedAction compares tx.origin with the stored owner. An intermediary remains msg.sender while preserving the owner's address as tx.origin, so the authorization boundary does not constrain the immediate caller.",
+    "preconditions": [
+      "The owner initiates a transaction through an intermediary contract.",
+      "The intermediary invokes privilegedAction on the pilot fixture."
+    ],
+    "reproduction_steps": [
+      "Deploy the repository-owned target and an intermediary on a private local EVM.",
+      "Have the owner call the intermediary, which calls privilegedAction.",
+      "Observe that protectedCounter increments even though the intermediary is the immediate caller."
+    ],
+    "remediation": "Authorize the immediate caller with msg.sender and an explicit ownership or role check.",
+    "limitations": [
+      "This result concerns only the pinned repository-owned fixture and has no live deployment."
+    ],
+    "unresolved_questions": [],
+    "duplicate_check": "Not applicable to the repository-owned synthetic pilot; no external bounty or issue database was contacted.",
+    "proof_status_explanation": "The scanner has no automatic SOL001 proof generator. The proof decision is unsupported, and the human-authored local reproduction remains separate from automatic confirmation.",
+    "program_rules_rechecked_on": "2026-08-09"
+  },
+  "approval": {
+    "reviewer": "Nunc",
+    "reason": "The pinned scope, human decision, limitations, and private report are complete for the repository pilot.",
+    "acknowledge_manual_submission": true
+  },
+  "timeline": {
+    "started_at": "2026-08-09T10:00:00Z",
+    "confirm_investigating_at": "2026-08-09T10:03:00Z",
+    "reject_investigating_at": "2026-08-09T10:04:00Z",
+    "confirm_decided_at": "2026-08-09T10:05:00Z",
+    "reject_decided_at": "2026-08-09T10:06:00Z",
+    "report_created_at": "2026-08-09T10:08:00Z",
+    "approved_at": "2026-08-09T10:10:00Z",
+    "finished_at": "2026-08-09T10:12:00Z"
+  }
+}

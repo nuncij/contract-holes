@@ -9,11 +9,10 @@ Current release: `1.0.0`
 Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — IN PROGRESS**
 
 Current position: M0 through M6 and the signed audit-ready 1.0 release are
-complete. M7 has an approved development plan and its profile/workspace
-foundation, pinned scope validation, and offline/private execution boundary are
-complete.
+complete. M7's profile, pinned scope, private execution, triage, proofs/reports,
+historical evidence gate, and authorized local end-to-end pilot are complete.
 
-Next: **BOUNTY-009 — authorized end-to-end pilot.**
+Next: **BOUNTY-010 — documentation and signed `1.1.0` release.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -388,7 +387,7 @@ Acceptance criteria:
 Depends on: can begin after `BOUNTY-001`; evaluation completes after
 `BOUNTY-005` and may exercise `BOUNTY-006`.
 
-### [ ] BOUNTY-009 — Authorized end-to-end pilot — P1 — **NEXT**
+### [x] BOUNTY-009 — Authorized end-to-end pilot — P1 — **COMPLETE**
 
 Exercise the complete local workflow against one explicitly authorized target
 without requiring a bounty submission.
@@ -410,7 +409,7 @@ Acceptance criteria:
 
 Depends on: `BOUNTY-002` through `BOUNTY-008`.
 
-### [ ] BOUNTY-010 — Documentation and signed `1.1.0` release — P0
+### [ ] BOUNTY-010 — Documentation and signed `1.1.0` release — P0 — **NEXT**
 
 Stabilize the bounty workflow only after its safety and historical-evaluation
 gates pass.

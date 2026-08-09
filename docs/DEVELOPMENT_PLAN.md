@@ -1,9 +1,9 @@
 # Contract Holes Development Plan
 
-Last updated: 2026-08-08  
+Last updated: 2026-08-09
 Current release: `1.0.0`
 Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — IN PROGRESS**
-Next: **BOUNTY-009 — authorized end-to-end pilot.**
+Next: **BOUNTY-010 — documentation and signed `1.1.0` release.**
 
 ## Product goal
 
@@ -34,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 151 Python tests; frozen JSON/SARIF schemas and 64 audit labels plus CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 200 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -230,8 +230,8 @@ Solidity project
   -> executable proofs where generation is reliable
   -> text / JSON / SARIF / CI policy
   -> optional AI correlation and explanation            [later]
-  -> pinned bounty scope and candidate workspace         [M7: planned]
-  -> local proof, private report, and human approval     [M7: planned]
+  -> pinned bounty scope and candidate workspace         [M7: implemented]
+  -> local proof, private report, and human approval     [M7: implemented]
 ```
 
 Source-only mode remains important for fast scans and partially broken projects.
@@ -358,6 +358,14 @@ The complete architecture, safety boundaries, delivery phases, evaluation
 design, and deferred decisions are in the
 [M7 Bounty Hunter Mode plan](BOUNTY_HUNTER_PLAN.md). Dependency-ordered work is
 tracked in [TASKS.md](../TASKS.md).
+
+The authorized M7 pilot is complete on a repository-owned, content-pinned
+fixture. It exercised profile validation, source-only scope scanning, two human
+review decisions, an unsupported automatic proof, complete private reporting,
+explicit approval, and checksummed local export. The path-independent result
+records a 720-second operator-event timeline, three friction observations, two
+successfully blocked unsafe actions, and no network, target, chain, platform, or
+submission action. See [authorized bounty pilot](BOUNTY_PILOT.md).
 
 ## Engineering rules
 

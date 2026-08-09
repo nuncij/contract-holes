@@ -142,6 +142,15 @@ locally. The command is offline by default; `--allow-downloads` permits only the
 pinned solc download. Exit `1` is a completed no-go result, not an execution
 error. See [historical bounty evaluation](BOUNTY_HISTORY.md).
 
+`pilot MANIFEST --output DIRECTORY` replays the frozen, human-reviewed
+repository pilot through profile validation, source-only scope scan, candidate
+triage, proof decision, private report, approval, and local export. Output must
+be a new private directory. The command performs no network, chain, target,
+platform, or submission action. Exit `1` is a completed failed pilot gate; exit
+`2` is a manifest/workflow error. This integration harness does not replace the
+interactive human decisions required for a real target. See the
+[authorized bounty pilot](BOUNTY_PILOT.md).
+
 ## Configuration precedence
 
 An explicit CLI setting wins over the selected/discovered `.holes.toml`, which

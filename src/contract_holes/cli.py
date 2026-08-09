@@ -24,6 +24,11 @@ from .bounty_history import (
     bounty_history_exit_status,
     evaluate_bounty_history,
 )
+from .bounty_pilot import (
+    BountyPilotError,
+    bounty_pilot_exit_status,
+    run_bounty_pilot,
+)
 from .bounty_profile import (
     BountyProfileError,
     initialize_bounty_workspace,
@@ -692,6 +697,22 @@ def bounty_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="allow Foundry to download the pinned compiler (offline by default)",
     )
+    pilot = commands.add_parser(
+        "pilot",
+        help="run the frozen authorized local workflow pilot",
+        description=(
+            "Exercise profile, scan, triage, proof, report, approval, and local "
+            "export against an explicitly authorized fixture. No network, target "
+            "contact, transaction, or submission action is performed."
+        ),
+    )
+    pilot.add_argument("manifest", help="authorized pilot manifest JSON")
+    pilot.add_argument(
+        "--output",
+        required=True,
+        metavar="DIRECTORY",
+        help="new private directory for the pilot workspace and local export",
+    )
     return result
 
 
@@ -1073,6 +1094,8 @@ def _bounty_main(argv: Sequence[str]) -> int:
                 args.manifest,
                 offline=not args.allow_downloads,
             )
+        elif args.bounty_command == "pilot":
+            payload = run_bounty_pilot(args.manifest, args.output)
         else:
             if args.bounty_command == "scan":
                 result = scan_bounty_workspace(args.workspace)
@@ -1156,14 +1179,15 @@ def _bounty_main(argv: Sequence[str]) -> int:
         BountyScopeError,
         BountyCandidateError,
         BountyHistoryError,
+        BountyPilotError,
         BountyProofError,
         BountyReportError,
     ) as exc:
         print(f"holes bounty: error: {exc}", file=sys.stderr)
         return 2
     print(json.dumps(payload, indent=2, sort_keys=True))
-    return (
-        bounty_history_exit_status(payload)
-        if args.bounty_command == "history"
-        else 0
-    )
+    if args.bounty_command == "history":
+        return bounty_history_exit_status(payload)
+    if args.bounty_command == "pilot":
+        return bounty_pilot_exit_status(payload)
+    return 0

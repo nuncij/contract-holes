@@ -31,6 +31,11 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 - Added a frozen ten-project historical corpus, calibration/holdout labels,
   tamper-evident offline evaluation, raw rejected-candidate metrics, and an
   explicit go/no-go product-claim gate via `holes bounty history`.
+- Added a reproducible repository-owned end-to-end pilot with pinned local
+  rules/scope, human confirm/reject inputs, an unsupported proof decision,
+  complete private report and approval, checksummed local export, workflow and
+  friction metrics, socket-denial coverage, and exercised safety guards via
+  `holes bounty pilot`.
 
 ## 1.0.0 — 2026-08-08
 

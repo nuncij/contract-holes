@@ -1,6 +1,6 @@
 # M7 Bounty Hunter Mode Development Plan
 
-Last updated: 2026-08-08
+Last updated: 2026-08-09
 Target release: `1.1.0`
 Status: **In progress**
 
@@ -209,6 +209,13 @@ If the historical results do not demonstrate useful supported-class detection,
 M7 still publishes the measurements but does not market Bounty Hunter Mode as a
 bounty-finding product. The next plan must then prioritize detector improvements
 before active-program use.
+
+The completed pilot uses a repository-owned, content-pinned fixture. Its frozen
+human decisions confirm one authorization flaw and reject one benign signal;
+the workflow records an unsupported proof, complete report, explicit approval,
+local export, timing, friction, and two successfully blocked unsafe actions.
+No network, target contact, transaction, platform integration, or submission is
+part of the gate. See [authorized bounty pilot](BOUNTY_PILOT.md).
 
 ## Task order
 

@@ -147,6 +147,15 @@ supported/out-of-model labels, raw rejected candidates, and an explicit no-go
 state limit score tuning. The result remains evidence about these ten reductions,
 not a population-wide accuracy or bounty-income claim.
 
+The end-to-end pilot is a deterministic replay of pre-authored human decisions
+against a repository-owned fixture. It deliberately exercises blocked export
+and acknowledgement gates, then writes a real private workspace and local
+export. Network-socket denial tests verify the Python workflow needs no network,
+but they do not turn the process into an OS sandbox. The pilot cannot establish
+legal authorization for another target, validate a real report, or predict
+program acceptance; changing its target or decisions requires a new reviewed
+manifest and result version.
+
 ### Reports, baselines, suppressions, and CI
 
 Reports may contain source excerpts and local paths. A baseline can hide an
