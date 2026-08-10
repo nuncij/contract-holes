@@ -40,7 +40,7 @@ the artifact digest and release attestation/checklist before installation, then:
 
 ```bash
 python3 -m venv .venv
-.venv/bin/python -m pip install ./contract_holes-1.1.0-py3-none-any.whl
+.venv/bin/python -m pip install ./contract_holes-1.1.1-py3-none-any.whl
 ```
 
 If a package index is used, pin the exact reviewed release rather than an open

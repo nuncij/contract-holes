@@ -1,10 +1,10 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-10
-Current release: **`1.1.1` release candidate; latest signed release is `1.1.0`**
+Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
-Next: **Complete the signed `1.1.1` security patch, then select one explicitly
-authorized external target.**
+Next: **Select one explicitly authorized external target and pin its rules,
+scope, source revision, and restrictions.**
 
 ## Product goal
 
@@ -26,7 +26,7 @@ The scanner is successful when it:
 | Area | Current state |
 | --- | --- |
 | Repository | Private `nuncij/contract-holes` GitHub repository on `main`, with signed release tags |
-| Release | Signed `1.1.0`; tested `1.1.1` security release candidate |
+| Release | Signed `1.1.1` security patch; M7 functionality remains `1.1.0` compatible |
 | Inputs | Solidity files/directories or Etherscan V2 verified source by chain/address |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |

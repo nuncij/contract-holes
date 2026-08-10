@@ -4,19 +4,19 @@ This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
 Keep one task marked **NEXT** while queued work exists and at most one task
 marked **IN PROGRESS**.
 
-Current release: `1.1.1` release candidate; latest signed release is `1.1.0`
+Current release: `1.1.1`
 
 Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
 
 Current position: M0 through M7 are complete. The private GitHub repository has
-passing production CI, a verified signed `v1.1.0` release, dependency alerts,
-and automated security fixes. A tested `v1.1.1` candidate updates the release
-toolchain after both initial dependency advisories were fixed on `main`; it
-still needs the maintainer confirmation, signatures, and publication checks.
+passing production CI, verified signed `v1.1.0` and `v1.1.1` releases,
+dependency alerts, and automated security fixes. The `v1.1.1` patch updates the
+release toolchain after both initial dependency advisories were fixed on `main`.
 Current-plan limits on private branch protection and secret scanning are
 recorded. No external target has been selected or scanned.
 
-Next: **OPS-003 — Confirm, sign, and publish the `v1.1.1` security patch.**
+Next: **PILOT-002 — Select one explicitly authorized program and pin its rules,
+scope, source revision, and restrictions.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -446,11 +446,11 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 - [x] **OPS-002** — Add production CI, publish and verify the signed `v1.1.0`
   GitHub release assets, and enable available repository security controls — P0
   — **COMPLETE**.
-- [ ] **OPS-003** — Update vulnerable release-build pins, verify the dependency
+- [x] **OPS-003** — Update vulnerable release-build pins, verify the dependency
   graph and reproducible build, close superseded automated PRs, and publish the
-  signed `v1.1.1` security patch without changing `v1.1.0` — P0 — **IN PROGRESS**.
+  signed `v1.1.1` security patch without changing `v1.1.0` — P0 — **COMPLETE**.
 - [ ] **PILOT-002** — Select one explicitly authorized program and pin its rules,
-  scope, source revision, and restrictions — P0 — **NEXT AFTER OPS-003**.
+  scope, source revision, and restrictions — P0 — **NEXT**.
 - [ ] **PILOT-003** — Run the complete workflow privately, record candidate
   decisions and friction, and make no submission without a separate human
   decision — P0.

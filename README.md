@@ -349,12 +349,10 @@ Project status and future work are tracked explicitly:
 - [Security policy](SECURITY.md) — supported versions, private reporting, and
   coordinated disclosure targets.
 
-The latest signed release is `1.1.0`; a tested `1.1.1` build-tool security patch
-is awaiting maintainer attestation and signing. M7 Bounty Hunter Mode is
-complete. M8 private real-world validation is in progress: repository CI,
-private release assets, and available dependency security controls are complete.
-Selection of the first externally authorized target follows the patch release.
-The compiler index, inheritance
+The latest release is `1.1.1`; M7 Bounty Hunter Mode is complete. M8 private
+real-world validation is in progress: repository CI, private release assets, and
+available dependency security controls are complete, while selection of the
+first externally authorized target is next. The compiler index, inheritance
 resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,
 deterministic inspection JSON, and repeatable benchmark are complete. `SOL008` traces
@@ -376,7 +374,7 @@ provenance, and optional AI annotations are constrained to deterministic evidenc
 The frozen output schemas, per-rule evaluation corpus, supported toolchain policy,
 security boundaries, complete user/contributor documentation, reproducible
 artifacts, and signed release evidence are ready. See the
-[release process](docs/RELEASING.md), [signed checklist](release/1.1.0-checklist.md),
+[release process](docs/RELEASING.md), [signed checklist](release/1.1.1-checklist.md),
 and [changelog](CHANGELOG.md).
 
 `SOL009` requires compiler mode. Its privileged-state classification and branch

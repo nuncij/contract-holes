@@ -8,7 +8,7 @@ Status checked: 2026-08-10
 | --- | --- |
 | Repository | `nuncij/contract-holes` is private; `main` is the default branch |
 | Production CI | Enabled; both the compiler-backed 201-test job and reproducible-package job pass on `main` |
-| Release | Private GitHub release `v1.1.0` is published from the signed tag with five verified assets; `v1.1.1` is a local candidate |
+| Release | Private GitHub release `v1.1.1` is published from the signed tag with five verified assets |
 | Dependency vulnerability alerts | Enabled |
 | Automated dependency security fixes | Enabled |
 | Open dependency alerts | None; the initial `setuptools` and `wheel` build-tool alerts are fixed on `main` |
@@ -23,11 +23,11 @@ unavailable for this repository.
 
 ## Release integrity
 
-The [private `v1.1.0` GitHub release](https://github.com/nuncij/contract-holes/releases/tag/v1.1.0)
+The [private `v1.1.1` GitHub release](https://github.com/nuncij/contract-holes/releases/tag/v1.1.1)
 contains:
 
-- `contract_holes-1.1.0-py3-none-any.whl`;
-- `contract_holes-1.1.0.tar.gz`;
+- `contract_holes-1.1.1-py3-none-any.whl`;
+- `contract_holes-1.1.1.tar.gz`;
 - `release-manifest.json`;
 - `SHA256SUMS`;
 - `SHA256SUMS.asc`.
