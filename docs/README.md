@@ -31,6 +31,7 @@
 - [Historical bounty evaluation](BOUNTY_HISTORY.md)
 - [Authorized end-to-end bounty pilot](BOUNTY_PILOT.md)
 - [M7 Bounty Hunter Mode plan](BOUNTY_HUNTER_PLAN.md)
+- [M8 external target selection](research/M8_TARGET_SELECTION.md)
 
 ## Project governance
 

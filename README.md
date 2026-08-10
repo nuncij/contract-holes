@@ -351,8 +351,10 @@ Project status and future work are tracked explicitly:
 
 The latest release is `1.1.1`; M7 Bounty Hunter Mode is complete. M8 private
 real-world validation is in progress: repository CI, private release assets, and
-available dependency security controls are complete, while selection of the
-first externally authorized target is next. The compiler index, inheritance
+available dependency security controls are complete. OpenZeppelin Confidential
+Contracts `v0.4.0` is selected and revision-pinned for the first authorized
+trial; source acquisition and scanning require a separate operator approval.
+The compiler index, inheritance
 resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,
 deterministic inspection JSON, and repeatable benchmark are complete. `SOL008` traces

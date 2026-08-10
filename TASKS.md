@@ -13,10 +13,12 @@ passing production CI, verified signed `v1.1.0` and `v1.1.1` releases,
 dependency alerts, and automated security fixes. The `v1.1.1` patch updates the
 release toolchain after both initial dependency advisories were fixed on `main`.
 Current-plan limits on private branch protection and secret scanning are
-recorded. No external target has been selected or scanned.
+recorded. OpenZeppelin Confidential Contracts `v0.4.0` is selected for the
+first authorized trial at the bounty-pinned commit, with 22 exact in-scope
+source paths. No external target has been acquired or scanned.
 
-Next: **PILOT-002 — Select one explicitly authorized program and pin its rules,
-scope, source revision, and restrictions.**
+Next: **PILOT-003 — After separate operator approval, recheck the program rules,
+acquire the approved revision, and run the private local-only workflow.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -449,11 +451,14 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 - [x] **OPS-003** — Update vulnerable release-build pins, verify the dependency
   graph and reproducible build, close superseded automated PRs, and publish the
   signed `v1.1.1` security patch without changing `v1.1.0` — P0 — **COMPLETE**.
-- [ ] **PILOT-002** — Select one explicitly authorized program and pin its rules,
-  scope, source revision, and restrictions — P0 — **NEXT**.
+- [x] **PILOT-002** — Select OpenZeppelin Confidential Contracts `v0.4.0`, pin
+  the program rules, exact commit, 22 source paths, impacts, and restrictions,
+  and record the comparison in
+  [the M8 target selection](docs/research/M8_TARGET_SELECTION.md) — P0 —
+  **COMPLETE**.
 - [ ] **PILOT-003** — Run the complete workflow privately, record candidate
   decisions and friction, and make no submission without a separate human
-  decision — P0.
+  decision — P0 — **NEXT**.
 - [ ] **EVAL-002** — Compare the real trial with historical/synthetic results and
   document false positives, missed classes, evidence quality, and workflow time
   — P0.
