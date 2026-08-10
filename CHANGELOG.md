@@ -5,7 +5,12 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ## Unreleased
 
-No changes yet.
+### Security
+
+- Updated the pinned release build toolchain to `setuptools 83.0.0` and
+  `wheel 0.46.2`, addressing `GHSA-h35f-9h28-mq5c` and
+  `GHSA-8rrh-rw8j-w5fx`. Contract Holes continues to have no runtime Python
+  dependencies.
 
 ## 1.1.0 — 2026-08-09
 

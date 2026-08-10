@@ -34,13 +34,13 @@ class ReleaseTests(unittest.TestCase):
         )
         manifest = (ROOT / "MANIFEST.in").read_text(encoding="utf-8")
 
-        self.assertIn('requires = ["setuptools==80.9.0"]', pyproject)
+        self.assertIn('requires = ["setuptools==83.0.0"]', pyproject)
         for pin in (
             "build==1.5.0",
             "packaging==26.2",
             "pyproject-hooks==1.2.0",
-            "setuptools==80.9.0",
-            "wheel==0.45.1",
+            "setuptools==83.0.0",
+            "wheel==0.46.2",
         ):
             self.assertIn(pin, requirements)
         for included in (
