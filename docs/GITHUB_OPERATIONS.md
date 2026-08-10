@@ -11,6 +11,7 @@ Status checked: 2026-08-10
 | Release | Private GitHub release `v1.1.0` is published from the signed tag with five verified assets |
 | Dependency vulnerability alerts | Enabled |
 | Automated dependency security fixes | Enabled |
+| Open dependency alerts | None; the initial `setuptools` and `wheel` build-tool alerts are fixed on `main` |
 | Branch protection and repository rulesets | Unavailable for this private repository on the current GitHub plan |
 | Secret scanning and push protection | Unavailable for this private repository on the current GitHub plan |
 | Private vulnerability reporting form | Not enabled while the repository is private; use a private maintainer contact or the private Security Advisory area |
