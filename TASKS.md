@@ -6,19 +6,20 @@ marked **IN PROGRESS**.
 
 Current release: `1.1.1`
 
-Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
+Current milestone: **M8 — Private Real-World Validation — COMPLETE**
 
-Current position: M0 through M7 are complete. The private GitHub repository has
+Current position: M0 through M8 are complete. The private GitHub repository has
 passing production CI, verified signed `v1.1.0` and `v1.1.1` releases,
 dependency alerts, and automated security fixes. The `v1.1.1` patch updates the
 release toolchain after both initial dependency advisories were fixed on `main`.
 Current-plan limits on private branch protection and secret scanning are
-recorded. OpenZeppelin Confidential Contracts `v0.4.0` is selected for the
-first authorized trial at the bounty-pinned commit, with 22 exact in-scope
-source paths. No external target has been acquired or scanned.
+recorded. The authorized OpenZeppelin Confidential Contracts `v0.4.0` trial
+scanned 22 exact in-scope files privately and source-only at the bounty-pinned
+commit. It produced zero candidates, no proof or report, and no external action.
+The limits of that result and the observed compiler-dependency gap are recorded.
 
-Next: **PILOT-003 — After separate operator approval, recheck the program rules,
-acquire the approved revision, and run the private local-only workflow.**
+Next: **COMP-003 — Design a distinct, immutable compiler-dependency boundary
+without expanding reportable bounty scope.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -456,14 +457,36 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   and record the comparison in
   [the M8 target selection](docs/research/M8_TARGET_SELECTION.md) — P0 —
   **COMPLETE**.
-- [ ] **PILOT-003** — Run the complete workflow privately, record candidate
-  decisions and friction, and make no submission without a separate human
-  decision — P0 — **NEXT**.
-- [ ] **EVAL-002** — Compare the real trial with historical/synthetic results and
-  document false positives, missed classes, evidence quality, and workflow time
-  — P0.
-- [ ] **BACKLOG-001** — Convert only observed gaps into detector or workflow tasks;
-  do not add speculative rules before the trial evidence exists — P1.
+- [x] **PILOT-003** — Run the 22-file source-only workflow privately at the
+  approved commit, produce an empty candidate ledger, verify deterministic
+  replay, and perform no proof, report, export, submission, or target contact —
+  P0 — **COMPLETE**.
+- [x] **EVAL-002** — Compare the real trial with historical/synthetic results and
+  document false positives, unknown recall, evidence quality, audit context,
+  workflow time, and resource use in
+  [the M8 trial evaluation](docs/research/M8_OPENZEPPELIN_TRIAL.md) — P0 —
+  **COMPLETE**.
+- [x] **BACKLOG-001** — Convert only the observed compiler-dependency boundary
+  into `COMP-003`; retain FHE semantics and verbose exact paths as explicit
+  limitations rather than adding speculative mechanisms — P1 — **COMPLETE**.
+
+## Observed post-M8 backlog
+
+- [ ] **COMP-003** — Design a separate, immutable, read-only compiler-dependency
+  boundary so exact bounty assets can receive compiler-backed analysis without
+  making dependencies reportable or broadening the approved scope — P1 —
+  **NEXT**.
+
+  Acceptance criteria:
+
+  - reportable source paths and compiler-only dependency paths are explicit,
+    separately hashed, and fail closed;
+  - findings and candidate IDs can originate only from reportable source paths;
+  - dependency resolution remains offline and cannot load or execute target
+    configuration, hooks, tests, scripts, plugins, or network settings;
+  - the current profile schema and source-only behavior remain compatible;
+  - tests cover dependency tampering, traversal, symlinks, ambiguous duplicate
+    units, and attempted findings from dependency files.
 
 ## Definition of done for every task
 

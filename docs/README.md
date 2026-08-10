@@ -32,6 +32,7 @@
 - [Authorized end-to-end bounty pilot](BOUNTY_PILOT.md)
 - [M7 Bounty Hunter Mode plan](BOUNTY_HUNTER_PLAN.md)
 - [M8 external target selection](research/M8_TARGET_SELECTION.md)
+- [M8 OpenZeppelin trial evaluation](research/M8_OPENZEPPELIN_TRIAL.md)
 
 ## Project governance
 

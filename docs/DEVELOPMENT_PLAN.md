@@ -2,9 +2,9 @@
 
 Last updated: 2026-08-10
 Current release: `1.1.1`
-Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
-Next: **Select one explicitly authorized external target and pin its rules,
-scope, source revision, and restrictions.**
+Current milestone: **M8 — Private Real-World Validation — COMPLETE**
+Next: **Design an immutable compiler-dependency boundary without expanding
+reportable bounty scope (`COMP-003`).**
 
 ## Product goal
 
@@ -251,7 +251,7 @@ back after the user explicitly requests compilation.
 | M5 — Team and CI workflow | `0.6.0` | Complete | Configuration, baselines, catalog, CI, limits, address provenance, evidence-bound AI triage |
 | M6 — Audit-ready release | `1.0.0` | Complete | Benchmarked accuracy, stable schemas, compatibility policy, security docs, reproducible signed release evidence |
 | M7 — Bounty Hunter Mode | `1.1.0` | Complete | Authorized scope profiles, candidate triage, isolated local proofs, private reports, historical validation, authorized pilot, and signed reproducible release evidence |
-| M8 — Private Real-World Validation | Unreleased | In progress | Production repository operations followed by one explicitly authorized external trial and evidence-driven backlog |
+| M8 — Private Real-World Validation | Unreleased | Complete | Production repository operations, one explicitly authorized external source-only trial, and evidence-driven backlog |
 
 ### M2 — Cross-contract analysis (`0.3.0`)
 
@@ -396,6 +396,14 @@ Release gate:
 - the trial produces a private evaluation record without automatic submission,
   public disclosure, live-network exploitation, or payout claims;
 - observed gaps are converted into prioritized, testable work items.
+
+Completed on 2026-08-10. The authorized OpenZeppelin Confidential Contracts
+`v0.4.0` source-only trial scanned 22 exact files, produced zero candidates,
+and performed no proof, report, disclosure, submission, or deployed-network
+action. The clean result has undefined precision and unknown recall. See the
+[M8 trial evaluation](research/M8_OPENZEPPELIN_TRIAL.md). The only accepted new
+task is `COMP-003`, which addresses the observed separation between reportable
+assets and compiler-only dependencies.
 
 ## Engineering rules
 

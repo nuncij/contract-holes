@@ -5,7 +5,15 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ## Unreleased
 
-No changes yet.
+### Validation
+
+- Completed the first authorized external source-only trial against the exact
+  bounty-pinned OpenZeppelin Confidential Contracts `v0.4.0` release. The
+  private deterministic workflow scanned 22 files, produced zero candidates,
+  and made no proof, report, submission, disclosure, or external target action.
+- Recorded that the real clean scan has undefined precision and unknown recall,
+  plus one observed backlog item for separating compiler-only dependencies from
+  reportable bounty scope.
 
 ## 1.1.1 — 2026-08-10
 

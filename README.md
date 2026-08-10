@@ -349,11 +349,11 @@ Project status and future work are tracked explicitly:
 - [Security policy](SECURITY.md) — supported versions, private reporting, and
   coordinated disclosure targets.
 
-The latest release is `1.1.1`; M7 Bounty Hunter Mode is complete. M8 private
-real-world validation is in progress: repository CI, private release assets, and
-available dependency security controls are complete. OpenZeppelin Confidential
-Contracts `v0.4.0` is selected and revision-pinned for the first authorized
-trial; source acquisition and scanning require a separate operator approval.
+The latest release is `1.1.1`; M7 Bounty Hunter Mode and M8 private real-world
+validation are complete. The authorized OpenZeppelin Confidential Contracts
+`v0.4.0` source-only trial scanned 22 exact files at the bounty-pinned commit,
+produced zero candidates, and performed no proof, report, submission, or other
+external action. The clean result is not an audit or completeness claim.
 The compiler index, inheritance
 resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,
