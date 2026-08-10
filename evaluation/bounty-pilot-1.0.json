@@ -79,7 +79,7 @@
     "safety_failure_count": 0
   },
   "pilot_id": "contract-holes-repository-pilot-1.0",
-  "result_sha256": "f8d40861beb59cd256c3b9a8fb689a00ba77e46fba89153ccdb140b8c6a88e8f",
+  "result_sha256": "492bb50e42b508e92864324e54e1da430d34003e1c6f7a21193e84befa22138d",
   "review_decisions": [
     {
       "decision_source": "human",
@@ -108,7 +108,7 @@
     ],
     "failures": []
   },
-  "scanner_version": "1.1.0",
+  "scanner_version": "1.1.1",
   "schema_version": "1.0",
   "source_set_sha256": "beda1aa739133a3995e875ed4da5dbd195b019f8f650131b8fad399130cedb46",
   "status": "passed",

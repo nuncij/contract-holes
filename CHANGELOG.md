@@ -5,6 +5,10 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ## Unreleased
 
+No changes yet.
+
+## 1.1.1 — 2026-08-10
+
 ### Security
 
 - Updated the pinned release build toolchain to `setuptools 83.0.0` and

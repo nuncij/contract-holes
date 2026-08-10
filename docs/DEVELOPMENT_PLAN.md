@@ -1,10 +1,10 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-10
-Current release: `1.1.0`
+Current release: **`1.1.1` release candidate; latest signed release is `1.1.0`**
 Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
-Next: **Select one explicitly authorized external target and pin its rules,
-scope, source revision, and restrictions.**
+Next: **Complete the signed `1.1.1` security patch, then select one explicitly
+authorized external target.**
 
 ## Product goal
 
@@ -26,7 +26,7 @@ The scanner is successful when it:
 | Area | Current state |
 | --- | --- |
 | Repository | Private `nuncij/contract-holes` GitHub repository on `main`, with signed release tags |
-| Release | `1.1.0` |
+| Release | Signed `1.1.0`; tested `1.1.1` security release candidate |
 | Inputs | Solidity files/directories or Etherscan V2 verified source by chain/address |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
 | Compiler analysis | Optional isolated Foundry build with solc ASTs and UTF-8 source mapping |
@@ -371,8 +371,8 @@ submission action. See [authorized bounty pilot](BOUNTY_PILOT.md).
 
 ### M8 — Private Real-World Validation
 
-First, establish production CI, attach the signed and checksummed `1.1.0`
-artifacts to the private GitHub release, and enable the security controls that
+First, establish production CI, attach signed and checksummed release artifacts
+to private GitHub releases, and enable the security controls that
 the private-repository plan supports. Branch protection and unavailable
 security features must be recorded as limitations instead of being claimed as
 enabled.
@@ -387,7 +387,7 @@ observations may create the next detector/workflow backlog.
 Release gate:
 
 - production CI passes from GitHub on `main`;
-- the private `v1.1.0` GitHub release contains artifacts, checksums, and the
+- the latest private GitHub release contains artifacts, checksums, and the
   maintainer's detached checksum signature;
 - available dependency security controls are enabled and unavailable private
   repository controls are documented;
