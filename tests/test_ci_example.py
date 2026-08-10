@@ -4,6 +4,7 @@ import unittest
 
 WORKFLOW = Path("examples/github-actions/contract-holes.yml")
 COMPATIBILITY_WORKFLOW = Path("examples/github-actions/compatibility.yml")
+REPOSITORY_WORKFLOW = Path(".github/workflows/ci.yml")
 
 
 class CiExampleTests(unittest.TestCase):
@@ -58,6 +59,22 @@ class CiExampleTests(unittest.TestCase):
         self.assertIn("FOUNDRY_SOLC_VERSION", content)
         self.assertIn("FOUNDRY_EVM_VERSION", content)
         self.assertIn("--compile --online --format json", content)
+
+    def test_repository_workflow_runs_full_tests_and_reproducible_build(self) -> None:
+        content = REPOSITORY_WORKFLOW.read_text(encoding="utf-8")
+
+        self.assertIn("contents: read", content)
+        self.assertIn("persist-credentials: false", content)
+        self.assertIn("cancel-in-progress: true", content)
+        self.assertIn("actions/checkout@v6", content)
+        self.assertIn("actions/setup-python@v6", content)
+        self.assertIn("foundry-rs/foundry-toolchain@v1", content)
+        self.assertIn("version: v1.7.1", content)
+        self.assertIn("--compile --online --format json", content)
+        self.assertIn("python -m unittest discover -s tests -q", content)
+        self.assertIn("python -m pip install -r requirements/release.txt", content)
+        self.assertIn("python scripts/release.py", content)
+        self.assertIn("sha256sum --check SHA256SUMS", content)
 
 
 if __name__ == "__main__":

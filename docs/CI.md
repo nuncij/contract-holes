@@ -1,5 +1,24 @@
 # CI and SARIF
 
+## Contract Holes repository CI
+
+The repository's own [CI workflow](../.github/workflows/ci.yml) runs on pushes to
+`main`, pull requests, and manual dispatch. It has two jobs:
+
+- `Quality / Python 3.13 / Foundry 1.7.1` installs the package, downloads the
+  tested Solidity compiler through the normal online compiler path, and runs the
+  complete Python test suite;
+- `Reproducible package` installs the pinned release toolchain, builds two
+  independent wheel/source-distribution pairs, compares their bytes, smoke-tests
+  the wheel, and verifies the generated checksums.
+
+Both jobs use read-only repository permissions, do not persist checkout
+credentials, have explicit time limits, and cancel superseded runs. The
+maintainer compatibility workflow remains separate because its full version
+matrix is more expensive than the required check on every change.
+
+## Consumer SARIF workflow
+
 The template at
 [`examples/github-actions/contract-holes.yml`](../examples/github-actions/contract-holes.yml)
 runs a baseline-aware scan, uploads SARIF, and then restores the scanner's exit

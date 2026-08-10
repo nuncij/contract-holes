@@ -1,9 +1,10 @@
 # Contract Holes Development Plan
 
-Last updated: 2026-08-09
+Last updated: 2026-08-10
 Current release: `1.1.0`
-Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — COMPLETE**
-Next: **None — the planned M7 `1.1.0` milestone is complete.**
+Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
+Next: **Complete private GitHub operations, then select one explicitly authorized
+external target.**
 
 ## Product goal
 
@@ -24,7 +25,7 @@ The scanner is successful when it:
 
 | Area | Current state |
 | --- | --- |
-| Repository | Local Git repository on `main`, with task-scoped implementation commits |
+| Repository | Private `nuncij/contract-holes` GitHub repository on `main`, with signed release tags |
 | Release | `1.1.0` |
 | Inputs | Solidity files/directories or Etherscan V2 verified source by chain/address |
 | Source analysis | Comment/string masking, contract/function regions, state-variable heuristics |
@@ -250,6 +251,7 @@ back after the user explicitly requests compilation.
 | M5 — Team and CI workflow | `0.6.0` | Complete | Configuration, baselines, catalog, CI, limits, address provenance, evidence-bound AI triage |
 | M6 — Audit-ready release | `1.0.0` | Complete | Benchmarked accuracy, stable schemas, compatibility policy, security docs, reproducible signed release evidence |
 | M7 — Bounty Hunter Mode | `1.1.0` | Complete | Authorized scope profiles, candidate triage, isolated local proofs, private reports, historical validation, authorized pilot, and signed reproducible release evidence |
+| M8 — Private Real-World Validation | Unreleased | In progress | Production repository operations followed by one explicitly authorized external trial and evidence-driven backlog |
 
 ### M2 — Cross-contract analysis (`0.3.0`)
 
@@ -366,6 +368,34 @@ explicit approval, and checksummed local export. The path-independent result
 records a 720-second operator-event timeline, three friction observations, two
 successfully blocked unsafe actions, and no network, target, chain, platform, or
 submission action. See [authorized bounty pilot](BOUNTY_PILOT.md).
+
+### M8 — Private Real-World Validation
+
+First, establish production CI, attach the signed and checksummed `1.1.0`
+artifacts to the private GitHub release, and enable the security controls that
+the private-repository plan supports. Branch protection and unavailable
+security features must be recorded as limitations instead of being claimed as
+enabled.
+
+Then select one external target whose published program rules explicitly permit
+this type of review. Pin the rules, source revision, paths, impacts, and
+restrictions before scanning. Run the released workflow privately, make every
+candidate confirmation and submission decision manually, and record useful
+evidence, false positives, out-of-model behavior, and operator time. Only those
+observations may create the next detector/workflow backlog.
+
+Release gate:
+
+- production CI passes from GitHub on `main`;
+- the private `v1.1.0` GitHub release contains artifacts, checksums, and the
+  maintainer's detached checksum signature;
+- available dependency security controls are enabled and unavailable private
+  repository controls are documented;
+- one external trial has explicit authorization and immutable source/scope
+  identity before analysis begins;
+- the trial produces a private evaluation record without automatic submission,
+  public disclosure, live-network exploitation, or payout claims;
+- observed gaps are converted into prioritized, testable work items.
 
 ## Engineering rules
 

@@ -6,14 +6,17 @@ marked **IN PROGRESS**.
 
 Current release: `1.1.0`
 
-Current milestone: **M7 — Bounty Hunter Mode (`1.1.0`) — COMPLETE**
+Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
 
 Current position: M0 through M6 and the signed audit-ready 1.0 release are
 complete. M7's profile, pinned scope, private execution, triage, proofs/reports,
 historical evidence gate, authorized local end-to-end pilot, compatibility policy,
-documentation, reproducible artifacts, and signed local release are complete.
+documentation, reproducible artifacts, signed local release, and private GitHub
+repository are complete. M8 is establishing repository operations before the
+first externally authorized private trial.
 
-Next: **None — the planned M7 `1.1.0` milestone is complete.**
+Next: **OPS-002 — Validate production CI and publish the signed private GitHub
+release.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -431,6 +434,28 @@ Acceptance criteria:
   claim.
 
 Depends on: `BOUNTY-001` through `BOUNTY-009`.
+
+## M8 — Private Real-World Validation
+
+M8 applies the released local workflow to an external target only after its
+owner or bounty program explicitly authorizes the review. No target interaction,
+submission, disclosure, transaction, or remote exploit execution is automatic.
+
+- [x] **OPS-001** — Create the private `nuncij/contract-holes` GitHub repository,
+  push `main`, and push the signed `v1.0.0` and `v1.1.0` tags — P0 — **COMPLETE**.
+- [ ] **OPS-002** — Add production CI, publish and verify the signed `v1.1.0`
+  GitHub release assets, and enable available repository security controls — P0
+  — **IN PROGRESS**.
+- [ ] **PILOT-002** — Select one explicitly authorized program and pin its rules,
+  scope, source revision, and restrictions — P0 — **NEXT AFTER OPS-002**.
+- [ ] **PILOT-003** — Run the complete workflow privately, record candidate
+  decisions and friction, and make no submission without a separate human
+  decision — P0.
+- [ ] **EVAL-002** — Compare the real trial with historical/synthetic results and
+  document false positives, missed classes, evidence quality, and workflow time
+  — P0.
+- [ ] **BACKLOG-001** — Convert only observed gaps into detector or workflow tasks;
+  do not add speculative rules before the trial evidence exists — P1.
 
 ## Definition of done for every task
 
