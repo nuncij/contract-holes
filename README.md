@@ -349,8 +349,11 @@ Project status and future work are tracked explicitly:
 - [Security policy](SECURITY.md) — supported versions, private reporting, and
   coordinated disclosure targets.
 
-The latest release is `1.1.0`; M7 Bounty Hunter Mode is complete. The compiler index,
-inheritance resolver, call graph, reusable
+The latest release is `1.1.0`; M7 Bounty Hunter Mode is complete. M8 private
+real-world validation is in progress: repository CI, private release assets, and
+available dependency security controls are complete, while selection of the
+first externally authorized target is next. The compiler index, inheritance
+resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,
 deterministic inspection JSON, and repeatable benchmark are complete. `SOL008` traces
 externally controlled call destinations across aliases and internal helpers.

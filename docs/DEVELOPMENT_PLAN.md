@@ -3,8 +3,8 @@
 Last updated: 2026-08-10
 Current release: `1.1.0`
 Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
-Next: **Complete private GitHub operations, then select one explicitly authorized
-external target.**
+Next: **Select one explicitly authorized external target and pin its rules,
+scope, source revision, and restrictions.**
 
 ## Product goal
 

@@ -24,6 +24,7 @@ class DocumentationTests(unittest.TestCase):
             "docs/CLI_REFERENCE.md",
             "docs/RULE_CATALOG.md",
             "docs/CI.md",
+            "docs/GITHUB_OPERATIONS.md",
             "docs/PROOF_REQUIREMENTS.md",
             "docs/BOUNTY_PROFILE.md",
             "docs/BOUNTY_TRIAGE.md",

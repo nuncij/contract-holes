@@ -8,15 +8,14 @@ Current release: `1.1.0`
 
 Current milestone: **M8 — Private Real-World Validation — IN PROGRESS**
 
-Current position: M0 through M6 and the signed audit-ready 1.0 release are
-complete. M7's profile, pinned scope, private execution, triage, proofs/reports,
-historical evidence gate, authorized local end-to-end pilot, compatibility policy,
-documentation, reproducible artifacts, signed local release, and private GitHub
-repository are complete. M8 is establishing repository operations before the
-first externally authorized private trial.
+Current position: M0 through M7 are complete. The private GitHub repository now
+has passing production CI, a verified five-asset `v1.1.0` release, dependency
+alerts, and automated security fixes. Current-plan limits on private branch
+protection and secret scanning are recorded. No external target has been
+selected or scanned.
 
-Next: **OPS-002 — Validate production CI and publish the signed private GitHub
-release.**
+Next: **PILOT-002 — Select one explicitly authorized program and pin its rules,
+scope, source revision, and restrictions.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -443,11 +442,11 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
 - [x] **OPS-001** — Create the private `nuncij/contract-holes` GitHub repository,
   push `main`, and push the signed `v1.0.0` and `v1.1.0` tags — P0 — **COMPLETE**.
-- [ ] **OPS-002** — Add production CI, publish and verify the signed `v1.1.0`
+- [x] **OPS-002** — Add production CI, publish and verify the signed `v1.1.0`
   GitHub release assets, and enable available repository security controls — P0
-  — **IN PROGRESS**.
+  — **COMPLETE**.
 - [ ] **PILOT-002** — Select one explicitly authorized program and pin its rules,
-  scope, source revision, and restrictions — P0 — **NEXT AFTER OPS-002**.
+  scope, source revision, and restrictions — P0 — **NEXT**.
 - [ ] **PILOT-003** — Run the complete workflow privately, record candidate
   decisions and friction, and make no submission without a separate human
   decision — P0.

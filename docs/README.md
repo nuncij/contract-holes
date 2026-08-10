@@ -17,6 +17,7 @@
 - [Toolchain compatibility](COMPATIBILITY.md)
 - [Release process](RELEASING.md)
 - [Release checklist contract](RELEASE_CHECKLIST.md)
+- [GitHub operations](GITHUB_OPERATIONS.md)
 
 ## Evidence and verification
 
