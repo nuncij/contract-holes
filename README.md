@@ -352,13 +352,12 @@ Project status and future work are tracked explicitly:
   coordinated disclosure targets.
 
 The latest release is `1.1.1`; M7 Bounty Hunter Mode and M8 private real-world
-validation are complete. The authorized OpenZeppelin Confidential Contracts
-`v0.4.0` source-only trial scanned 22 exact files at the bounty-pinned commit,
-produced zero candidates, and performed no proof, report, submission, or other
-external action. The clean result is not an audit or completeness claim. The
-unreleased compiler-dependency boundary can now stage separately hashed,
-compiler-only Solidity inputs while findings remain restricted to reportable
-scope; a new target scan still requires separate operator approval.
+validation are complete. Authorized OpenZeppelin Confidential Contracts
+`v0.4.0` trials scanned the same 22 reportable files at the bounty-pinned
+commit, first source-only and then with 58 separately hashed compiler-only
+dependencies. The offline compiler trial produced 51 private, unreviewed
+candidates. These are not confirmed bugs, and no proof, report, export,
+disclosure, submission, chain action, or target interaction occurred.
 The compiler index, inheritance
 resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,

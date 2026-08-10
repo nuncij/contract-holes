@@ -1,11 +1,11 @@
 import json
+from dataclasses import replace
 from pathlib import Path
 import tempfile
 import unittest
 
 from contract_holes.compiler import CompilationResult, CompiledSource
-from contract_holes.models import RuleInfo
-from contract_holes.models import Severity
+from contract_holes.models import Finding, RuleInfo, Severity
 from contract_holes.project import ProjectIndex
 from contract_holes.rules import Rule
 from contract_holes.reporters import json_report, sarif_report
@@ -133,6 +133,47 @@ class ScannerTests(unittest.TestCase):
 
             with self.assertRaisesRegex(ScanError, "produced no AST"):
                 scanner.scan_paths([path], compile_sources=True)
+
+    def test_scan_paths_coalesces_findings_with_the_same_fingerprint(self) -> None:
+        class DuplicateRule(Rule):
+            info = RuleInfo(
+                "SOL999",
+                Severity.HIGH,
+                "duplicate fixture",
+                "duplicate fixture",
+                "none",
+            )
+
+            def scan(self, source):
+                finding = Finding(
+                    rule_id=self.info.rule_id,
+                    severity=self.info.severity,
+                    title=self.info.title,
+                    message="first trace",
+                    path=source.path,
+                    line=1,
+                    column=1,
+                    excerpt="contract SafeVault",
+                    recommendation=self.info.recommendation,
+                    metadata={"trace": ["first"]},
+                )
+                return (
+                    finding,
+                    replace(
+                        finding,
+                        message="alternative trace",
+                        metadata={"trace": ["alternative"]},
+                    ),
+                )
+
+        findings, count = Scanner(rules=(DuplicateRule(),)).scan_paths(
+            [Path("tests/fixtures/SafeVault.sol")]
+        )
+
+        self.assertEqual(count, 1)
+        self.assertEqual(len(findings), 1)
+        self.assertEqual(findings[0].message, "first trace")
+        json_report(findings, count)
 
 
 if __name__ == "__main__":

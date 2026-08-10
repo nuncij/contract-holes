@@ -15,6 +15,14 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   material and behavior.
 - Reject dependency tampering, traversal, symlinks, overlap with reportable
   source units, unsafe imports, and findings attributed outside reportable scope.
+- Keep all top-level and nested bounty evidence paths relative to the approved
+  target root before writing a private record.
+
+### Analysis
+
+- Coalesce deterministic alternative evidence with the same fingerprint before
+  report rendering, preserving the first representative trace and the frozen
+  fingerprint definition.
 
 ### Validation
 
@@ -25,6 +33,11 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 - Recorded that the real clean scan has undefined precision and unknown recall,
   plus one observed backlog item for separating compiler-only dependencies from
   reportable bounty scope.
+- Completed the separately approved offline compiler follow-up with 22
+  reportable files, 58 exact compiler-only dependencies, and Solidity `0.8.27`.
+  It materialized 51 private candidates in state `new`; no vulnerability was
+  confirmed and no proof, report, export, disclosure, submission, chain action,
+  or target interaction occurred.
 
 ## 1.1.1 — 2026-08-10
 

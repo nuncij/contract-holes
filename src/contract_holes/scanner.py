@@ -131,7 +131,14 @@ class Scanner:
                     if finding.severity >= minimum_severity
                 )
                 self._check_limits(started, memory_baseline, f"scanning {path}")
-            return sorted(findings, key=_finding_sort_key), len(files)
+            deduplicated: list[Finding] = []
+            seen_fingerprints: set[str] = set()
+            for finding in sorted(findings, key=_finding_sort_key):
+                if finding.fingerprint in seen_fingerprints:
+                    continue
+                seen_fingerprints.add(finding.fingerprint)
+                deduplicated.append(finding)
+            return deduplicated, len(files)
         finally:
             if not already_tracing:
                 tracemalloc.stop()

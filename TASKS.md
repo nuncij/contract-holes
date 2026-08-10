@@ -13,14 +13,14 @@ passing production CI, verified signed `v1.1.0` and `v1.1.1` releases,
 dependency alerts, and automated security fixes. The `v1.1.1` patch updates the
 release toolchain after both initial dependency advisories were fixed on `main`.
 Current-plan limits on private branch protection and secret scanning are
-recorded. The authorized OpenZeppelin Confidential Contracts `v0.4.0` trial
-scanned 22 exact in-scope files privately and source-only at the bounty-pinned
-commit. It produced zero candidates, no proof or report, and no external action.
-The limits of that result are recorded. `COMP-003` now closes the observed
-compiler-dependency gap without expanding reportable scope.
+recorded. The authorized OpenZeppelin Confidential Contracts `v0.4.0` trials
+now cover both source-only and offline compiler analysis at the bounty-pinned
+commit. The compiler trial kept 22 reportable files separate from 58 exact
+compiler-only dependencies and materialized 51 private candidates in state
+`new`. No candidate is a confirmed bug, and no proof, report, export,
+disclosure, submission, chain action, or target interaction occurred.
 
-Next: **PILOT-004 — After separate operator approval, run a new private,
-compiler-enabled OpenZeppelin trial with exact reportable and dependency paths.**
+Next: **PILOT-005 — Human review of the 51 private compiler candidates.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -489,9 +489,9 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   - tests cover dependency tampering, traversal, symlinks, ambiguous duplicate
     units, and attempted findings from dependency files.
 
-- [ ] **PILOT-004** — Create a new private workspace and run the approved target
+- [x] **PILOT-004** — Create a new private workspace and run the approved target
   through offline compiler analysis using exact reportable and compiler-only
-  dependency paths — P1 — **NEXT, REQUIRES SEPARATE OPERATOR APPROVAL**.
+  dependency paths — P1 — **COMPLETE**.
 
   Acceptance criteria:
 
@@ -505,6 +505,22 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   - results and limitations are added to the private trial evaluation.
 
   Depends on: `COMP-003`.
+
+- [ ] **PILOT-005** — Review the 51 compiler-backed candidates against the
+  pinned source and program impact rules — P1 — **NEXT, REQUIRES OPERATOR REVIEW
+  INPUT**.
+
+  Acceptance criteria:
+
+  - every candidate remains private and receives an explicit human decision
+    with a reason before any precision claim is made;
+  - review distinguishes duplicated or conservative analysis signals from
+    plausible security defects without automatically changing detector logic;
+  - proof, report, approval, export, disclosure, submission, chain action, and
+    target contact remain separate, explicitly approved actions;
+  - only observed, labelled gaps become product work items.
+
+  Depends on: `PILOT-004`.
 
 ## Definition of done for every task
 

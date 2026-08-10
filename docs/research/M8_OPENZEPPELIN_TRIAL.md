@@ -4,9 +4,10 @@ Trial date: 2026-08-10
 
 ## Outcome
 
-The first authorized external trial completed successfully and produced no
-Contract Holes candidates. This is an operational result, not evidence that the
-target is free of vulnerabilities.
+The first authorized external, source-only trial completed successfully and
+produced no Contract Holes candidates. This is an operational result, not
+evidence that the target is free of vulnerabilities. A separately approved
+offline compiler follow-up is recorded below.
 
 The operator approved private, local, source-only analysis of OpenZeppelin
 Confidential Contracts `v0.4.0`. Immediately before acquisition, the live
@@ -65,13 +66,62 @@ releases had FHE overflow and handle-allowance findings. Those reports are
 important evidence of domain-specific risk, but they do not establish a defect
 in the pinned `v0.4.0` release.
 
+## Compiler-enabled follow-up
+
+The operator separately approved local, private, offline compiler analysis of
+the same pinned commit. The profile retained the 22 reportable paths and added
+exactly 58 compiler-only Solidity dependencies. The dependencies were acquired
+once at pinned Git or package-lock identities, verified locally, and were never
+eligible to produce a reportable finding. The subsequent scans were offline.
+
+| Record or tool | Value |
+| --- | --- |
+| Scanner | Contract Holes `1.1.1` plus the unreleased `COMP-003` boundary |
+| Solidity compiler | `0.8.27+commit.40a35a09.Linux.g++` |
+| Compiler SHA-256 | `b9977d500c17cba6f0032ca939ef98c4decf6363f19f386d05fb02f708115264` |
+| Profile | `ef8439b4b14dacc5d9c8ce1450924c19194b2d3b4e8f308cf3ff4410b3384a9d` |
+| Source manifest | `f40f1cee224101bf440fe07514ec34f92d2f02a283b1b373d6eec9b3dac74604` |
+| Source set | `550251d65a1d6d29856a2b1a66e847f481633a61913d14e674e4a3f08a16e1da` |
+| Compiler-dependency set | `0837f1adb6cae49fdc2aabd3e7af5debfed1f299bc92fb2e36e8e1094bb2597a` |
+| Scan | `8fa3093b06c7bb23710f2d663d728032bc7eb107fb82513982b8560137483433` |
+| Candidate ledger | `889e58b1f0cf91a9db4e011882a40a2b7455e90aeaa68e0e600bda1a10a5d15e` |
+
+The canonical scan compiled 22 reportable files, materialized 51 candidates,
+and left all 51 in review state `new`. Candidate details remain only in the
+mode-`0600` private workspace. They have not been classified as bugs or false
+positives, so precision and recall remain unknown.
+
+The first canonical pass took 103.95 seconds and used at most 1,176,856 KiB of
+resident memory. An immutable replay reproduced the scan digest in 79.81
+seconds and used at most 1,177,080 KiB. Both measured runs sent and received
+zero socket messages.
+
+The real compiler workload exposed two producer defects before the result was
+accepted:
+
+1. Several rules emitted alternative traces with the same stable finding
+   fingerprint. The JSON reporter correctly rejected the duplicate identity.
+   The scanner now keeps the first representative in deterministic order.
+2. Compiler traces contained absolute local paths in nested metadata. The
+   bounty boundary now converts nested `path` evidence to target-relative paths
+   and fails closed for paths outside the target. The diagnostic record remains
+   private; the canonical result was produced in a fresh immutable workspace
+   and contains no target-root literal.
+
+Neither fix changes the fingerprint definition or treats a candidate as a
+confirmed vulnerability. The 51-candidate volume also shows that generic
+compiler-backed rules need human validation on confidential-contract code. No
+FHE-specific suppression or detector change is justified until the candidates
+are labelled.
+
 ## Comparison with existing evaluations
 
 | Evaluation | Ground truth | Result that can be claimed |
 | --- | --- | --- |
 | Synthetic `audit-1` | 33 positive and 31 safe labels | `1.0` precision and recall on the curated regression corpus |
 | Historical `m7-history-1` | 10 disclosed cases from 10 projects | `0.875` candidate precision and `1.0` supported-class recall |
-| OpenZeppelin real trial | No independent labels for the pinned release | 22 files scanned, zero candidates; precision undefined and recall unknown |
+| OpenZeppelin source-only trial | No independent labels for the pinned release | 22 files scanned, zero candidates; precision undefined and recall unknown |
+| OpenZeppelin compiler trial | 51 candidates, all unreviewed | Compiler and privacy boundaries reproduced; precision and recall unknown |
 
 There were zero observed false-positive candidates in this trial. That is not a
 precision score because the denominator is zero. A clean scan also provides no
@@ -94,17 +144,20 @@ a real repository.
 3. Pinning 22 individual files was verbose but safe. Positive-only scope remains
    preferable to adding exclusion globs after one trial.
 
-Only the first gap became product task `COMP-003`. It is now complete: immutable
-compiler-only source units are separate from reportable scope and cannot produce
-findings. This did not modify or rerun the frozen source-only trial. The other
-limitations remain explicit accepted risks until another authorized trial
-supplies stronger evidence.
+The first gap became product task `COMP-003`, which enabled the compiler
+follow-up without changing the frozen source-only evidence. The follow-up then
+produced two regression-backed implementation fixes: stable-identity
+coalescing and nested evidence-path normalization. FHE semantics and verbose
+positive-only scope remain explicit limitations. Candidate labelling is now
+`PILOT-005`; detector changes wait for those labels.
 
 ## Decision
 
 M8 passes its release gate. The authorized target and rules were pinned before
 analysis, private deterministic evidence was produced, every candidate was
-accounted for, no unsafe or external action occurred, and the sole accepted
-workflow gap was recorded as a testable backlog item. `COMP-003` later closed
-that product gap without changing this trial's evidence; a compiler-enabled
-target trial still requires separate operator approval.
+accounted for, and no target, chain, proof, report, export, disclosure, or
+submission action occurred. The sole initial workflow gap was recorded as a
+testable backlog item. `COMP-003` later closed that gap, and the separately
+approved compiler trial reproduced its private scan and candidate records
+without changing the source-only evidence. No candidate can be called a
+vulnerability until `PILOT-005` receives human review input.

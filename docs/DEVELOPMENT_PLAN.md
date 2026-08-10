@@ -3,8 +3,7 @@
 Last updated: 2026-08-10
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Obtain separate approval for a compiler-enabled OpenZeppelin trial
-(`PILOT-004`).**
+Next: **Human review of the private compiler candidates (`PILOT-005`).**
 
 ## Product goal
 
@@ -35,7 +34,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 200 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 212 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -251,7 +250,7 @@ back after the user explicitly requests compilation.
 | M5 — Team and CI workflow | `0.6.0` | Complete | Configuration, baselines, catalog, CI, limits, address provenance, evidence-bound AI triage |
 | M6 — Audit-ready release | `1.0.0` | Complete | Benchmarked accuracy, stable schemas, compatibility policy, security docs, reproducible signed release evidence |
 | M7 — Bounty Hunter Mode | `1.1.0` | Complete | Authorized scope profiles, candidate triage, isolated local proofs, private reports, historical validation, authorized pilot, and signed reproducible release evidence |
-| M8 — Private Real-World Validation | Unreleased | Complete | Production repository operations, one explicitly authorized external source-only trial, and evidence-driven backlog |
+| M8 — Private Real-World Validation | Unreleased | Complete | Production repository operations, authorized source-only and offline compiler trials, and evidence-driven backlog |
 
 ### M2 — Cross-contract analysis (`0.3.0`)
 
@@ -401,11 +400,16 @@ Completed on 2026-08-10. The authorized OpenZeppelin Confidential Contracts
 `v0.4.0` source-only trial scanned 22 exact files, produced zero candidates,
 and performed no proof, report, disclosure, submission, or deployed-network
 action. The clean result has undefined precision and unknown recall. See the
-[M8 trial evaluation](research/M8_OPENZEPPELIN_TRIAL.md). The only accepted new
-task was `COMP-003`, which now separates reportable assets from immutable,
-compiler-only dependencies. A new compiler-enabled trial is queued as
-`PILOT-004`, but it requires separate operator approval and a new private
-workspace; the source-only evidence remains unchanged.
+[M8 trial evaluation](research/M8_OPENZEPPELIN_TRIAL.md). `COMP-003` then
+separated reportable assets from immutable compiler-only dependencies.
+
+The separately approved `PILOT-004` follow-up compiled the same 22 reportable
+files offline with 58 exact compiler-only dependencies and Solidity `0.8.27`.
+It produced 51 deduplicated private candidates, all left in human-review state
+`new`. Replaying the scan reproduced its immutable digest. No proof, report,
+approval, export, disclosure, submission, chain action, or target interaction
+occurred, and the frozen source-only evidence was unchanged. `PILOT-005` is the
+next task because candidate precision cannot be measured before human review.
 
 ### Post-M8 — Compiler-only dependency boundary
 

@@ -35,8 +35,10 @@ Every finding contains:
 | `fingerprint` | string | Fingerprint-v1 identifier |
 
 `finding_count` equals the length of `findings`; fingerprints are unique within
-a report. Metadata keys are rule-specific and additive. Consumers must ignore
-unknown metadata and root/finding fields.
+a report. If a detector produces alternative evidence with the same fingerprint,
+the producer keeps the first representative in deterministic finding order.
+Metadata keys are rule-specific and additive. Consumers must ignore unknown
+metadata and root/finding fields.
 
 Fingerprint v1 is the first 16 lowercase hexadecimal characters of SHA-256 over
 the UTF-8 string `rule_id + NUL + path + NUL + decimal line + NUL + stripped

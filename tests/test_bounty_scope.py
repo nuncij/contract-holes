@@ -149,6 +149,52 @@ class BountyScopeTests(unittest.TestCase):
             scan_digest = scan_material.pop("scan_sha256")
             self.assertEqual(scan_digest, payload_sha256(scan_material))
 
+    def test_scan_record_relativizes_nested_finding_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = create_source(root)
+            profile = directory_profile(root)
+            finding = Finding(
+                rule_id="SOL999",
+                severity=Severity.MEDIUM,
+                title="Trace finding",
+                message="nested evidence must not expose the target root",
+                path=source,
+                line=1,
+                column=1,
+                excerpt="contract ScopedVault",
+                recommendation="review the trace",
+                metadata={
+                    "trace": [{"path": str(source.resolve()), "line": 1}],
+                    "sink": {"path": str(source.resolve())},
+                },
+            )
+
+            class ScannerWithAbsoluteTrace:
+                def __init__(self, **kwargs):
+                    pass
+
+                def scan_paths(self, paths, **kwargs):
+                    return [finding], len(list(paths))
+
+            with patch(
+                "contract_holes.bounty_scope.Scanner",
+                ScannerWithAbsoluteTrace,
+            ):
+                result = scan_bounty_workspace(profile.workspace)
+                finding.metadata["sink"]["path"] = str(root / "outside.sol")
+                with self.assertRaisesRegex(BountyScopeError, "escapes source root"):
+                    scan_bounty_workspace(profile.workspace)
+
+            recorded = result.scan_record["report"]["findings"][0]
+            self.assertEqual(
+                recorded["metadata"]["trace"][0]["path"], "src/Vault.sol"
+            )
+            self.assertEqual(
+                recorded["metadata"]["sink"]["path"], "src/Vault.sol"
+            )
+            self.assertNotIn(str(root.resolve()), json.dumps(result.scan_record))
+
     def test_directory_identity_fails_after_source_or_remapping_changes(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

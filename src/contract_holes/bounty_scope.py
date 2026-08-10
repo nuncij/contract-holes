@@ -261,7 +261,7 @@ def scan_bounty_workspace(workspace: Path | str) -> BountyScanResult:
     except (ScanError, CompilerError) as exc:
         raise BountyScopeError(str(exc)) from exc
     relative_findings = tuple(
-        replace(finding, path=Path(_relative_to_root(finding.path, profile.source_root)))
+        _relative_finding(finding, profile.source_root)
         for finding in findings
     )
     report = json.loads(json_report(list(relative_findings), files_scanned))
@@ -735,6 +735,31 @@ def _relative_to_root(path: Path, root: Path) -> str:
         return path.resolve().relative_to(root.resolve()).as_posix()
     except ValueError as exc:
         raise BountyScopeError(f"path escapes source root: {path}") from exc
+
+
+def _relative_finding(finding: Finding, root: Path) -> Finding:
+    metadata = _relative_metadata_paths(finding.metadata, root)
+    assert isinstance(metadata, dict)
+    return replace(
+        finding,
+        path=Path(_relative_to_root(finding.path, root)),
+        metadata=metadata,
+    )
+
+
+def _relative_metadata_paths(value: object, root: Path) -> object:
+    if isinstance(value, dict):
+        return {
+            key: (
+                _relative_to_root(Path(item), root)
+                if key == "path" and isinstance(item, str) and Path(item).is_absolute()
+                else _relative_metadata_paths(item, root)
+            )
+            for key, item in value.items()
+        }
+    if isinstance(value, list):
+        return [_relative_metadata_paths(item, root) for item in value]
+    return value
 
 
 def _normalized_scope_path(value: str) -> str:

@@ -151,6 +151,10 @@ The command writes two private, deterministic records:
 - `scan.json` binds that manifest to the relative-path scanner report and exact
   compiler policy/version observations.
 
+Top-level finding paths and nested evidence fields named `path` are stored
+relative to the approved target root. An absolute nested path outside that root
+fails closed instead of being written.
+
 Records use mode `0600` where supported, are created atomically, and are
 accepted on a repeat run only when their complete bytes are identical. Changed
 or symlinked records are never overwritten.
