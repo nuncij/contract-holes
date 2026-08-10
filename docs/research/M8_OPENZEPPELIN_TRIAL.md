@@ -84,8 +84,9 @@ a real repository.
 
 1. Source-only mode provided no compiler AST, inheritance, call-graph,
    data-flow, or executable-proof evidence. The target imports dependencies that
-   are not reportable bounty assets, while the current profile treats every
-   admitted compiler source unit as part of the approved scan scope.
+   are not reportable bounty assets, while the profile implementation at trial
+   time treated every admitted compiler source unit as part of approved scan
+   scope.
 2. Contract Holes does not model fhEVM encrypted handles, ACL allowances, or
    non-reverting confidential-operation failures. No FHE-specific rule is added
    from this trial because there is no confirmed current vulnerability to
@@ -93,14 +94,17 @@ a real repository.
 3. Pinning 22 individual files was verbose but safe. Positive-only scope remains
    preferable to adding exclusion globs after one trial.
 
-Only the first gap becomes a product task: design a separate, immutable,
-read-only compiler-dependency boundary that cannot produce reportable findings
-or silently expand bounty scope. The other limitations remain explicit accepted
-risks until another authorized trial supplies stronger evidence.
+Only the first gap became product task `COMP-003`. It is now complete: immutable
+compiler-only source units are separate from reportable scope and cannot produce
+findings. This did not modify or rerun the frozen source-only trial. The other
+limitations remain explicit accepted risks until another authorized trial
+supplies stronger evidence.
 
 ## Decision
 
 M8 passes its release gate. The authorized target and rules were pinned before
 analysis, private deterministic evidence was produced, every candidate was
 accounted for, no unsafe or external action occurred, and the sole accepted
-workflow gap is recorded as a testable backlog item.
+workflow gap was recorded as a testable backlog item. `COMP-003` later closed
+that product gap without changing this trial's evidence; a compiler-enabled
+target trial still requires separate operator approval.

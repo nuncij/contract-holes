@@ -34,6 +34,7 @@ class BountyScopeError(RuntimeError):
 SOURCE_MANIFEST_FILENAME = "source-manifest.json"
 SCAN_RECORD_FILENAME = "scan.json"
 SOURCE_MANIFEST_SCHEMA_VERSION = "1.0"
+SOURCE_MANIFEST_DEPENDENCY_SCHEMA_VERSION = "1.1"
 SCAN_RECORD_SCHEMA_VERSION = "1.0"
 _GIT_ENVIRONMENT = {
     "GIT_CONFIG_NOSYSTEM": "1",
@@ -79,18 +80,40 @@ class SourceIdentity:
     root: Path
     scope_paths: tuple[str, ...]
     files: tuple[SourceEntry, ...]
+    compiler_dependency_paths: tuple[str, ...]
+    compiler_dependency_files: tuple[SourceEntry, ...]
+    compiler_dependency_set_sha256: str | None
     source_set_sha256: str
     remappings: tuple[str, ...]
     remappings_sha256: str | None
 
     def public_payload(self) -> dict[str, object]:
-        return {
-            "schema_version": SOURCE_MANIFEST_SCHEMA_VERSION,
+        payload: dict[str, object] = {
+            "schema_version": (
+                SOURCE_MANIFEST_DEPENDENCY_SCHEMA_VERSION
+                if self.compiler_dependency_paths
+                else SOURCE_MANIFEST_SCHEMA_VERSION
+            ),
             "scope_paths": list(self.scope_paths),
             "files": [entry.payload() for entry in self.files],
             "source_set_sha256": self.source_set_sha256,
             "remappings_sha256": self.remappings_sha256,
         }
+        if self.compiler_dependency_paths:
+            payload.update(
+                {
+                    "compiler_dependency_paths": list(
+                        self.compiler_dependency_paths
+                    ),
+                    "compiler_dependency_files": [
+                        entry.payload() for entry in self.compiler_dependency_files
+                    ],
+                    "compiler_dependency_set_sha256": (
+                        self.compiler_dependency_set_sha256
+                    ),
+                }
+            )
+        return payload
 
 
 @dataclass(frozen=True, slots=True)
@@ -106,6 +129,7 @@ def identify_source(
     source_root: Path | str,
     scope_paths: Sequence[str],
     *,
+    compiler_dependency_paths: Sequence[str] = (),
     limits: ScanLimits = ScanLimits(),
 ) -> SourceIdentity:
     root = Path(source_root).resolve()
@@ -117,12 +141,51 @@ def identify_source(
     if len(normalized_scope) != len(set(normalized_scope)):
         raise BountyScopeError("scope paths must not contain duplicates")
     files = _discover_scoped_sources(root, normalized_scope, limits=limits)
+    normalized_dependencies = tuple(
+        _normalized_scope_path(value) for value in compiler_dependency_paths
+    )
+    if len(normalized_dependencies) != len(set(normalized_dependencies)):
+        raise BountyScopeError("compiler dependency paths must not contain duplicates")
+    dependency_files = (
+        _discover_scoped_sources(root, normalized_dependencies, limits=limits)
+        if normalized_dependencies
+        else ()
+    )
+    reportable_names = {entry.relative_path for entry in files}
+    dependency_names = {entry.relative_path for entry in dependency_files}
+    overlap = reportable_names & dependency_names
+    if overlap:
+        raise BountyScopeError(
+            "source unit cannot be both reportable and a compiler dependency: "
+            + sorted(overlap)[0]
+        )
+    if len(files) + len(dependency_files) > limits.max_files:
+        raise BountyScopeError(
+            f"scope and compiler dependencies contain more than {limits.max_files} Solidity files"
+        )
+    if sum(entry.bytes for entry in files + dependency_files) > limits.max_source_bytes:
+        raise BountyScopeError(
+            "scope and compiler dependencies exceed "
+            f"{limits.max_source_bytes} bytes"
+        )
     remappings, remappings_digest = _load_safe_remappings(root)
     source_set = hashlib.sha256()
     for entry in files:
         source_set.update(entry.relative_path.encode("utf-8"))
         source_set.update(b"\0")
         source_set.update(entry.sha256.encode("ascii"))
+        source_set.update(b"\n")
+    dependency_set_digest: str | None = None
+    if dependency_files:
+        dependency_set = hashlib.sha256()
+        for entry in dependency_files:
+            dependency_set.update(entry.relative_path.encode("utf-8"))
+            dependency_set.update(b"\0")
+            dependency_set.update(entry.sha256.encode("ascii"))
+            dependency_set.update(b"\n")
+        dependency_set_digest = dependency_set.hexdigest()
+        source_set.update(b"compiler-dependencies\0")
+        source_set.update(dependency_set_digest.encode("ascii"))
         source_set.update(b"\n")
     if remappings_digest is not None:
         source_set.update(b"config\0remappings.txt\0")
@@ -132,6 +195,9 @@ def identify_source(
         root=root,
         scope_paths=normalized_scope,
         files=files,
+        compiler_dependency_paths=normalized_dependencies,
+        compiler_dependency_files=dependency_files,
+        compiler_dependency_set_sha256=dependency_set_digest,
         source_set_sha256=source_set.hexdigest(),
         remappings=remappings,
         remappings_sha256=remappings_digest,
@@ -141,7 +207,11 @@ def identify_source(
 def validate_profile_source(profile: BountyProfile) -> SourceIdentity:
     if profile.source_kind == "git":
         _validate_git_source(profile)
-    identity = identify_source(profile.source_root, profile.scope_paths)
+    identity = identify_source(
+        profile.source_root,
+        profile.scope_paths,
+        compiler_dependency_paths=profile.compiler_dependency_paths,
+    )
     if (
         profile.source_kind == "directory"
         and identity.source_set_sha256 != profile.source_content_sha256
@@ -170,8 +240,10 @@ def scan_bounty_workspace(workspace: Path | str) -> BountyScanResult:
     if profile.compiler_enabled:
         scoped_compiler = ScopedForgeCompiler(profile, identity)
     scanner = Scanner(compiler=scoped_compiler) if scoped_compiler else Scanner()
+    declared_entries = identity.files + identity.compiler_dependency_files
+    reportable_paths = {entry.path.resolve() for entry in identity.files}
     try:
-        for entry in identity.files:
+        for entry in declared_entries:
             _verify_entry(entry)
         findings, files_scanned = scanner.scan_paths(
             [entry.path for entry in identity.files],
@@ -179,9 +251,14 @@ def scan_bounty_workspace(workspace: Path | str) -> BountyScanResult:
             compile_sources=profile.compiler_enabled,
             compiler_offline=True,
         )
-        for entry in identity.files:
+        for finding in findings:
+            if finding.path.resolve() not in reportable_paths:
+                raise BountyScopeError(
+                    "scanner produced a finding outside reportable scope"
+                )
+        for entry in declared_entries:
             _verify_entry(entry)
-    except ScanError as exc:
+    except (ScanError, CompilerError) as exc:
         raise BountyScopeError(str(exc)) from exc
     relative_findings = tuple(
         replace(finding, path=Path(_relative_to_root(finding.path, profile.source_root)))
@@ -198,7 +275,7 @@ def scan_bounty_workspace(workspace: Path | str) -> BountyScanResult:
         "compiler": {
             "enabled": profile.compiler_enabled,
             "offline": True,
-            "isolation": "staged-approved-sources",
+            "isolation": _compiler_isolation(identity),
             "versions": list(
                 scoped_compiler.compiler_versions if scoped_compiler else ()
             ),
@@ -258,9 +335,17 @@ class ScopedForgeCompiler:
             staged_root = Path(raw)
             staged_to_original: dict[Path, SourceEntry] = {}
             staged_files: list[Path] = []
-            for entry in self.identity.files:
+            declared_entries = (
+                self.identity.files + self.identity.compiler_dependency_files
+            )
+            declared_paths = {entry.path.resolve() for entry in declared_entries}
+            for entry in declared_entries:
                 _verify_entry(entry)
-                _validate_import_paths(entry)
+                _validate_import_paths(
+                    entry,
+                    source_root=self.identity.root,
+                    declared_paths=declared_paths,
+                )
                 staged = staged_root.joinpath(*PurePosixPath(entry.relative_path).parts)
                 staged.parent.mkdir(parents=True, exist_ok=True)
                 shutil.copyfile(entry.path, staged)
@@ -324,7 +409,11 @@ def _source_manifest(
     if profile.source_content_sha256 is not None:
         source["content_sha256"] = profile.source_content_sha256
     payload: dict[str, object] = {
-        "schema_version": SOURCE_MANIFEST_SCHEMA_VERSION,
+        "schema_version": (
+            SOURCE_MANIFEST_DEPENDENCY_SCHEMA_VERSION
+            if identity.compiler_dependency_paths
+            else SOURCE_MANIFEST_SCHEMA_VERSION
+        ),
         "scanner_version": __version__,
         "profile_sha256": profile.digest,
         "source": source,
@@ -334,13 +423,33 @@ def _source_manifest(
         "compiler": {
             "enabled": profile.compiler_enabled,
             "offline": True,
-            "isolation": "staged-approved-sources",
+            "isolation": _compiler_isolation(identity),
             "target_configuration_loaded": False,
             "remappings_sha256": identity.remappings_sha256,
         },
     }
+    if identity.compiler_dependency_paths:
+        payload.update(
+            {
+                "compiler_dependency_paths": list(
+                    identity.compiler_dependency_paths
+                ),
+                "compiler_dependency_files": [
+                    entry.payload() for entry in identity.compiler_dependency_files
+                ],
+                "compiler_dependency_set_sha256": (
+                    identity.compiler_dependency_set_sha256
+                ),
+            }
+        )
     payload["manifest_sha256"] = payload_sha256(payload)
     return payload
+
+
+def _compiler_isolation(identity: SourceIdentity) -> str:
+    if identity.compiler_dependency_paths:
+        return "staged-reportable-sources-and-compiler-dependencies"
+    return "staged-approved-sources"
 
 
 def _discover_scoped_sources(
@@ -511,7 +620,12 @@ def _verify_entry(entry: SourceEntry) -> None:
         raise CompilerError(f"approved source changed during scan: {entry.relative_path}")
 
 
-def _validate_import_paths(entry: SourceEntry) -> None:
+def _validate_import_paths(
+    entry: SourceEntry,
+    *,
+    source_root: Path,
+    declared_paths: set[Path],
+) -> None:
     try:
         text = entry.path.read_text(encoding="utf-8")
     except (OSError, UnicodeError) as exc:
@@ -524,9 +638,19 @@ def _validate_import_paths(entry: SourceEntry) -> None:
             not import_value
             or "\\" in import_value
             or candidate.is_absolute()
-            or ".." in candidate.parts
             or "://" in import_value
         ):
+            raise CompilerError(
+                f"unsafe import path in approved source {entry.relative_path}: {import_value}"
+            )
+        if ".." not in candidate.parts:
+            continue
+        if not import_value.startswith("."):
+            raise CompilerError(
+                f"unsafe import path in approved source {entry.relative_path}: {import_value}"
+            )
+        resolved = entry.path.parent.joinpath(*candidate.parts).resolve()
+        if not _is_relative_to(resolved, source_root) or resolved not in declared_paths:
             raise CompilerError(
                 f"unsafe import path in approved source {entry.relative_path}: {import_value}"
             )

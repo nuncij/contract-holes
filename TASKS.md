@@ -16,10 +16,11 @@ Current-plan limits on private branch protection and secret scanning are
 recorded. The authorized OpenZeppelin Confidential Contracts `v0.4.0` trial
 scanned 22 exact in-scope files privately and source-only at the bounty-pinned
 commit. It produced zero candidates, no proof or report, and no external action.
-The limits of that result and the observed compiler-dependency gap are recorded.
+The limits of that result are recorded. `COMP-003` now closes the observed
+compiler-dependency gap without expanding reportable scope.
 
-Next: **COMP-003 — Design a distinct, immutable compiler-dependency boundary
-without expanding reportable bounty scope.**
+Next: **PILOT-004 — After separate operator approval, run a new private,
+compiler-enabled OpenZeppelin trial with exact reportable and dependency paths.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -472,10 +473,10 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
 ## Observed post-M8 backlog
 
-- [ ] **COMP-003** — Design a separate, immutable, read-only compiler-dependency
+- [x] **COMP-003** — Add a separate, immutable, read-only compiler-dependency
   boundary so exact bounty assets can receive compiler-backed analysis without
   making dependencies reportable or broadening the approved scope — P1 —
-  **NEXT**.
+  **COMPLETE**.
 
   Acceptance criteria:
 
@@ -487,6 +488,23 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   - the current profile schema and source-only behavior remain compatible;
   - tests cover dependency tampering, traversal, symlinks, ambiguous duplicate
     units, and attempted findings from dependency files.
+
+- [ ] **PILOT-004** — Create a new private workspace and run the approved target
+  through offline compiler analysis using exact reportable and compiler-only
+  dependency paths — P1 — **NEXT, REQUIRES SEPARATE OPERATOR APPROVAL**.
+
+  Acceptance criteria:
+
+  - the operator explicitly approves compiler-enabled local analysis of the
+    pinned target before a new scan starts;
+  - the existing source-only workspace and its records remain unchanged;
+  - the new profile pins the same clean commit and separates reportable assets
+    from compiler-only source units;
+  - the scan remains local, private, offline, and performs no target, chain,
+    platform, proof, report, export, or submission action;
+  - results and limitations are added to the private trial evaluation.
+
+  Depends on: `COMP-003`.
 
 ## Definition of done for every task
 

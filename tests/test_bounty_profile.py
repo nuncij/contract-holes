@@ -57,6 +57,7 @@ class BountyProfileTests(unittest.TestCase):
             self.assertEqual(len(loaded.digest), 64)
             normalized = loaded.normalized_payload()
             self.assertEqual(normalized["schema_version"], "1.0")
+            self.assertNotIn("dependency_paths", normalized["compiler"])
             self.assertEqual(normalized["profile_sha256"], loaded.digest)
             self.assertNotIn(str(root.resolve()), json.dumps(normalized))
             self.assertEqual(
@@ -112,6 +113,29 @@ class BountyProfileTests(unittest.TestCase):
             with self.assertRaisesRegex(BountyProfileError, "unknown .* setting"):
                 load_bounty_profile(profile.path)
 
+    def test_rejects_invalid_compiler_dependency_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            with self.assertRaisesRegex(BountyProfileError, "relative and contained"):
+                initialize(
+                    root,
+                    workspace=root / "traversal",
+                    compiler_dependency_paths=["../outside.sol"],
+                )
+            with self.assertRaisesRegex(BountyProfileError, "duplicate scope.paths"):
+                initialize(
+                    root,
+                    workspace=root / "overlap",
+                    compiler_dependency_paths=["src"],
+                )
+            with self.assertRaisesRegex(BountyProfileError, "require compiler.enabled"):
+                initialize(
+                    root,
+                    workspace=root / "source-only",
+                    compiler_enabled=False,
+                    compiler_dependency_paths=["lib/Dependency.sol"],
+                )
+
     def test_python_310_subset_parser_loads_generated_profile(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             profile = initialize(Path(temporary))
@@ -141,8 +165,71 @@ class BountyProfileTests(unittest.TestCase):
         self.assertEqual(schema["properties"]["schema_version"]["const"], "1.0")
         self.assertFalse(schema["additionalProperties"])
 
+        dependency_schema = json.loads(
+            files("contract_holes")
+            .joinpath("schemas/bounty-profile-1.1.schema.json")
+            .read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            dependency_schema["properties"]["schema_version"]["const"],
+            "1.1",
+        )
+        self.assertIn(
+            "dependency_paths",
+            dependency_schema["properties"]["compiler"]["properties"],
+        )
+
 
 class BountyProfileCliTests(unittest.TestCase):
+    def test_init_records_compiler_only_dependency_paths(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            source = root / "target"
+            source.mkdir()
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                status = main(
+                    [
+                        "bounty",
+                        "init",
+                        str(root / "review"),
+                        "--program",
+                        "Example Protocol",
+                        "--platform",
+                        "Example Bounty",
+                        "--rules-url",
+                        "https://example.test/rules",
+                        "--reviewed-on",
+                        "2026-08-10",
+                        "--authorized",
+                        "--authorization-note",
+                        "Local compiler analysis is in scope",
+                        "--source",
+                        str(source),
+                        "--revision",
+                        REVISION,
+                        "--scope",
+                        "contracts/Vault.sol",
+                        "--compiler-dependency",
+                        "lib/Dependency.sol",
+                        "--impact",
+                        "Loss of funds",
+                    ]
+                )
+
+            payload = json.loads(output.getvalue())
+            self.assertEqual(status, 0)
+            self.assertEqual(payload["profile"]["schema_version"], "1.1")
+            self.assertEqual(
+                payload["profile"]["compiler"]["dependency_paths"],
+                ["lib/Dependency.sol"],
+            )
+            loaded = load_bounty_profile(root / "review")
+            self.assertEqual(
+                loaded.compiler_dependency_paths,
+                ("lib/Dependency.sol",),
+            )
+
     def test_init_and_validate_emit_versioned_json(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

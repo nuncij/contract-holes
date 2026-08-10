@@ -25,6 +25,7 @@ class BountyProfileError(RuntimeError):
 PROFILE_FILENAME = "bounty.toml"
 PROFILE_SCHEMA_VERSION = 1
 PROFILE_NORMALIZED_SCHEMA_VERSION = "1.0"
+PROFILE_DEPENDENCY_SCHEMA_VERSION = "1.1"
 GIT_REVISION_PATTERN = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
 SHA256_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
 
@@ -47,6 +48,7 @@ class BountyProfile:
     restrictions: tuple[str, ...]
     compiler_enabled: bool
     compiler_offline: bool
+    compiler_dependency_paths: tuple[str, ...]
 
     @property
     def workspace(self) -> Path:
@@ -70,8 +72,18 @@ class BountyProfile:
             source["revision"] = self.source_revision
         if self.source_content_sha256 is not None:
             source["content_sha256"] = self.source_content_sha256
+        compiler: dict[str, object] = {
+            "enabled": self.compiler_enabled,
+            "offline": self.compiler_offline,
+        }
+        if self.compiler_dependency_paths:
+            compiler["dependency_paths"] = list(self.compiler_dependency_paths)
         payload: dict[str, object] = {
-            "schema_version": PROFILE_NORMALIZED_SCHEMA_VERSION,
+            "schema_version": (
+                PROFILE_DEPENDENCY_SCHEMA_VERSION
+                if self.compiler_dependency_paths
+                else PROFILE_NORMALIZED_SCHEMA_VERSION
+            ),
             "program": {
                 "name": self.program_name,
                 "platform": self.platform,
@@ -86,10 +98,7 @@ class BountyProfile:
                 "impacts": list(self.impacts),
                 "restrictions": list(self.restrictions),
             },
-            "compiler": {
-                "enabled": self.compiler_enabled,
-                "offline": self.compiler_offline,
-            },
+            "compiler": compiler,
         }
         if include_digest:
             payload["profile_sha256"] = self.digest
@@ -112,6 +121,7 @@ def initialize_bounty_workspace(
     impacts: list[str] | tuple[str, ...],
     restrictions: list[str] | tuple[str, ...] = (),
     compiler_enabled: bool = True,
+    compiler_dependency_paths: list[str] | tuple[str, ...] = (),
 ) -> BountyProfile:
     destination = Path(workspace).resolve()
     source = Path(source_root).resolve()
@@ -150,6 +160,11 @@ def initialize_bounty_workspace(
         "compiler": {
             "enabled": compiler_enabled,
             "offline": True,
+            **(
+                {"dependency_paths": list(compiler_dependency_paths)}
+                if compiler_dependency_paths
+                else {}
+            ),
         },
     }
     _validate_payload(payload, destination / PROFILE_FILENAME, require_source=False)
@@ -239,7 +254,11 @@ def _validate_payload(
         "[source]",
     )
     _unknown_keys(scope, {"paths", "impacts", "restrictions"}, "[scope]")
-    _unknown_keys(compiler, {"enabled", "offline"}, "[compiler]")
+    _unknown_keys(
+        compiler,
+        {"enabled", "offline", "dependency_paths"},
+        "[compiler]",
+    )
 
     program_name = _nonempty_string(program.get("name"), "program.name")
     platform = _nonempty_string(program.get("platform"), "program.platform")
@@ -312,6 +331,20 @@ def _validate_payload(
     )
     compiler_enabled = _boolean(compiler.get("enabled"), "compiler.enabled")
     compiler_offline = _boolean(compiler.get("offline"), "compiler.offline")
+    dependency_paths = tuple(
+        _string_list(compiler.get("dependency_paths", []), "compiler.dependency_paths")
+    )
+    normalized_dependencies = tuple(_scope_path(value) for value in dependency_paths)
+    if len(normalized_dependencies) != len(set(normalized_dependencies)):
+        raise BountyProfileError("compiler.dependency_paths must not contain duplicates")
+    if set(normalized_dependencies) & set(normalized_paths):
+        raise BountyProfileError(
+            "compiler.dependency_paths must not duplicate scope.paths"
+        )
+    if normalized_dependencies and not compiler_enabled:
+        raise BountyProfileError(
+            "compiler.dependency_paths require compiler.enabled to be true"
+        )
     if not compiler_offline:
         raise BountyProfileError("compiler.offline must be true in bounty profiles")
 
@@ -332,6 +365,7 @@ def _validate_payload(
         restrictions=restrictions,
         compiler_enabled=compiler_enabled,
         compiler_offline=compiler_offline,
+        compiler_dependency_paths=normalized_dependencies,
     )
 
 
@@ -375,10 +409,11 @@ def _render_profile(payload: dict[str, object]) -> str:
             "",
             "[compiler]",
             f"enabled = {'true' if compiler['enabled'] else 'false'}",
-            "offline = true",
-            "",
         ]
     )
+    if "dependency_paths" in compiler:
+        lines.append(f"dependency_paths = {_toml_array(compiler['dependency_paths'])}")
+    lines.extend(["offline = true", ""])
     return "\n".join(lines)
 
 

@@ -500,6 +500,13 @@ def bounty_parser() -> argparse.ArgumentParser:
         help="program restriction (repeatable)",
     )
     initialize.add_argument(
+        "--compiler-dependency",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="compiler-only relative Solidity path (repeatable)",
+    )
+    initialize.add_argument(
         "--source-only",
         action="store_true",
         help="disable compiler analysis; bounty compiler mode is offline by default",
@@ -526,6 +533,13 @@ def bounty_parser() -> argparse.ArgumentParser:
         required=True,
         metavar="PATH",
         help="approved relative source path (repeatable)",
+    )
+    identify.add_argument(
+        "--compiler-dependency",
+        action="append",
+        default=[],
+        metavar="PATH",
+        help="compiler-only relative Solidity path (repeatable)",
     )
     scan = commands.add_parser(
         "scan",
@@ -1060,6 +1074,7 @@ def _bounty_main(argv: Sequence[str]) -> int:
                 impacts=args.impact,
                 restrictions=args.restriction,
                 compiler_enabled=not args.source_only,
+                compiler_dependency_paths=args.compiler_dependency,
             )
             command = "bounty.init"
             status = "created"
@@ -1082,7 +1097,11 @@ def _bounty_main(argv: Sequence[str]) -> int:
                 "profile": profile.normalized_payload(),
             }
         elif args.bounty_command == "identify":
-            identity = identify_source(args.source, args.scope)
+            identity = identify_source(
+                args.source,
+                args.scope,
+                compiler_dependency_paths=args.compiler_dependency,
+            )
             payload = {
                 "schema_version": "1.0",
                 "command": "bounty.identify",

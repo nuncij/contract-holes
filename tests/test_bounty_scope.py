@@ -4,6 +4,7 @@ from importlib.resources import files
 import json
 import os
 from pathlib import Path
+import shutil
 import subprocess
 import tempfile
 import unittest
@@ -25,6 +26,7 @@ from contract_holes.bounty_scope import (
 )
 from contract_holes.cli import main
 from contract_holes.compiler import CompilationResult, CompiledSource, CompilerError
+from contract_holes.models import Finding, Severity
 from contract_holes.process_environment import sanitized_subprocess_environment
 
 
@@ -42,10 +44,15 @@ def directory_profile(
     root: Path,
     *,
     scope: tuple[str, ...] = ("src",),
+    compiler_dependencies: tuple[str, ...] = (),
     compiler_enabled: bool = False,
 ):
     target = root / "target"
-    identity = identify_source(target, scope)
+    identity = identify_source(
+        target,
+        scope,
+        compiler_dependency_paths=compiler_dependencies,
+    )
     return initialize_bounty_workspace(
         root / "review",
         program_name="Example Protocol",
@@ -61,6 +68,7 @@ def directory_profile(
         impacts=["Unauthorized privileged operation"],
         restrictions=["No live-network testing"],
         compiler_enabled=compiler_enabled,
+        compiler_dependency_paths=compiler_dependencies,
     )
 
 
@@ -72,6 +80,46 @@ def create_source(root: Path, relative: str = "src/Vault.sol") -> Path:
 
 
 class BountyScopeTests(unittest.TestCase):
+    def test_identity_separately_hashes_compiler_dependencies(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            create_source(root, "src/Vault.sol")
+            dependency = create_source(root, "lib/Dependency.sol")
+
+            first = identify_source(
+                root / "target",
+                ["src/Vault.sol"],
+                compiler_dependency_paths=["lib/Dependency.sol"],
+            )
+            self.assertEqual(
+                [entry.relative_path for entry in first.files],
+                ["src/Vault.sol"],
+            )
+            self.assertEqual(
+                [entry.relative_path for entry in first.compiler_dependency_files],
+                ["lib/Dependency.sol"],
+            )
+            self.assertEqual(len(first.compiler_dependency_set_sha256), 64)
+
+            dependency.write_text(VULNERABLE_SOURCE + "\n", encoding="utf-8")
+            changed = identify_source(
+                root / "target",
+                ["src/Vault.sol"],
+                compiler_dependency_paths=["lib/Dependency.sol"],
+            )
+            self.assertNotEqual(
+                first.compiler_dependency_set_sha256,
+                changed.compiler_dependency_set_sha256,
+            )
+            self.assertNotEqual(first.source_set_sha256, changed.source_set_sha256)
+
+            with self.assertRaisesRegex(BountyScopeError, "both reportable"):
+                identify_source(
+                    root / "target",
+                    ["src"],
+                    compiler_dependency_paths=["src/Vault.sol"],
+                )
+
     def test_directory_scan_writes_reproducible_relative_private_records(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -122,6 +170,23 @@ class BountyScopeTests(unittest.TestCase):
             with self.assertRaisesRegex(BountyScopeError, "content_sha256"):
                 validate_profile_source(profile)
 
+    def test_directory_identity_fails_after_compiler_dependency_changes(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            create_source(root, "src/Vault.sol")
+            dependency = create_source(root, "lib/Dependency.sol")
+            profile = directory_profile(
+                root,
+                scope=("src/Vault.sol",),
+                compiler_dependencies=("lib/Dependency.sol",),
+                compiler_enabled=True,
+            )
+            validate_profile_source(profile)
+
+            dependency.write_text(VULNERABLE_SOURCE + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(BountyScopeError, "content_sha256"):
+                validate_profile_source(profile)
+
     def test_scope_excludes_unapproved_source_and_rejects_symlink_escape(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -140,6 +205,12 @@ class BountyScopeTests(unittest.TestCase):
                 link.symlink_to(root / "target" / "outside" / "Unapproved.sol")
                 with self.assertRaisesRegex(BountyScopeError, "symlink"):
                     identify_source(root / "target", ["linked.sol"])
+                with self.assertRaisesRegex(BountyScopeError, "symlink"):
+                    identify_source(
+                        root / "target",
+                        ["src/Approved.sol"],
+                        compiler_dependency_paths=["linked.sol"],
+                    )
 
     def test_rejects_remapping_that_escapes_source_root(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -248,6 +319,138 @@ class BountyScopeTests(unittest.TestCase):
             with self.assertRaisesRegex(CompilerError, "out-of-scope"):
                 compiler.compile([root / "target" / "outside.sol"], offline=True)
 
+    def test_scoped_compiler_stages_dependencies_without_requesting_them(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            reportable = create_source(root, "src/Vault.sol")
+            reportable.write_text(
+                'pragma solidity ^0.8.20; import "lib/Dependency.sol"; contract Vault is Dependency {}\n',
+                encoding="utf-8",
+            )
+            dependency = create_source(root, "lib/Dependency.sol")
+            profile = directory_profile(
+                root,
+                scope=("src/Vault.sol",),
+                compiler_dependencies=("lib/Dependency.sol",),
+                compiler_enabled=True,
+            )
+            identity = validate_profile_source(profile)
+
+            class Delegate:
+                def compile(self, files, *, project_root=None, offline=False):
+                    self.requested = [path.relative_to(project_root).as_posix() for path in files]
+                    staged_dependency = project_root / "lib/Dependency.sol"
+                    self.dependency_exists = staged_dependency.is_file()
+                    staged_reportable = project_root / "src/Vault.sol"
+                    return CompilationResult(
+                        sources=(
+                            CompiledSource(
+                                path=staged_reportable,
+                                source_id=0,
+                                compilation_id="safe-build",
+                                ast={"nodeType": "SourceUnit", "src": "0:1:0"},
+                                content=staged_reportable.read_text(encoding="utf-8"),
+                            ),
+                            CompiledSource(
+                                path=staged_dependency,
+                                source_id=1,
+                                compilation_id="safe-build",
+                                ast={"nodeType": "SourceUnit", "src": "0:1:1"},
+                                content=staged_dependency.read_text(encoding="utf-8"),
+                            ),
+                        ),
+                        compiler_versions=("0.8.25",),
+                        diagnostics=(),
+                    )
+
+            delegate = Delegate()
+            compiler = ScopedForgeCompiler(profile, identity, delegate=delegate)
+            result = compiler.compile([reportable], offline=True)
+
+            self.assertEqual(delegate.requested, ["src/Vault.sol"])
+            self.assertTrue(delegate.dependency_exists)
+            self.assertEqual(
+                {source.path for source in result.sources},
+                {reportable.resolve(), dependency.resolve()},
+            )
+
+    @unittest.skipUnless(shutil.which("forge"), "Foundry is required")
+    def test_compiler_dependencies_cannot_create_reportable_findings(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            reportable = create_source(root, "src/Vault.sol")
+            reportable.write_text(
+                'pragma solidity ^0.8.20; import "lib/Dependency.sol"; contract Vault is Dependency {}\n',
+                encoding="utf-8",
+            )
+            dependency = create_source(root, "lib/Dependency.sol")
+            dependency.write_text(
+                "pragma solidity ^0.8.20; abstract contract Dependency {"
+                "function unsafeOrigin() external view returns (bool) {"
+                "return tx.origin == msg.sender; }}\n",
+                encoding="utf-8",
+            )
+            profile = directory_profile(
+                root,
+                scope=("src/Vault.sol",),
+                compiler_dependencies=("lib/Dependency.sol",),
+                compiler_enabled=True,
+            )
+
+            result = scan_bounty_workspace(profile.workspace)
+
+            self.assertEqual(result.scan_record["report"]["files_scanned"], 1)
+            self.assertEqual(result.scan_record["report"]["finding_count"], 0)
+            self.assertEqual(result.source_manifest["schema_version"], "1.1")
+            self.assertEqual(
+                result.source_manifest["compiler_dependency_paths"],
+                ["lib/Dependency.sol"],
+            )
+            self.assertEqual(
+                [
+                    entry["path"]
+                    for entry in result.source_manifest["compiler_dependency_files"]
+                ],
+                ["lib/Dependency.sol"],
+            )
+
+    def test_scan_rejects_finding_for_compiler_only_dependency(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            create_source(root, "src/Vault.sol")
+            dependency = create_source(root, "lib/Dependency.sol")
+            profile = directory_profile(
+                root,
+                scope=("src/Vault.sol",),
+                compiler_dependencies=("lib/Dependency.sol",),
+                compiler_enabled=True,
+            )
+            finding = Finding(
+                rule_id="SOL003",
+                severity=Severity.HIGH,
+                title="Dependency finding",
+                message="must not be reportable",
+                path=dependency,
+                line=1,
+                column=1,
+                excerpt="dependency",
+                recommendation="none",
+            )
+
+            class ScannerOutsideReportableScope:
+                def __init__(self, **kwargs):
+                    pass
+
+                def scan_paths(self, paths, **kwargs):
+                    return [finding], len(list(paths))
+
+            with patch(
+                "contract_holes.bounty_scope.Scanner",
+                ScannerOutsideReportableScope,
+            ):
+                with self.assertRaisesRegex(BountyScopeError, "outside reportable scope"):
+                    scan_bounty_workspace(profile.workspace)
+
     def test_scoped_compiler_rejects_traversal_and_absolute_imports(self) -> None:
         for imported in ("../outside.sol", "/tmp/outside.sol", "https://evil.test/X.sol"):
             with self.subTest(imported=imported), tempfile.TemporaryDirectory() as temporary:
@@ -269,6 +472,55 @@ class BountyScopeTests(unittest.TestCase):
                 )
                 with self.assertRaisesRegex(CompilerError, "unsafe import path"):
                     compiler.compile([source], offline=True)
+
+    def test_scoped_compiler_allows_declared_contained_parent_import(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            reportable = create_source(root, "contracts/Vault.sol")
+            reportable.write_text(
+                'pragma solidity ^0.8.20; import "../lib/Dependency.sol"; contract Vault is Dependency {}\n',
+                encoding="utf-8",
+            )
+            create_source(root, "lib/Dependency.sol")
+            profile = directory_profile(
+                root,
+                scope=("contracts/Vault.sol",),
+                compiler_dependencies=("lib/Dependency.sol",),
+                compiler_enabled=True,
+            )
+            identity = validate_profile_source(profile)
+
+            class Delegate:
+                def compile(self, files, *, project_root=None, offline=False):
+                    staged_reportable = project_root / "contracts/Vault.sol"
+                    staged_dependency = project_root / "lib/Dependency.sol"
+                    return CompilationResult(
+                        sources=tuple(
+                            CompiledSource(
+                                path=path,
+                                source_id=index,
+                                compilation_id="safe-build",
+                                ast={
+                                    "nodeType": "SourceUnit",
+                                    "src": f"0:1:{index}",
+                                },
+                                content=path.read_text(encoding="utf-8"),
+                            )
+                            for index, path in enumerate(
+                                (staged_reportable, staged_dependency)
+                            )
+                        ),
+                        compiler_versions=("0.8.25",),
+                        diagnostics=(),
+                    )
+
+            result = ScopedForgeCompiler(
+                profile,
+                identity,
+                delegate=Delegate(),
+            ).compile([reportable], offline=True)
+
+            self.assertEqual(len(result.sources), 2)
 
     def test_private_records_refuse_tampering_and_symlinks(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
@@ -328,10 +580,51 @@ class BountyScopeTests(unittest.TestCase):
             )
         )
         self.assertEqual(source_schema["properties"]["schema_version"]["const"], "1.0")
+        dependency_schema = json.loads(
+            schema_directory.joinpath(
+                "bounty-source-manifest-1.1.schema.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            dependency_schema["properties"]["schema_version"]["const"],
+            "1.1",
+        )
+        self.assertIn("compiler_dependency_files", dependency_schema["required"])
         self.assertEqual(scan_schema["properties"]["command"]["const"], "bounty.scan")
 
 
 class BountyScopeCliTests(unittest.TestCase):
+    def test_identify_includes_compiler_only_dependencies(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            create_source(root, "src/Vault.sol")
+            create_source(root, "lib/Dependency.sol")
+            output = io.StringIO()
+            with contextlib.redirect_stdout(output):
+                status = main(
+                    [
+                        "bounty",
+                        "identify",
+                        str(root / "target"),
+                        "--scope",
+                        "src/Vault.sol",
+                        "--compiler-dependency",
+                        "lib/Dependency.sol",
+                    ]
+                )
+
+            payload = json.loads(output.getvalue())
+            self.assertEqual(status, 0)
+            self.assertEqual(payload["source"]["schema_version"], "1.1")
+            self.assertEqual(
+                payload["source"]["compiler_dependency_paths"],
+                ["lib/Dependency.sol"],
+            )
+            self.assertEqual(
+                [entry["path"] for entry in payload["source"]["files"]],
+                ["src/Vault.sol"],
+            )
+
     def test_identify_then_source_only_scan(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

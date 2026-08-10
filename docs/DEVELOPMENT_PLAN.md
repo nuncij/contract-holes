@@ -3,8 +3,8 @@
 Last updated: 2026-08-10
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Design an immutable compiler-dependency boundary without expanding
-reportable bounty scope (`COMP-003`).**
+Next: **Obtain separate approval for a compiler-enabled OpenZeppelin trial
+(`PILOT-004`).**
 
 ## Product goal
 
@@ -402,8 +402,20 @@ Completed on 2026-08-10. The authorized OpenZeppelin Confidential Contracts
 and performed no proof, report, disclosure, submission, or deployed-network
 action. The clean result has undefined precision and unknown recall. See the
 [M8 trial evaluation](research/M8_OPENZEPPELIN_TRIAL.md). The only accepted new
-task is `COMP-003`, which addresses the observed separation between reportable
-assets and compiler-only dependencies.
+task was `COMP-003`, which now separates reportable assets from immutable,
+compiler-only dependencies. A new compiler-enabled trial is queued as
+`PILOT-004`, but it requires separate operator approval and a new private
+workspace; the source-only evidence remains unchanged.
+
+### Post-M8 — Compiler-only dependency boundary
+
+`COMP-003` is complete. Bounty profiles can now declare repeatable compiler-only
+Solidity paths separately from reportable `scope.paths`. Both sets are explicit,
+content-bound, staged into the fixed offline compiler project, and rechecked for
+tampering. Only reportable files are requested for scanning, and findings outside
+that set fail closed. Profiles and source manifests using this feature emit their
+additive `1.1` normalized record schemas; existing workspaces retain `1.0` digest
+material and behavior.
 
 ## Engineering rules
 

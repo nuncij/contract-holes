@@ -73,6 +73,8 @@ contact any external service:
 holes bounty init --help
 holes bounty validate PRIVATE_WORKSPACE
 holes bounty identify TARGET --scope contracts
+holes bounty identify TARGET --scope contracts/Vault.sol \
+  --compiler-dependency lib/Dependency.sol
 holes bounty scan PRIVATE_WORKSPACE
 holes bounty candidates PRIVATE_WORKSPACE
 holes bounty review --help
@@ -353,7 +355,10 @@ The latest release is `1.1.1`; M7 Bounty Hunter Mode and M8 private real-world
 validation are complete. The authorized OpenZeppelin Confidential Contracts
 `v0.4.0` source-only trial scanned 22 exact files at the bounty-pinned commit,
 produced zero candidates, and performed no proof, report, submission, or other
-external action. The clean result is not an audit or completeness claim.
+external action. The clean result is not an audit or completeness claim. The
+unreleased compiler-dependency boundary can now stage separately hashed,
+compiler-only Solidity inputs while findings remain restricted to reportable
+scope; a new target scan still requires separate operator approval.
 The compiler index, inheritance
 resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,

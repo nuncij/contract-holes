@@ -92,8 +92,11 @@ candidates, reviews, proofs/results, reports/inputs, approvals, historical
 evaluation, and the authorized pilot. These records are not additions to the
 ordinary report schema and must not be sent to a generic 1.0 report consumer.
 
-The initial bounty record versions are all `1.0`, independently of package
-version `1.1.0`. Their compatibility policy is:
+The initial bounty record versions are `1.0`, independently of package version
+`1.1.0`. Profiles and source manifests that declare compiler-only dependencies
+use additive schema `1.1`; records without that feature remain `1.0` with
+unchanged digest material. The scan record remains `1.0`. Their compatibility
+policy is:
 
 - an additive optional field requires a record-schema minor version;
 - removing, renaming, or changing a required field or digest definition requires

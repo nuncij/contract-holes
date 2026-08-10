@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://contract-holes.dev/schemas/bounty-source-manifest-1.1.schema.json",
+  "title": "Contract Holes bounty source manifest 1.1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "scanner_version",
+    "profile_sha256",
+    "source",
+    "scope_paths",
+    "files",
+    "compiler_dependency_paths",
+    "compiler_dependency_files",
+    "compiler_dependency_set_sha256",
+    "source_set_sha256",
+    "compiler",
+    "manifest_sha256"
+  ],
+  "properties": {
+    "schema_version": { "const": "1.1" },
+    "scanner_version": { "type": "string", "minLength": 1 },
+    "profile_sha256": { "$ref": "#/$defs/digest" },
+    "source": { "type": "object" },
+    "scope_paths": { "$ref": "#/$defs/nonemptyUniqueTextArray" },
+    "files": { "$ref": "#/$defs/nonemptySourceArray" },
+    "compiler_dependency_paths": {
+      "$ref": "#/$defs/nonemptyUniqueTextArray"
+    },
+    "compiler_dependency_files": { "$ref": "#/$defs/nonemptySourceArray" },
+    "compiler_dependency_set_sha256": { "$ref": "#/$defs/digest" },
+    "source_set_sha256": { "$ref": "#/$defs/digest" },
+    "compiler": { "type": "object" },
+    "manifest_sha256": { "$ref": "#/$defs/digest" }
+  },
+  "$defs": {
+    "digest": { "type": "string", "pattern": "^[0-9a-f]{64}$" },
+    "text": { "type": "string", "minLength": 1 },
+    "nonemptyUniqueTextArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/text" },
+      "uniqueItems": true
+    },
+    "source": {
+      "type": "object",
+      "required": ["path", "sha256", "bytes"],
+      "properties": {
+        "path": { "$ref": "#/$defs/text" },
+        "sha256": { "$ref": "#/$defs/digest" },
+        "bytes": { "type": "integer", "minimum": 0 }
+      },
+      "additionalProperties": false
+    },
+    "nonemptySourceArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": { "$ref": "#/$defs/source" }
+    }
+  },
+  "additionalProperties": false
+}

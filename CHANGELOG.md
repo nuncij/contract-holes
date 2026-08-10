@@ -5,6 +5,17 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ## Unreleased
 
+### Bounty workflow
+
+- Added repeatable `--compiler-dependency` paths to bounty initialization and
+  source identification. These Solidity units are separately hashed, staged only
+  for fixed offline compilation, and cannot produce reportable findings.
+- Added additive normalized profile and source-manifest schemas `1.1`; existing
+  profiles without compiler-only dependencies retain schema `1.0` digest
+  material and behavior.
+- Reject dependency tampering, traversal, symlinks, overlap with reportable
+  source units, unsafe imports, and findings attributed outside reportable scope.
+
 ### Validation
 
 - Completed the first authorized external source-only trial against the exact

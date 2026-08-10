@@ -24,6 +24,7 @@ holes bounty init ../private-example-review \
   --source ./example-protocol \
   --revision 0123456789abcdef0123456789abcdef01234567 \
   --scope contracts \
+  --compiler-dependency lib/openzeppelin-contracts/contracts/access/Ownable.sol \
   --impact "Unauthorized withdrawal of user funds" \
   --restriction "No live-network testing"
 ```
@@ -43,13 +44,21 @@ its deterministic source manifest:
 Generate the non-Git identity with the local-only command:
 
 ```bash
-holes bounty identify ./source-snapshot --scope contracts
+holes bounty identify ./source-snapshot \
+  --scope contracts \
+  --compiler-dependency lib/openzeppelin-contracts/contracts/access/Ownable.sol
 ```
 
 It hashes normalized relative Solidity paths, file bytes, and a safe
 `remappings.txt` when present. Copy `source.source_set_sha256` into
 `--content-sha256`; do not invent a digest from an archive with unstable
 metadata.
+
+Use repeatable `--compiler-dependency PATH` arguments only for Solidity source
+units needed to compile the reportable files. These paths are immutable compiler
+inputs, not reportable bounty assets. They cannot produce findings or candidates.
+Do not use the option to enlarge scope; only the program's reviewed scope belongs
+under `--scope`.
 
 Compiler analysis is enabled and offline by default. `--source-only` records an
 explicit source-only profile. Bounty profiles cannot enable online compiler
@@ -96,6 +105,7 @@ restrictions = ["No live-network testing"]
 
 [compiler]
 enabled = true
+dependency_paths = ["lib/openzeppelin-contracts/contracts/access/Ownable.sol"]
 offline = true
 ```
 
@@ -106,12 +116,19 @@ paths relative to the target root; absolute paths, `..`, backslashes, empty
 scope, and duplicates are rejected. At least one in-scope impact and a non-empty
 authorization note are required.
 
+Compiler dependency paths use the same path rules. They must not overlap a
+reportable source unit, require compiler mode, and are separately listed and
+hashed. `--source-only` and compiler dependencies cannot be combined.
+
 The source root is stored relative to the workspace for portability. The
 resolved target must exist when loading a profile, and the workspace cannot be
 inside that target.
 
 The normalized representation is described by the packaged
-`bounty-profile-1.0.schema.json`. TOML remains the editable source of truth.
+`bounty-profile-1.0.schema.json`. Profiles with compiler-only dependencies use
+the additive `bounty-profile-1.1.schema.json`. Existing profiles without the new
+field remain schema `1.0` with unchanged digest material. TOML remains the
+editable source of truth.
 
 ## Validate scope and scan
 
@@ -128,9 +145,9 @@ closed.
 
 The command writes two private, deterministic records:
 
-- `source-manifest.json` binds the profile, scanner, source identity, approved
-  relative paths, byte counts and hashes, remappings, and compiler-isolation
-  policy;
+- `source-manifest.json` binds the profile, scanner, source identity, reportable
+  and compiler-only relative paths, their separate byte counts and hashes,
+  remappings, and compiler-isolation policy;
 - `scan.json` binds that manifest to the relative-path scanner report and exact
   compiler policy/version observations.
 
@@ -138,19 +155,25 @@ Records use mode `0600` where supported, are created atomically, and are
 accepted on a repeat run only when their complete bytes are identical. Changed
 or symlinked records are never overwritten.
 
-Source-only mode reads only approved Solidity files. Compiler mode rechecks and
-copies those files into a temporary project, writes a fixed safe
+Source-only mode reads only reportable Solidity files. Compiler mode rechecks and
+copies reportable plus explicitly declared compiler-only files into a temporary
+project, writes a fixed safe
 `foundry.toml`, carries forward only contained `remappings.txt` entries, runs
 Foundry offline, and rejects build information containing any source unit or
-literal bytes outside the approved manifest. The target's `foundry.toml`, tests,
+literal bytes outside the declared sets. Only reportable files are scanned; a
+finding attributed to a compiler-only file fails the scan. The target's
+`foundry.toml`, tests,
 scripts, hooks, plugins, output, and cache are not loaded or executed.
 
-Imports containing absolute paths, `..`, backslashes, or URLs are rejected
-before Foundry starts. A target needing unsafe or unsupported build behavior is
-reported as an execution error; the bounty workflow does not weaken isolation
-to make it compile.
+Absolute paths, backslashes, URLs, and parent imports that escape the source root
+or resolve to an undeclared file are rejected before Foundry starts. A contained
+parent import is accepted only when its resolved source unit is explicitly
+declared. A target needing unsafe or unsupported build behavior is reported as
+an execution error; the bounty workflow does not weaken isolation to make it
+compile.
 
-Packaged schemas `bounty-source-manifest-1.0.schema.json` and
+Packaged schemas `bounty-source-manifest-1.0.schema.json`,
+`bounty-source-manifest-1.1.schema.json`, and
 `bounty-scan-1.0.schema.json` describe these records. Status `0` means a complete
 scan, including one with findings. Status `2` means profile, provenance, scope,
 compiler, record-integrity, or execution failure; it is never a clean result.

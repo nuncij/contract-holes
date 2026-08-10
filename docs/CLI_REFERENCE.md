@@ -104,16 +104,20 @@ Create or validate a private, human-approved bounty research workspace. `init`
 requires program identity, an HTTPS rules URL and review date, explicit
 authorization acknowledgement, a local source, an immutable Git revision or
 directory-manifest digest, in-scope paths, and in-scope impacts. Compiler mode is
-offline by default; `--source-only` disables it. `validate` emits the normalized
+offline by default; `--source-only` disables it. Repeatable
+`--compiler-dependency PATH` options declare immutable Solidity inputs needed for
+compilation but excluded from reportable scope. `validate` emits the normalized
 profile and its SHA-256 identity.
 
 The workspace must be new and outside the target tree. These commands do not
 submit, upload, send transactions, or contact a remote RPC endpoint.
-`identify SOURCE --scope PATH` computes a local deterministic source-set digest.
+`identify SOURCE --scope PATH [--compiler-dependency PATH]` computes a local
+deterministic source-set digest and separately hashes compiler-only inputs.
 `scan WORKSPACE` validates an exact clean Git commit or directory digest,
-enforces approved paths and symlink/remapping boundaries, stages only approved
-source, compiles offline under fixed configuration when enabled, and writes
-private source/scan records. See the [bounty profile contract](BOUNTY_PROFILE.md).
+enforces declared paths and symlink/remapping boundaries, stages only reportable
+and compiler-only source, scans only reportable files, compiles offline under
+fixed configuration when enabled, and writes private source/scan records. See
+the [bounty profile contract](BOUNTY_PROFILE.md).
 
 `candidates WORKSPACE [--state STATE]` lists stable observations, current human
 review state, and transparent review-priority components. `review WORKSPACE
