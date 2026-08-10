@@ -34,7 +34,7 @@ jobs:
         run: python -m pip install --no-deps -e .
       - name: Cache the tested Solidity compiler
         run: >-
-          holes tests/fixtures/compatibility/Compatibility.sol
+          holes tests/fixtures/m2_corpus
           --compile --online --format json
           > "${RUNNER_TEMP}/compiler-smoke.json"
       - name: Run the complete test suite

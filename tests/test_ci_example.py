@@ -70,6 +70,11 @@ class CiExampleTests(unittest.TestCase):
         self.assertIn("actions/setup-python@v6", content)
         self.assertIn("foundry-rs/foundry-toolchain@v1", content)
         self.assertIn("version: v1.7.1", content)
+        self.assertIn("tests/fixtures/m2_corpus", content)
+        self.assertNotIn(
+            "tests/fixtures/compatibility/Compatibility.sol",
+            content,
+        )
         self.assertIn("--compile --online --format json", content)
         self.assertIn("python -m unittest discover -s tests -q", content)
         self.assertIn("python -m pip install -r requirements/release.txt", content)
