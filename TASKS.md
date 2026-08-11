@@ -16,11 +16,13 @@ Current-plan limits on private branch protection and secret scanning are
 recorded. The authorized OpenZeppelin Confidential Contracts `v0.4.0` trials
 now cover both source-only and offline compiler analysis at the bounty-pinned
 commit. The compiler trial kept 22 reportable files separate from 58 exact
-compiler-only dependencies and materialized 51 private candidates in state
-`new`. No candidate is a confirmed bug, and no proof, report, export,
-disclosure, submission, chain action, or target interaction occurred.
+compiler-only dependencies and materialized 51 private candidates. Human review
+rejected 50 false positives and left one candidate under investigation. No
+candidate is confirmed, and no proof, report, export, disclosure, submission,
+chain action, or target interaction occurred.
 
-Next: **PILOT-005 — Human review of the 51 private compiler candidates.**
+Next: **PILOT-006 — Resolve the sole investigating candidate behind a separate
+offline-proof approval gate.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -506,9 +508,8 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
   Depends on: `COMP-003`.
 
-- [ ] **PILOT-005** — Review the 51 compiler-backed candidates against the
-  pinned source and program impact rules — P1 — **NEXT, REQUIRES OPERATOR REVIEW
-  INPUT**.
+- [x] **PILOT-005** — Review the 51 compiler-backed candidates against the
+  pinned source and program impact rules — P1 — **COMPLETE**.
 
   Acceptance criteria:
 
@@ -521,6 +522,41 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   - only observed, labelled gaps become product work items.
 
   Depends on: `PILOT-004`.
+
+- [ ] **PILOT-006** — Resolve the sole investigating candidate with focused
+  trust-boundary analysis and, only after separate approval, an offline local
+  proof — P1 — **NEXT, REQUIRES SEPARATE PROOF APPROVAL**.
+
+  Acceptance criteria:
+
+  - the exact candidate ID and evidence remain only in the private workspace;
+  - analysis determines whether the reported call can reach an untrusted
+    callback in the approved reference integration;
+  - proof generation or execution begins only after explicit operator approval
+    and remains local, isolated, and offline;
+  - a human decision records either rejection or confirmation with a concrete
+    in-scope impact;
+  - no report, approval, export, disclosure, submission, chain action, or target
+    contact occurs.
+
+  Depends on: `PILOT-005`.
+
+- [ ] **PRECISION-001** — Convert the 50 rejected real-trial labels into generic
+  safe regression fixtures and the smallest detector precision fixes — P1 —
+  **QUEUED**.
+
+  Acceptance criteria:
+
+  - private target code, paths, candidate IDs, and evidence are not copied into
+    repository fixtures or documentation;
+  - pure/internal calls and user-defined value-type conversions are not treated
+    as external interactions;
+  - intended callbacks, immutable deployment targets, role checks, and
+    caller-owned mapping writes retain enough context for accurate review;
+  - existing positive corpus findings remain detected; broad name- or
+    project-specific suppressions are not added.
+
+  Depends on: `PILOT-005`.
 
 ## Definition of done for every task
 

@@ -1,6 +1,7 @@
 # M8 OpenZeppelin trial
 
 Trial date: 2026-08-10
+Review date: 2026-08-11
 
 ## Outcome
 
@@ -85,11 +86,13 @@ eligible to produce a reportable finding. The subsequent scans were offline.
 | Compiler-dependency set | `0837f1adb6cae49fdc2aabd3e7af5debfed1f299bc92fb2e36e8e1094bb2597a` |
 | Scan | `8fa3093b06c7bb23710f2d663d728032bc7eb107fb82513982b8560137483433` |
 | Candidate ledger | `889e58b1f0cf91a9db4e011882a40a2b7455e90aeaa68e0e600bda1a10a5d15e` |
+| Review ledger | `0a321f9e919175b8879019d1b80996a434bd35b9866d2c214d2750ccd162f238` |
 
 The canonical scan compiled 22 reportable files, materialized 51 candidates,
-and left all 51 in review state `new`. Candidate details remain only in the
-mode-`0600` private workspace. They have not been classified as bugs or false
-positives, so precision and recall remain unknown.
+and initially left all 51 in review state `new`. The operator later approved
+source-backed decisions that rejected 50 and retained one in state
+`investigating`. Candidate details and reasons remain only in the mode-`0600`
+private workspace. No candidate is confirmed.
 
 The first canonical pass took 103.95 seconds and used at most 1,176,856 KiB of
 resident memory. An immutable replay reproduced the scan digest in 79.81
@@ -109,10 +112,20 @@ accepted:
    and contains no target-root literal.
 
 Neither fix changes the fingerprint definition or treats a candidate as a
-confirmed vulnerability. The 51-candidate volume also shows that generic
-compiler-backed rules need human validation on confidential-contract code. No
-FHE-specific suppression or detector change is justified until the candidates
-are labelled.
+confirmed vulnerability. The completed review grouped the 50 rejected
+candidates into four observed precision failures:
+
+- 27 traces treated pure/internal calls or user-defined value-type conversions
+  as external interactions;
+- eight callback traces paired an intentional, previously audited callback with
+  an infeasible state-write branch;
+- 12 call-target traces treated intended generic interfaces, callbacks, or
+  immutable deployment configuration as uncontrolled privileged targets;
+- three authorization traces missed a role check or a caller-owned mapping key.
+
+One candidate remains under investigation. Its exact identity and evidence
+remain private. These labels justify generic safe fixtures and precision work,
+not target-specific or FHE-name suppressions.
 
 ## Comparison with existing evaluations
 
@@ -121,14 +134,13 @@ are labelled.
 | Synthetic `audit-1` | 33 positive and 31 safe labels | `1.0` precision and recall on the curated regression corpus |
 | Historical `m7-history-1` | 10 disclosed cases from 10 projects | `0.875` candidate precision and `1.0` supported-class recall |
 | OpenZeppelin source-only trial | No independent labels for the pinned release | 22 files scanned, zero candidates; precision undefined and recall unknown |
-| OpenZeppelin compiler trial | 51 candidates, all unreviewed | Compiler and privacy boundaries reproduced; precision and recall unknown |
+| OpenZeppelin compiler trial | 50 rejected, one investigating, none confirmed | False-positive modes measured; final precision and recall remain unknown |
 
-There were zero observed false-positive candidates in this trial. That is not a
-precision score because the denominator is zero. A clean scan also provides no
-way to count false negatives. The result therefore does not strengthen the
-project's accuracy claims beyond proving that the authorization, source
-identity, scope, privacy, deterministic replay, and empty-triage paths worked on
-a real repository.
+The source-only phase had no candidates, so its precision is undefined and its
+recall is unknown. The compiler phase now has 50 reviewed false positives and
+one unresolved candidate. Reporting a final precision score before resolving
+that candidate would be premature, and neither phase provides ground truth for
+counting false negatives.
 
 ## Observed gaps and decisions
 
@@ -148,8 +160,10 @@ The first gap became product task `COMP-003`, which enabled the compiler
 follow-up without changing the frozen source-only evidence. The follow-up then
 produced two regression-backed implementation fixes: stable-identity
 coalescing and nested evidence-path normalization. FHE semantics and verbose
-positive-only scope remain explicit limitations. Candidate labelling is now
-`PILOT-005`; detector changes wait for those labels.
+positive-only scope remain explicit limitations. `PILOT-005` recorded decisions
+for every candidate. `PILOT-006` will resolve the one investigating candidate
+behind a separate offline-proof approval gate, while `PRECISION-001` converts
+the 50 rejected labels into generic safe fixtures and minimal detector fixes.
 
 ## Decision
 
@@ -159,5 +173,5 @@ accounted for, and no target, chain, proof, report, export, disclosure, or
 submission action occurred. The sole initial workflow gap was recorded as a
 testable backlog item. `COMP-003` later closed that gap, and the separately
 approved compiler trial reproduced its private scan and candidate records
-without changing the source-only evidence. No candidate can be called a
-vulnerability until `PILOT-005` receives human review input.
+without changing the source-only evidence. Human review rejected 50 candidates
+and retained one for investigation; none is a confirmed vulnerability.

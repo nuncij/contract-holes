@@ -355,9 +355,10 @@ The latest release is `1.1.1`; M7 Bounty Hunter Mode and M8 private real-world
 validation are complete. Authorized OpenZeppelin Confidential Contracts
 `v0.4.0` trials scanned the same 22 reportable files at the bounty-pinned
 commit, first source-only and then with 58 separately hashed compiler-only
-dependencies. The offline compiler trial produced 51 private, unreviewed
-candidates. These are not confirmed bugs, and no proof, report, export,
-disclosure, submission, chain action, or target interaction occurred.
+dependencies. The offline compiler trial produced 51 private candidates. Human
+review rejected 50 and retained one for investigation. No candidate is
+confirmed, and no proof, report, export, disclosure, submission, chain action,
+or target interaction occurred.
 The compiler index, inheritance
 resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,

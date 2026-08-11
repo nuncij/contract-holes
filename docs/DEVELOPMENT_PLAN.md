@@ -1,9 +1,10 @@
 # Contract Holes Development Plan
 
-Last updated: 2026-08-10
+Last updated: 2026-08-11
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Human review of the private compiler candidates (`PILOT-005`).**
+Next: **Resolve the sole investigating candidate behind the offline-proof
+approval gate (`PILOT-006`).**
 
 ## Product goal
 
@@ -406,10 +407,15 @@ separated reportable assets from immutable compiler-only dependencies.
 The separately approved `PILOT-004` follow-up compiled the same 22 reportable
 files offline with 58 exact compiler-only dependencies and Solidity `0.8.27`.
 It produced 51 deduplicated private candidates, all left in human-review state
-`new`. Replaying the scan reproduced its immutable digest. No proof, report,
-approval, export, disclosure, submission, chain action, or target interaction
-occurred, and the frozen source-only evidence was unchanged. `PILOT-005` is the
-next task because candidate precision cannot be measured before human review.
+`new`. Replaying the scan reproduced its immutable digest. `PILOT-005` then
+reviewed all 51: 50 were rejected with source-backed reasons and one remains
+under investigation. No candidate is confirmed. No proof, report, approval,
+export, disclosure, submission, chain action, or target interaction occurred,
+and the frozen source-only evidence was unchanged.
+
+`PILOT-006` is next and requires separate approval before any offline proof.
+`PRECISION-001` captures only the generic detector gaps demonstrated by the 50
+rejected labels; private target evidence will not become a public fixture.
 
 ### Post-M8 — Compiler-only dependency boundary
 
