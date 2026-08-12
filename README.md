@@ -358,12 +358,13 @@ validation are complete. Authorized OpenZeppelin Confidential Contracts
 `v0.4.0` trials scanned the same 22 reportable files at the bounty-pinned
 commit, first source-only and then with 58 separately hashed compiler-only
 dependencies. The offline compiler trial produced 51 private candidates. Human
-review rejected 50 and retained one for investigation. No candidate is
-confirmed, and no proof, report, export, disclosure, submission, chain action,
-or target interaction occurred. Local, private, isolated, offline analysis and
-proof work for the sole candidate is authorized. `PILOT-006` is next. RPC,
-chain activity, target contact, report export, disclosure, and submission remain
-outside that authorization.
+review rejected all 51 as false positives; none is confirmed, and no proof,
+report, export, disclosure, submission, chain action, or target interaction
+occurred. The final candidate was resolved on 2026-08-12 under standing local
+offline authorization: trust-boundary analysis and a mechanical external-call
+enumeration showed no untrusted callback is reachable in the reported window.
+`PRECISION-001` is next: it converts the 51 rejected labels into generic safe
+fixtures and minimal detector precision fixes.
 
 The compiler index, inheritance
 resolver, call graph, reusable

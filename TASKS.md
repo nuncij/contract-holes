@@ -17,17 +17,16 @@ recorded. The authorized OpenZeppelin Confidential Contracts `v0.4.0` trials
 now cover both source-only and offline compiler analysis at the bounty-pinned
 commit. The compiler trial kept 22 reportable files separate from 58 exact
 compiler-only dependencies and materialized 51 private candidates. Human review
-rejected 50 false positives and left one candidate under investigation. No
-candidate is confirmed, and no proof, report, export, disclosure, submission,
-chain action, or target interaction occurred.
+has now rejected all 51 as false positives; none is confirmed, and no proof,
+report, export, disclosure, submission, chain action, or target interaction
+occurred. The final candidate was resolved on 2026-08-12 under the operator's
+standing local-work authorization: focused trust-boundary analysis and an
+offline mechanical enumeration showed no untrusted actor can reach a callback
+in the reported interaction window, and the existing proof workflow could not
+test that question without inventing setup facts.
 
-The operator authorized local, private, isolated, offline analysis and proof
-work for the exact pinned trial on 2026-08-12. This standing authorization
-removes repeat approval prompts for `PILOT-006`. It does not authorize RPC,
-chain activity, target contact, report export, disclosure, or submission.
-
-Next: **PILOT-006 — Resolve the sole investigating candidate with focused
-trust-boundary analysis and an offline local proof.**
+Next: **PRECISION-001 — Convert the 51 rejected real-trial labels into generic
+safe regression fixtures and the smallest detector precision fixes.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -528,9 +527,8 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
   Depends on: `PILOT-004`.
 
-- [ ] **PILOT-006** — Resolve the sole investigating candidate with focused
-  trust-boundary analysis and an offline local proof — P1 — **NEXT, LOCAL WORK
-  AUTHORIZED**.
+- [x] **PILOT-006** — Resolve the sole investigating candidate with focused
+  trust-boundary analysis and an offline local proof — P1 — **COMPLETE**.
 
   Acceptance criteria:
 
@@ -547,9 +545,21 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
   Depends on: `PILOT-005`.
 
-- [ ] **PRECISION-001** — Convert the 50 rejected real-trial labels into generic
+  Completed on 2026-08-12. The reported interaction cannot reach an untrusted
+  callback under the pinned deployment trust boundary: the called external
+  contract is an immutable, interface-checked deployment setting; every
+  external call in the reported window's pinned dependency closure targets
+  deployment-fixed fhEVM predeploys, that immutable target, or read-only
+  view/staticcall reads; and the affected in-flight state reverts as
+  nonexistent to every reenterable entry point during the window. The generic
+  probe workflow could not test this trust-boundary question without inventing
+  setup facts, so the proof-execution path is recorded as unsupported for the
+  decisive question. The human decision is `rejected`; the private review
+  ledger now holds 51 rejections, zero investigating, and zero confirmed.
+
+- [ ] **PRECISION-001** — Convert the 51 rejected real-trial labels into generic
   safe regression fixtures and the smallest detector precision fixes — P1 —
-  **QUEUED**.
+  **NEXT**.
 
   Acceptance criteria:
 

@@ -3,6 +3,7 @@
 Trial date: 2026-08-10
 Review date: 2026-08-11
 Handoff update: 2026-08-12
+Candidate resolution: 2026-08-12
 
 ## Outcome
 
@@ -92,8 +93,10 @@ eligible to produce a reportable finding. The subsequent scans were offline.
 The canonical scan compiled 22 reportable files, materialized 51 candidates,
 and initially left all 51 in review state `new`. The operator later approved
 source-backed decisions that rejected 50 and retained one in state
-`investigating`. Candidate details and reasons remain only in the mode-`0600`
-private workspace. No candidate is confirmed.
+`investigating`. On 2026-08-12 the final candidate was also rejected after the
+focused `PILOT-006` analysis described below. All 51 candidates are now
+rejected; none is confirmed. Candidate details and reasons remain only in the
+mode-`0600` private workspace.
 
 The first canonical pass took 103.95 seconds and used at most 1,176,856 KiB of
 resident memory. An immutable replay reproduced the scan digest in 79.81
@@ -113,8 +116,8 @@ accepted:
    and contains no target-root literal.
 
 Neither fix changes the fingerprint definition or treats a candidate as a
-confirmed vulnerability. The completed review grouped the 50 rejected
-candidates into four observed precision failures:
+confirmed vulnerability. The completed review grouped the 51 rejected
+candidates into five observed precision failures:
 
 - 27 traces treated pure/internal calls or user-defined value-type conversions
   as external interactions;
@@ -122,16 +125,29 @@ candidates into four observed precision failures:
   an infeasible state-write branch;
 - 12 call-target traces treated intended generic interfaces, callbacks, or
   immutable deployment configuration as uncontrolled privileged targets;
-- three authorization traces missed a role check or a caller-owned mapping key.
+- three authorization traces missed a role check or a caller-owned mapping key;
+- one reentrancy-ordering trace treated an immutable, interface-checked
+  deployment target as callback-capable and did not recognize that the
+  in-flight state is unreachable to reentrant entry points during the window.
 
-One candidate remains under investigation. Its exact identity and evidence
-remain private. These labels justify generic safe fixtures and precision work,
-not target-specific or FHE-name suppressions.
+The final candidate's exact identity and evidence remain private. These labels
+justify generic safe fixtures and precision work, not target-specific or
+FHE-name suppressions.
 
 On 2026-08-12, the operator granted standing authorization for local, private,
-isolated, offline analysis and proof work on this exact pinned trial. No proof
-had run at the handoff point. RPC, chain activity, target contact, report
-export, disclosure, and submission remain outside this authorization.
+isolated, offline analysis and proof work on this exact pinned trial.
+`PILOT-006` used that authorization the same day. Focused trust-boundary
+analysis of the pinned reference integration showed that no untrusted actor can
+reach a callback during the reported interaction window. An offline mechanical
+enumeration of the exact pinned dependency closure, compiled read-only with
+the pinned compiler, confirmed that every external call in the window targets
+deployment-fixed fhEVM predeploys, the immutable deployment-configured target,
+or read-only view/staticcall reads, with zero actor-controlled targets. The
+existing bounty-proof workflow could not test this decisive question without
+inventing setup facts, so proof execution is recorded as unsupported rather
+than run. The human decision rejected the candidate. RPC, chain activity,
+target contact, report export, disclosure, and submission remained outside the
+authorization and did not occur.
 
 ## Comparison with existing evaluations
 
@@ -140,13 +156,13 @@ export, disclosure, and submission remain outside this authorization.
 | Synthetic `audit-1` | 33 positive and 31 safe labels | `1.0` precision and recall on the curated regression corpus |
 | Historical `m7-history-1` | 10 disclosed cases from 10 projects | `0.875` candidate precision and `1.0` supported-class recall |
 | OpenZeppelin source-only trial | No independent labels for the pinned release | 22 files scanned, zero candidates; precision undefined and recall unknown |
-| OpenZeppelin compiler trial | 50 rejected, one investigating, none confirmed | False-positive modes measured; final precision and recall remain unknown |
+| OpenZeppelin compiler trial | 51 rejected, none confirmed | False-positive modes measured; candidate precision 0/51 on this target and recall unknown |
 
 The source-only phase had no candidates, so its precision is undefined and its
-recall is unknown. The compiler phase now has 50 reviewed false positives and
-one unresolved candidate. Reporting a final precision score before resolving
-that candidate would be premature, and neither phase provides ground truth for
-counting false negatives.
+recall is unknown. The compiler phase now has 51 reviewed false positives and
+no unresolved candidates, giving a measured candidate precision of 0/51 on
+this target. Neither phase provides ground truth for counting false negatives,
+so recall remains unknown.
 
 ## Observed gaps and decisions
 
@@ -167,9 +183,10 @@ follow-up without changing the frozen source-only evidence. The follow-up then
 produced two regression-backed implementation fixes: stable-identity
 coalescing and nested evidence-path normalization. FHE semantics and verbose
 positive-only scope remain explicit limitations. `PILOT-005` recorded decisions
-for every candidate. `PILOT-006` will use the recorded local-work authorization
-to resolve the one investigating candidate. `PRECISION-001` converts the 50
-rejected labels into generic safe fixtures and minimal detector fixes.
+for every candidate. `PILOT-006` used the recorded local-work authorization to
+resolve the one investigating candidate, which is now rejected. `PRECISION-001`
+converts the 51 rejected labels into generic safe fixtures and minimal
+detector fixes.
 
 ## Decision
 
@@ -179,5 +196,5 @@ accounted for, and no target, chain, proof, report, export, disclosure, or
 submission action occurred. The sole initial workflow gap was recorded as a
 testable backlog item. `COMP-003` later closed that gap, and the separately
 approved compiler trial reproduced its private scan and candidate records
-without changing the source-only evidence. Human review rejected 50 candidates
-and retained one for investigation; none is a confirmed vulnerability.
+without changing the source-only evidence. Human review rejected all 51
+candidates; none is a confirmed vulnerability.

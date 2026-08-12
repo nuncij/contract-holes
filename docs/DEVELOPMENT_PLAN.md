@@ -3,8 +3,8 @@
 Last updated: 2026-08-12
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Resolve the sole investigating candidate with authorized local offline
-proof work (`PILOT-006`).**
+Next: **Convert the rejected real-trial labels into generic precision fixes
+(`PRECISION-001`).**
 
 ## Product goal
 
@@ -408,17 +408,26 @@ The separately approved `PILOT-004` follow-up compiled the same 22 reportable
 files offline with 58 exact compiler-only dependencies and Solidity `0.8.27`.
 It produced 51 deduplicated private candidates, all left in human-review state
 `new`. Replaying the scan reproduced its immutable digest. `PILOT-005` then
-reviewed all 51: 50 were rejected with source-backed reasons and one remains
+reviewed all 51: 50 were rejected with source-backed reasons and one remained
 under investigation. No candidate is confirmed. No proof, report, approval,
 export, disclosure, submission, chain action, or target interaction occurred,
 and the frozen source-only evidence was unchanged.
 
 The operator granted standing authorization on 2026-08-12 for local, private,
 isolated, offline analysis and proof work on the exact pinned trial.
-`PILOT-006` can continue without another approval prompt. RPC, chain activity,
-target contact, report export, disclosure, and submission remain outside this
-authorization. `PRECISION-001` captures only the generic detector gaps shown by
-the 50 rejected labels. Private target evidence will not become a repository
+`PILOT-006` completed the same day under that authorization: focused
+trust-boundary analysis showed the reported interaction cannot reach an
+untrusted callback, and an offline mechanical enumeration of the pinned
+dependency closure found zero actor-controlled external call targets in the
+reported window. The existing proof workflow could not test that decisive
+question without inventing setup facts, so proof execution is recorded as
+unsupported. The final human decision rejected the last investigating
+candidate. All 51 candidates are now rejected false positives, none is
+confirmed, and the trial's candidate precision is measured at 0/51 with
+unknown recall. RPC, chain activity, target contact, report export,
+disclosure, and submission remained outside the authorization and did not
+occur. `PRECISION-001` captures only the generic detector gaps shown by the
+51 rejected labels. Private target evidence will not become a repository
 fixture.
 
 ### Post-M8 — Compiler-only dependency boundary

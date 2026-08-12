@@ -43,9 +43,16 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   reportable bounty scope.
 - Completed the separately approved offline compiler follow-up with 22
   reportable files, 58 exact compiler-only dependencies, and Solidity `0.8.27`.
-  It materialized 51 private candidates. Human review rejected 50 and retained
-  one for investigation; no vulnerability was confirmed and no proof, report,
-  export, disclosure, submission, chain action, or target interaction occurred.
+  It materialized 51 private candidates. Human review rejected all 51 as false
+  positives; no vulnerability was confirmed and no proof, report, export,
+  disclosure, submission, chain action, or target interaction occurred.
+- Resolved the final investigating candidate under the standing local offline
+  authorization. Focused trust-boundary analysis plus a mechanical
+  external-call enumeration of the pinned dependency closure showed no
+  untrusted actor can reach a callback in the reported interaction window; the
+  generic proof workflow could not test that question without inventing setup
+  facts. The compiler trial's measured candidate precision is 0/51 with
+  unknown recall.
 
 ## 1.1.1 — 2026-08-10
 
