@@ -335,6 +335,8 @@ Project status and future work are tracked explicitly:
   rule maturity, milestones, and release gates.
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
+- [Next-session handoff](docs/NEXT_SESSION_PROMPT.md) — a copy-ready prompt with
+  the current private-trial state, work boundary, and completion checklist.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review
@@ -358,7 +360,11 @@ commit, first source-only and then with 58 separately hashed compiler-only
 dependencies. The offline compiler trial produced 51 private candidates. Human
 review rejected 50 and retained one for investigation. No candidate is
 confirmed, and no proof, report, export, disclosure, submission, chain action,
-or target interaction occurred.
+or target interaction occurred. Local, private, isolated, offline analysis and
+proof work for the sole candidate is authorized. `PILOT-006` is next. RPC,
+chain activity, target contact, report export, disclosure, and submission remain
+outside that authorization.
+
 The compiler index, inheritance
 resolver, call graph, reusable
 data-flow facts, interprocedural `SOL005` analysis, versioned multi-file corpus,

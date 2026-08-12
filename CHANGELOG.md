@@ -5,6 +5,14 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ## Unreleased
 
+### Documentation
+
+- Added a copy-ready next-session prompt with the current private-trial state,
+  authorization boundary, ordered work, and completion checks.
+- Recorded standing authorization for local, private, isolated, offline work on
+  `PILOT-006`. Target-related network activity, report export, disclosure, and
+  submission remain outside that authorization.
+
 ### Bounty workflow
 
 - Added repeatable `--compiler-dependency` paths to bounty initialization and

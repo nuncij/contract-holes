@@ -57,6 +57,12 @@ Record these values in the bounty profile before scanning:
 - proof: local-only and only after a human confirms an in-scope impact;
 - submission: manual and private through Immunefi only.
 
+Authorization update on 2026-08-12: the operator later authorized a local,
+private, isolated, offline diagnostic proof for `PILOT-006` before the final
+candidate decision. This extends the proof timing only for the exact pinned
+trial. It does not confirm impact or authorize RPC, chain activity, target
+contact, report export, disclosure, or submission.
+
 The bounty profile has positive paths, not exclusion patterns. Do not use the
 whole `contracts` directory because that would also admit the out-of-scope
 `contracts/mocks` subtree. Pin these exact paths:

@@ -1,10 +1,10 @@
 # Contract Holes Development Plan
 
-Last updated: 2026-08-11
+Last updated: 2026-08-12
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Resolve the sole investigating candidate behind the offline-proof
-approval gate (`PILOT-006`).**
+Next: **Resolve the sole investigating candidate with authorized local offline
+proof work (`PILOT-006`).**
 
 ## Product goal
 
@@ -413,9 +413,13 @@ under investigation. No candidate is confirmed. No proof, report, approval,
 export, disclosure, submission, chain action, or target interaction occurred,
 and the frozen source-only evidence was unchanged.
 
-`PILOT-006` is next and requires separate approval before any offline proof.
-`PRECISION-001` captures only the generic detector gaps demonstrated by the 50
-rejected labels; private target evidence will not become a public fixture.
+The operator granted standing authorization on 2026-08-12 for local, private,
+isolated, offline analysis and proof work on the exact pinned trial.
+`PILOT-006` can continue without another approval prompt. RPC, chain activity,
+target contact, report export, disclosure, and submission remain outside this
+authorization. `PRECISION-001` captures only the generic detector gaps shown by
+the 50 rejected labels. Private target evidence will not become a repository
+fixture.
 
 ### Post-M8 — Compiler-only dependency boundary
 

@@ -21,8 +21,13 @@ rejected 50 false positives and left one candidate under investigation. No
 candidate is confirmed, and no proof, report, export, disclosure, submission,
 chain action, or target interaction occurred.
 
-Next: **PILOT-006 — Resolve the sole investigating candidate behind a separate
-offline-proof approval gate.**
+The operator authorized local, private, isolated, offline analysis and proof
+work for the exact pinned trial on 2026-08-12. This standing authorization
+removes repeat approval prompts for `PILOT-006`. It does not authorize RPC,
+chain activity, target contact, report export, disclosure, or submission.
+
+Next: **PILOT-006 — Resolve the sole investigating candidate with focused
+trust-boundary analysis and an offline local proof.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -524,16 +529,17 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   Depends on: `PILOT-004`.
 
 - [ ] **PILOT-006** — Resolve the sole investigating candidate with focused
-  trust-boundary analysis and, only after separate approval, an offline local
-  proof — P1 — **NEXT, REQUIRES SEPARATE PROOF APPROVAL**.
+  trust-boundary analysis and an offline local proof — P1 — **NEXT, LOCAL WORK
+  AUTHORIZED**.
 
   Acceptance criteria:
 
   - the exact candidate ID and evidence remain only in the private workspace;
   - analysis determines whether the reported call can reach an untrusted
     callback in the approved reference integration;
-  - proof generation or execution begins only after explicit operator approval
-    and remains local, isolated, and offline;
+  - the operator's 2026-08-12 standing authorization covers proof generation
+    and execution for this exact trial;
+  - analysis and proof execution remain local, private, isolated, and offline;
   - a human decision records either rejection or confirmation with a concrete
     in-scope impact;
   - no report, approval, export, disclosure, submission, chain action, or target

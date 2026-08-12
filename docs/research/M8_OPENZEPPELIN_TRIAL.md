@@ -2,6 +2,7 @@
 
 Trial date: 2026-08-10
 Review date: 2026-08-11
+Handoff update: 2026-08-12
 
 ## Outcome
 
@@ -127,6 +128,11 @@ One candidate remains under investigation. Its exact identity and evidence
 remain private. These labels justify generic safe fixtures and precision work,
 not target-specific or FHE-name suppressions.
 
+On 2026-08-12, the operator granted standing authorization for local, private,
+isolated, offline analysis and proof work on this exact pinned trial. No proof
+had run at the handoff point. RPC, chain activity, target contact, report
+export, disclosure, and submission remain outside this authorization.
+
 ## Comparison with existing evaluations
 
 | Evaluation | Ground truth | Result that can be claimed |
@@ -161,9 +167,9 @@ follow-up without changing the frozen source-only evidence. The follow-up then
 produced two regression-backed implementation fixes: stable-identity
 coalescing and nested evidence-path normalization. FHE semantics and verbose
 positive-only scope remain explicit limitations. `PILOT-005` recorded decisions
-for every candidate. `PILOT-006` will resolve the one investigating candidate
-behind a separate offline-proof approval gate, while `PRECISION-001` converts
-the 50 rejected labels into generic safe fixtures and minimal detector fixes.
+for every candidate. `PILOT-006` will use the recorded local-work authorization
+to resolve the one investigating candidate. `PRECISION-001` converts the 50
+rejected labels into generic safe fixtures and minimal detector fixes.
 
 ## Decision
 
