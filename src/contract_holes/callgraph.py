@@ -280,6 +280,12 @@ class CallGraph:
                 target=member_name,
             )
         resolution = self.project.resolve_reference_detail(member)
+        if resolution.node is not None and resolution.node.get("nodeType") in {
+            "ErrorDefinition",
+            "EventDefinition",
+            "StructDefinition",
+        }:
+            return None
         if resolution.node is not None and resolution.node.get("nodeType") == "FunctionDefinition":
             if owner_name == "this":
                 return self._edge_from_resolution(
