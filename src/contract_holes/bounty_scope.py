@@ -19,6 +19,7 @@ from .bounty_io import (
     write_private_json_new_or_identical,
 )
 from .bounty_profile import BountyProfile, BountyProfileError, load_bounty_profile
+from .compatibility import parse_version
 from .compiler import CompilationResult, CompiledSource, CompilerError, ForgeCompiler
 from .limits import ScanLimits
 from .models import Finding
@@ -35,6 +36,7 @@ SOURCE_MANIFEST_FILENAME = "source-manifest.json"
 SCAN_RECORD_FILENAME = "scan.json"
 SOURCE_MANIFEST_SCHEMA_VERSION = "1.0"
 SOURCE_MANIFEST_DEPENDENCY_SCHEMA_VERSION = "1.1"
+SOURCE_MANIFEST_PINNED_SCHEMA_VERSION = "1.2"
 SCAN_RECORD_SCHEMA_VERSION = "1.0"
 _GIT_ENVIRONMENT = {
     "GIT_CONFIG_NOSYSTEM": "1",
@@ -359,8 +361,12 @@ class ScopedForgeCompiler:
                 'test = "__holes_no_tests__"\n'
                 'script = "__holes_no_scripts__"\n'
                 "libs = []\n"
-                "auto_detect_solc = true\n"
-                "ffi = false\n",
+                + (
+                    f'solc_version = "{self.profile.compiler_version}"\n'
+                    if self.profile.compiler_version is not None
+                    else "auto_detect_solc = true\n"
+                )
+                + "ffi = false\n",
                 encoding="utf-8",
             )
             if self.identity.remappings:
@@ -373,6 +379,11 @@ class ScopedForgeCompiler:
                 project_root=staged_root,
                 offline=True,
             )
+            if self.profile.compiler_version is not None:
+                _verify_pinned_compiler(
+                    result.compiler_versions,
+                    self.profile.compiler_version,
+                )
             remapped_sources: list[CompiledSource] = []
             for compiled in result.sources:
                 staged_path = compiled.path.resolve()
@@ -410,9 +421,13 @@ def _source_manifest(
         source["content_sha256"] = profile.source_content_sha256
     payload: dict[str, object] = {
         "schema_version": (
-            SOURCE_MANIFEST_DEPENDENCY_SCHEMA_VERSION
-            if identity.compiler_dependency_paths
-            else SOURCE_MANIFEST_SCHEMA_VERSION
+            SOURCE_MANIFEST_PINNED_SCHEMA_VERSION
+            if profile.compiler_version is not None
+            else (
+                SOURCE_MANIFEST_DEPENDENCY_SCHEMA_VERSION
+                if identity.compiler_dependency_paths
+                else SOURCE_MANIFEST_SCHEMA_VERSION
+            )
         ),
         "scanner_version": __version__,
         "profile_sha256": profile.digest,
@@ -428,6 +443,10 @@ def _source_manifest(
             "remappings_sha256": identity.remappings_sha256,
         },
     }
+    if profile.compiler_version is not None:
+        compiler = payload["compiler"]
+        assert isinstance(compiler, dict)
+        compiler["version"] = profile.compiler_version
     if identity.compiler_dependency_paths:
         payload.update(
             {
@@ -444,6 +463,17 @@ def _source_manifest(
         )
     payload["manifest_sha256"] = payload_sha256(payload)
     return payload
+
+
+def _verify_pinned_compiler(observed: tuple[str, ...], pin: str) -> None:
+    if len(observed) != 1 or parse_version(observed[0]) != parse_version(pin):
+        observed_text = ", ".join(observed) if observed else "none"
+        raise CompilerError(
+            "pinned Solidity "
+            + pin
+            + " requires exactly one observed compiler release matching it; "
+            + f"observed: {observed_text}"
+        )
 
 
 def _compiler_isolation(identity: SourceIdentity) -> str:

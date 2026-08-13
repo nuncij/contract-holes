@@ -15,6 +15,11 @@ try:
 except ModuleNotFoundError:  # pragma: no cover - exercised only on Python 3.10
     tomllib = None
 
+from .compatibility import (
+    SOLIDITY_MAXIMUM_EXCLUSIVE,
+    SOLIDITY_MINIMUM,
+    version_is_supported,
+)
 from .config import ConfigError, _parse_toml_subset
 
 
@@ -26,8 +31,12 @@ PROFILE_FILENAME = "bounty.toml"
 PROFILE_SCHEMA_VERSION = 1
 PROFILE_NORMALIZED_SCHEMA_VERSION = "1.0"
 PROFILE_DEPENDENCY_SCHEMA_VERSION = "1.1"
+PROFILE_PINNED_SCHEMA_VERSION = "1.2"
 GIT_REVISION_PATTERN = re.compile(r"(?:[0-9a-f]{40}|[0-9a-f]{64})\Z")
 SHA256_PATTERN = re.compile(r"[0-9a-f]{64}\Z")
+EXACT_SOLIDITY_VERSION_PATTERN = re.compile(
+    r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
+)
 
 
 @dataclass(frozen=True, slots=True)
@@ -49,6 +58,7 @@ class BountyProfile:
     compiler_enabled: bool
     compiler_offline: bool
     compiler_dependency_paths: tuple[str, ...]
+    compiler_version: str | None = None
 
     @property
     def workspace(self) -> Path:
@@ -78,11 +88,17 @@ class BountyProfile:
         }
         if self.compiler_dependency_paths:
             compiler["dependency_paths"] = list(self.compiler_dependency_paths)
+        if self.compiler_version is not None:
+            compiler["version"] = self.compiler_version
         payload: dict[str, object] = {
             "schema_version": (
-                PROFILE_DEPENDENCY_SCHEMA_VERSION
-                if self.compiler_dependency_paths
-                else PROFILE_NORMALIZED_SCHEMA_VERSION
+                PROFILE_PINNED_SCHEMA_VERSION
+                if self.compiler_version is not None
+                else (
+                    PROFILE_DEPENDENCY_SCHEMA_VERSION
+                    if self.compiler_dependency_paths
+                    else PROFILE_NORMALIZED_SCHEMA_VERSION
+                )
             ),
             "program": {
                 "name": self.program_name,
@@ -122,6 +138,7 @@ def initialize_bounty_workspace(
     restrictions: list[str] | tuple[str, ...] = (),
     compiler_enabled: bool = True,
     compiler_dependency_paths: list[str] | tuple[str, ...] = (),
+    compiler_version: str | None = None,
 ) -> BountyProfile:
     destination = Path(workspace).resolve()
     source = Path(source_root).resolve()
@@ -163,6 +180,11 @@ def initialize_bounty_workspace(
             **(
                 {"dependency_paths": list(compiler_dependency_paths)}
                 if compiler_dependency_paths
+                else {}
+            ),
+            **(
+                {"version": compiler_version}
+                if compiler_version is not None
                 else {}
             ),
         },
@@ -256,7 +278,7 @@ def _validate_payload(
     _unknown_keys(scope, {"paths", "impacts", "restrictions"}, "[scope]")
     _unknown_keys(
         compiler,
-        {"enabled", "offline", "dependency_paths"},
+        {"enabled", "offline", "dependency_paths", "version"},
         "[compiler]",
     )
 
@@ -347,6 +369,15 @@ def _validate_payload(
         )
     if not compiler_offline:
         raise BountyProfileError("compiler.offline must be true in bounty profiles")
+    compiler_version = (
+        _normalize_compiler_version(compiler.get("version"), "compiler.version")
+        if compiler.get("version") is not None
+        else None
+    )
+    if compiler_version is not None and not compiler_enabled:
+        raise BountyProfileError(
+            "compiler.version requires compiler.enabled to be true"
+        )
 
     return BountyProfile(
         path=source,
@@ -366,7 +397,28 @@ def _validate_payload(
         compiler_enabled=compiler_enabled,
         compiler_offline=compiler_offline,
         compiler_dependency_paths=normalized_dependencies,
+        compiler_version=compiler_version,
     )
+
+
+def _normalize_compiler_version(value: object, label: str) -> str:
+    match = (
+        EXACT_SOLIDITY_VERSION_PATTERN.fullmatch(value)
+        if isinstance(value, str)
+        else None
+    )
+    if match is None:
+        raise BountyProfileError(f"{label} must be an exact MAJOR.MINOR.PATCH release")
+    parsed = tuple(int(part) for part in match.groups())
+    if not version_is_supported(
+        parsed,
+        SOLIDITY_MINIMUM,
+        SOLIDITY_MAXIMUM_EXCLUSIVE,
+    ):
+        raise BountyProfileError(
+            f"{label} must be inside the supported Solidity range"
+        )
+    return value
 
 
 def _render_profile(payload: dict[str, object]) -> str:
@@ -413,6 +465,8 @@ def _render_profile(payload: dict[str, object]) -> str:
     )
     if "dependency_paths" in compiler:
         lines.append(f"dependency_paths = {_toml_array(compiler['dependency_paths'])}")
+    if "version" in compiler:
+        lines.append(f"version = {_toml_string(str(compiler['version']))}")
     lines.extend(["offline = true", ""])
     return "\n".join(lines)
 

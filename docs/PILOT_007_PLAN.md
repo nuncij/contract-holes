@@ -3,8 +3,8 @@
 Status: **UNSATISFIED — Silo retained as research corpus; the required
 independent follow-up `PILOT-008` later completed.**
 
-Completion record: **REPAIR-007 COMPLETE (2026-08-13); `PILOT-008` COMPLETE;
-`COMP-004` is NEXT.**
+Completion record: **REPAIR-007, `PILOT-008`, and `COMP-004` COMPLETE;
+`PRECISION-002` is NEXT.**
 
 ## Goal
 

@@ -22,6 +22,16 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Bounty workflow
 
+- Added optional `--compiler-version X.Y.Z` to bounty initialization. The value
+  must be an exact release inside the published supported Solidity range and is
+  rejected with `--source-only`.
+- Pinned profiles emit additive normalized profile and source-manifest schemas
+  `1.2`; the fixed temporary Foundry project writes `solc_version = "X.Y.Z"`
+  instead of auto-detection, and the isolated compile fails closed unless the
+  build reports one compiler release and it matches the pin.
+- Preserved every legacy unpinned `1.0`/`1.1` profile, normalized payload, and
+  digest byte-for-byte, and kept `scan.json` recording the compiler version
+  strings observed in Foundry build information.
 - Added repeatable `--compiler-dependency` paths to bounty initialization and
   source identification. These Solidity units are separately hashed, staged only
   for fixed offline compilation, and cannot produce reportable findings.
@@ -46,13 +56,21 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Validation
 
+- Implemented `COMP-004` exact-compiler binding in the bounty profile and
+  isolated compiler. The public `holes bounty init --compiler-version`,
+  `validate`, and `scan`/`ScopedForgeCompiler` behaviors pass with new
+  interface, schema, legacy-stability, and fail-closed tests. A new private
+  pinned Olas replay selected only Solidity `0.8.30`, preserved the frozen
+  source and dependency sets, scanned two reportable files, and again produced
+  zero findings and candidates.
+
 - Completed `PILOT-008` against the exactly mapped Olas governance `v1.2.5`
   subset. Two private offline Solidity `0.8.30` workspaces reproduced identical
   two-file scan and zero-candidate results. A preserved initial scan selected
   cached Solidity `0.8.28`, exposing that the profile did not bind an exact
   compiler. No detector, proof, report, export, disclosure, submission, RPC,
-  chain action, platform write, or target contact occurred. `COMP-004` is next;
-  `PRECISION-002` is unblocked by the target gate and queued after that repair.
+  chain action, platform write, or target contact occurred. `PRECISION-002` is
+  the next precision milestone after `COMP-004`.
 
 - Reopened `PILOT-007` after completion review. The initial repair
   (2026-08-13) reconstructed the untouched baseline, which is a reproducible

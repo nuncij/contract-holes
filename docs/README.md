@@ -44,7 +44,7 @@
 - [PILOT-008 evaluation](research/PILOT_008_EVALUATION.md) — reproducible Olas
   scan result and compiler-pin follow-up
 - [COMP-004 development plan](COMP_004_PLAN.md) — exact compiler version in
-  bounty profiles
+  bounty profiles (complete, including the private pinned Olas replay)
 
 ## Project governance
 

@@ -1,13 +1,13 @@
 # PRECISION-002 development plan
 
-Status: **QUEUED — `PILOT-008` complete; starts after `COMP-004`**
+Status: **NEXT — `PILOT-008` and `COMP-004` complete**
 
 ## Goal
 
 Reduce the generic false-positive families observed during the Silo
 compiler-enabled operational validation. `PILOT-008` supplied the required
 untouched independent baseline with an exact deployed-source mapping. Start
-after `COMP-004` binds the compiler version used by private replay profiles.
+after `COMP-004` bound the compiler version used by private replay profiles.
 Preserve every existing positive finding and historical supported case.
 
 This task improves triage quality. It does not prove audit completeness,

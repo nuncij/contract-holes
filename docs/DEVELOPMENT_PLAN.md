@@ -3,8 +3,8 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **Bind an optional exact supported Solidity release into bounty profiles
-and isolated compilation (`COMP-004`), then start `PRECISION-002`.**
+Next: **Run `PRECISION-002`: convert the generic Silo false-positive families
+into paired public regressions and minimal detector fixes.**
 
 ## Product goal
 
@@ -490,7 +490,9 @@ ledger identities. The trial therefore satisfies the independent target gate,
 but its two-file scope is too small to establish broad real-world recall or
 bounty viability. The preserved initial run selected cached Solidity `0.8.28`,
 showing that compiler-enabled profiles do not bind an exact compiler release.
-`COMP-004` fixes that profile/compiler interface before `PRECISION-002` starts.
+`COMP-004` now fixes that profile/compiler interface. A new private pinned replay
+selected only Solidity `0.8.30`, preserved the frozen source and dependency
+sets, and again produced zero candidates. `PRECISION-002` is next.
 
 ### Post-M8 — Compiler-only dependency boundary
 

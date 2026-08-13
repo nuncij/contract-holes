@@ -511,6 +511,11 @@ def bounty_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="disable compiler analysis; bounty compiler mode is offline by default",
     )
+    initialize.add_argument(
+        "--compiler-version",
+        metavar="X.Y.Z",
+        help="exact supported Solidity release to pin in compiler mode",
+    )
 
     validate = commands.add_parser(
         "validate",
@@ -1059,6 +1064,11 @@ def _bounty_main(argv: Sequence[str]) -> int:
     args = argument_parser.parse_args(argv)
     try:
         if args.bounty_command == "init":
+            if args.source_only and args.compiler_version is not None:
+                argument_parser.error(
+                    "--compiler-version requires compiler mode and cannot be "
+                    "combined with --source-only"
+                )
             profile = initialize_bounty_workspace(
                 args.workspace,
                 program_name=args.program,
@@ -1075,6 +1085,7 @@ def _bounty_main(argv: Sequence[str]) -> int:
                 restrictions=args.restriction,
                 compiler_enabled=not args.source_only,
                 compiler_dependency_paths=args.compiler_dependency,
+                compiler_version=args.compiler_version,
             )
             command = "bounty.init"
             status = "created"

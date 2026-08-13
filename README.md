@@ -86,6 +86,16 @@ holes bounty history tests/fixtures/bounty_history/manifest.json
 holes bounty pilot tests/fixtures/bounty_pilot/manifest.json --output ../private-pilot
 ```
 
+A compiler-enabled profile can bind one exact supported Solidity release so the
+isolated compiler cannot silently select another version:
+
+```bash
+holes bounty init PRIVATE_WORKSPACE ... --compiler-version 0.8.30
+```
+
+Pinned profiles emit additive profile/source-manifest schema `1.2` and fail
+closed unless the build reports one compiler release and it matches the pin.
+
 See the [bounty profile contract](docs/BOUNTY_PROFILE.md). There is deliberately
 no automatic submission or live-network transaction command.
 
@@ -339,15 +349,15 @@ Project status and future work are tracked explicitly:
   the current private-trial state, work boundary, and completion checklist.
 - [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
   packages, safety constraints, validation gates, and completion criteria.
-- [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — precision work
-  queued after the compiler-pin repair.
+- [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — the next
+  precision milestone after the completed compiler-pin repair.
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
 - [PILOT-008 development plan](docs/PILOT_008_PLAN.md) and
   [evaluation](docs/research/PILOT_008_EVALUATION.md) — completed independent
   Olas trial with an exact deployed-source mapping and zero candidates.
-- [COMP-004 development plan](docs/COMP_004_PLAN.md) — bind an exact Solidity
-  release into new bounty profiles before `PRECISION-002`.
+- [COMP-004 development plan](docs/COMP_004_PLAN.md) — completed exact Solidity
+  release binding and private pinned replay.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review
@@ -413,7 +423,10 @@ two reportable and two compiler-only files and reproduced identical manifests,
 scans, and zero-candidate ledgers. The tiny clean result does not establish
 recall, safety, or bounty viability. A preserved first run selected cached
 Solidity `0.8.28`, exposing that bounty profiles do not bind an exact compiler.
-`COMP-004` is next; `PRECISION-002` follows that repair.
+`COMP-004` now binds an optional exact release into profile and manifest schema
+`1.2`, selects it in the isolated Foundry project, and rejects any mismatched or
+mixed observed compiler set. A new private pinned `0.8.30` replay reproduced the
+same two-file, zero-candidate Olas scan semantics. `PRECISION-002` is next.
 
 The compiler index, inheritance
 resolver, call graph, reusable

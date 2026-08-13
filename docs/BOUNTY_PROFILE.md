@@ -64,6 +64,23 @@ Compiler analysis is enabled and offline by default. `--source-only` records an
 explicit source-only profile. Bounty profiles cannot enable online compiler
 downloads.
 
+Optional `--compiler-version X.Y.Z` binds one exact supported Solidity release
+into a compiler-enabled profile:
+
+```bash
+holes bounty init ../private-example-review \
+  ... --compiler-version 0.8.30
+```
+
+The value must be an exact `MAJOR.MINOR.PATCH` release inside the published
+supported Solidity range (see [compatibility](COMPATIBILITY.md)); suffixes such
+as `0.8.30+commit.a2be1a0c` and non-canonical spellings are rejected, and the
+option is rejected with `--source-only`. The profile binds the compiler once;
+validation, manifest binding, isolated Foundry configuration, and
+observed-version verification all stay behind that single declaration. Optimizer
+runs and EVM target are not part of the pin; Contract Holes consumes compiler
+ASTs in a fixed isolated project and does not claim bytecode reproduction.
+
 ## Validate a profile
 
 ```bash
@@ -107,6 +124,7 @@ restrictions = ["No live-network testing"]
 enabled = true
 dependency_paths = ["lib/openzeppelin-contracts/contracts/access/Ownable.sol"]
 offline = true
+version = "0.8.30"
 ```
 
 All tables and keys are closed: unknown settings fail instead of being ignored.
@@ -115,6 +133,11 @@ identities must be lowercase SHA-256 digests. Scope paths are normalized POSIX
 paths relative to the target root; absolute paths, `..`, backslashes, empty
 scope, and duplicates are rejected. At least one in-scope impact and a non-empty
 authorization note are required.
+
+`compiler.version` is optional and requires compiler mode. When present it is
+stored as a canonical exact release; when absent the profile keeps legacy
+auto-detection behavior byte-for-byte. A `compiler.version` without
+`compiler.enabled = true` is rejected.
 
 Compiler dependency paths use the same path rules. They must not overlap a
 reportable source unit, require compiler mode, and are separately listed and
@@ -126,8 +149,10 @@ inside that target.
 
 The normalized representation is described by the packaged
 `bounty-profile-1.0.schema.json`. Profiles with compiler-only dependencies use
-the additive `bounty-profile-1.1.schema.json`. Existing profiles without the new
-field remain schema `1.0` with unchanged digest material. TOML remains the
+the additive `bounty-profile-1.1.schema.json`. Pinned profiles use the additive
+`bounty-profile-1.2.schema.json`, which describes `compiler.version`. Existing
+profiles without a pin remain schema `1.0` (no dependencies) or `1.1`
+(compiler-only dependencies) with unchanged digest material. TOML remains the
 editable source of truth.
 
 ## Validate scope and scan
@@ -164,7 +189,10 @@ copies reportable plus explicitly declared compiler-only files into a temporary
 project, writes a fixed safe
 `foundry.toml`, carries forward only contained `remappings.txt` entries, runs
 Foundry offline, and rejects build information containing any source unit or
-literal bytes outside the declared sets. Only reportable files are scanned; a
+literal bytes outside the declared sets. A pinned profile writes
+`solc_version = "X.Y.Z"` instead of enabling auto-detection, and the run fails
+closed unless the build reports one compiler release and it matches the pin. Only
+reportable files are scanned; a
 finding attributed to a compiler-only file fails the scan. The target's
 `foundry.toml`, tests,
 scripts, hooks, plugins, output, and cache are not loaded or executed.
@@ -177,8 +205,12 @@ an execution error; the bounty workflow does not weaken isolation to make it
 compile.
 
 Packaged schemas `bounty-source-manifest-1.0.schema.json`,
-`bounty-source-manifest-1.1.schema.json`, and
-`bounty-scan-1.0.schema.json` describe these records. Status `0` means a complete
+`bounty-source-manifest-1.1.schema.json`,
+`bounty-source-manifest-1.2.schema.json`, and
+`bounty-scan-1.0.schema.json` describe these records. Pinned profiles emit
+source-manifest schema `1.2` with `compiler.version`; `scan.json` remains schema
+`1.0` and records the compiler version strings observed in Foundry build
+information. Status `0` means a complete
 scan, including one with findings. Status `2` means profile, provenance, scope,
 compiler, record-integrity, or execution failure; it is never a clean result.
 

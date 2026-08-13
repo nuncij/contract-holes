@@ -1,6 +1,6 @@
 # COMP-004 development plan
 
-Status: **NEXT**
+Status: **COMPLETE — 2026-08-13**
 
 ## Goal
 
@@ -32,8 +32,10 @@ configuration, and observed-version verification stay behind that interface.
   and auto-detection behavior byte-for-byte.
 - Write `solc_version = "X.Y.Z"` in the temporary safe `foundry.toml` when a
   pin exists; do not load the target configuration.
-- Require exactly one observed compiler release matching the pin.
-- Continue recording the observed long version in `scan.json`.
+- Require one observed compiler release, matching the pin; reject empty, mixed,
+  or mismatched observed version sets.
+- Continue recording the compiler version strings supplied by Foundry build
+  information in `scan.json` without normalization.
 
 Optimizer runs and EVM target are intentionally outside this task. Contract
 Holes consumes compiler ASTs in a fixed isolated project; it does not claim
@@ -63,3 +65,17 @@ bytecode reproduction.
 - positive, negative, schema, CLI, and end-to-end tests pass;
 - the private pinned replay matches the `PILOT-008` scan semantics;
 - no target-specific detector behavior or target source enters the repository.
+
+## Completion record
+
+The public implementation added 13 interface and integration tests; the full
+suite now passes 234 tests. Frozen synthetic evaluation remains 33/33 positive
+and 31/31 safe labels, and the historical gate remains at 0.875 candidate
+precision and 1.0 supported-class recall.
+
+A new private offline Olas replay used the unchanged commit and exact two-file
+reportable plus two-file compiler-only closure. Its profile and source manifest
+used schema `1.2`, Foundry reported only Solidity `0.8.30`, the frozen source-set
+and compiler-dependency-set identities matched `PILOT-008`, and the scan again
+produced zero findings and zero candidates. No target source or candidate
+evidence entered the repository, and no external target action occurred.

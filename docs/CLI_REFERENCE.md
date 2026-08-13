@@ -106,8 +106,12 @@ authorization acknowledgement, a local source, an immutable Git revision or
 directory-manifest digest, in-scope paths, and in-scope impacts. Compiler mode is
 offline by default; `--source-only` disables it. Repeatable
 `--compiler-dependency PATH` options declare immutable Solidity inputs needed for
-compilation but excluded from reportable scope. `validate` emits the normalized
-profile and its SHA-256 identity.
+compilation but excluded from reportable scope. Optional
+`--compiler-version X.Y.Z` binds an exact release inside the published supported
+Solidity range; it is rejected with `--source-only`. A pinned profile emits
+additive normalized profile and source-manifest schema `1.2` and the isolated
+compiler selects that exact release. `validate` emits the normalized profile and
+its SHA-256 identity.
 
 The workspace must be new and outside the target tree. These commands do not
 submit, upload, send transactions, or contact a remote RPC endpoint.
@@ -116,7 +120,11 @@ deterministic source-set digest and separately hashes compiler-only inputs.
 `scan WORKSPACE` validates an exact clean Git commit or directory digest,
 enforces declared paths and symlink/remapping boundaries, stages only reportable
 and compiler-only source, scans only reportable files, compiles offline under
-fixed configuration when enabled, and writes private source/scan records. See
+fixed configuration when enabled, and writes private source/scan records. A
+pinned profile writes `solc_version = "X.Y.Z"` in the fixed temporary Foundry
+project and fails closed unless the build reports one compiler release and it
+matches the pin; `scan.json` records the observed build-information version
+strings. See
 the [bounty profile contract](BOUNTY_PROFILE.md).
 
 `candidates WORKSPACE [--state STATE]` lists stable observations, current human

@@ -36,18 +36,21 @@ Git-backed minimal checkout (only the three submodules intersecting the frozen
 124-file closure, with superproject Git metadata, user-read-only) is accepted
 by the public scanner and reproduces the canonical 81-finding result offline;
 the two compiler-backed regressions assert expected semantic results and exact
-stable public evidence; and the deep-AST test uses `TemporaryDirectory`. The
-suite is 221 tests; frozen gates unchanged.
+stable public evidence; and the deep-AST test uses `TemporaryDirectory`.
 
 `PILOT-008` completed against an exactly mapped Olas governance subset. Two
 private Solidity `0.8.30` scans reproduced identical source, scan, and
 candidate identities over two reportable files and produced zero candidates.
 The preserved first run exposed an unbound compiler-selection gap without
-changing detector behavior.
+changing detector behavior. `COMP-004` closed that gap with an optional exact
+compiler pin, additive profile and source-manifest schema `1.2`, and fail-closed
+observed-version checking. A new private pinned replay preserved the source and
+dependency sets, selected only Solidity `0.8.30`, scanned two files, and again
+produced zero candidates. The suite is 234 tests; frozen gates are unchanged.
 
-Next: **COMP-004 — bind an optional exact Solidity release into new bounty
-profiles and isolated compilation while preserving every legacy profile and
-digest.**
+Next: **PRECISION-002 — convert the generic false-positive families from the
+Silo research corpus into paired regression fixtures and minimal detector
+fixes.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -736,9 +739,9 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   export, disclosure, submission, RPC, chain action, platform write, or target
   contact occurred. See [the evaluation](docs/research/PILOT_008_EVALUATION.md).
 
-- [ ] **COMP-004** — Bind an optional exact supported Solidity release into a
+- [x] **COMP-004** — Bind an optional exact supported Solidity release into a
   bounty profile and its isolated compiler execution. Follow the
-  [dedicated development plan](docs/COMP_004_PLAN.md) — P1 — **NEXT**.
+  [dedicated development plan](docs/COMP_004_PLAN.md) — P1 — **COMPLETE**.
 
   Acceptance criteria:
 
@@ -753,10 +756,18 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
   Depends on: `PILOT-008`.
 
+  Completed on 2026-08-13. New compiler-enabled profiles can bind a canonical
+  supported release in additive profile/source-manifest schema `1.2`; the fixed
+  temporary Foundry project selects that release and rejects zero, mixed, or
+  mismatched observed compiler sets. Frozen unpinned `1.0` and `1.1` profile
+  digests remain unchanged. The new private Olas replay used the frozen two
+  reportable and two compiler-only files, selected only Solidity `0.8.30`, and
+  reproduced zero findings and candidates offline.
+
 - [ ] **PRECISION-002** — Convert the generic false-positive families observed
   on the second independent target into regression fixtures and minimal
   detector fixes. Follow the
-  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **QUEUED AFTER `COMP-004`**.
+  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **NEXT**.
 
   Acceptance criteria:
 

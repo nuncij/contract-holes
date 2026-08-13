@@ -96,9 +96,10 @@ ordinary report schema and must not be sent to a generic 1.0 report consumer.
 
 The initial bounty record versions are `1.0`, independently of package version
 `1.1.0`. Profiles and source manifests that declare compiler-only dependencies
-use additive schema `1.1`; records without that feature remain `1.0` with
-unchanged digest material. The scan record remains `1.0`. Their compatibility
-policy is:
+use additive schema `1.1`; profiles and source manifests that pin an exact
+compiler release use additive schema `1.2`. Records without those features
+remain `1.0` with unchanged digest material. The scan record remains `1.0`.
+Their compatibility policy is:
 
 - an additive optional field requires a record-schema minor version;
 - removing, renaming, or changing a required field or digest definition requires

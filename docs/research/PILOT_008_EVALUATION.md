@@ -70,9 +70,23 @@ profile, detector, or finding logic changed between these scans.
 This exposed a generic workflow defect: a compiler-enabled bounty profile binds
 offline mode but does not bind an exact Solidity version. The same profile can
 therefore select a different compatible cached compiler on another host. The
-next task, `COMP-004`, will add an optional exact compiler pin at the existing
-bounty-profile seam. Existing unpinned profiles and their digests must remain
-unchanged.
+completed `COMP-004` task adds an optional exact compiler pin at the existing
+bounty-profile seam while preserving existing unpinned profiles and their
+digests.
+
+## COMP-004 pinned replay
+
+After the generic compiler-pin implementation passed its public tests, a new
+private workspace replayed the same immutable source and four-file closure. The
+profile and source manifest used additive schema `1.2`; the frozen source-set
+and compiler-dependency-set identities matched the original trial. Foundry
+reported only Solidity `0.8.30`, and the scan again processed two reportable
+files with zero findings and zero candidates.
+
+The new profile, source-manifest, scan, and candidate-ledger identities differ
+because the compiler pin is new digest material. This is the expected result;
+the source bytes, dependency bytes, compiler release, scanned-file count, and
+finding semantics match the preserved exact-compiler runs.
 
 ## Results
 
@@ -105,12 +119,9 @@ bounded target, but it cannot calibrate real-world recall or bounty value.
 
 ## Next work
 
-1. Complete `COMP-004` so new bounty profiles can bind an exact supported
-   Solidity release and isolated compilation fails if the observed compiler
-   differs.
-2. Start `PRECISION-002`, using only generic fixtures derived from the Silo
+1. Start `PRECISION-002`, using only generic fixtures derived from the Silo
    research families. Keep private target evidence out of the repository.
-3. After precision work, evaluate on another untouched target. Do not measure
+2. After precision work, evaluate on another untouched target. Do not measure
    the fixes only against the corpus that inspired them.
 
 ## Safety record
