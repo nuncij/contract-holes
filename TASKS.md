@@ -652,10 +652,10 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   the pinned `4.26.0` (commit `570a668`); it manually matched the minimal
   124-file compiler closure byte-for-byte from local objects; it completed
   every private review-brief field for all 81 candidates; and it added two
-  genuine regressions (221 tests now). Because the minimal checkout omitted
-  Git metadata, the public scanner could not validate its `git` source or
-  reproduce a source manifest and scan. Because the source-to-scope gate fails,
-  `PILOT-007` is
+  genuine regressions (221 tests now). Its minimal checkout lacked Git metadata,
+  so the follow-up `REPAIR-007` later rebuilt it as a scanner-compatible
+  Git-backed checkout and reproduced the scan through the public CLI. Because
+  the source-to-scope gate fails, `PILOT-007` is
   **UNSATISFIED**. Silo is retained only as a non-bounty research corpus, and a
   new independent target trial is required before `PRECISION-002`.
 
