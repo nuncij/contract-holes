@@ -6,7 +6,7 @@ marked **IN PROGRESS**.
 
 Current release: `1.1.1`
 
-Current milestone: **Post-M8 — independent validation rework**
+Current milestone: **Post-M8 — PILOT-007 completion-record repair**
 
 Current position: M0 through M8 are complete. The private GitHub repository has
 passing production CI, verified signed `v1.1.0` and `v1.1.1` releases,
@@ -31,13 +31,14 @@ untouched scanner at selection commit `08050a1` hits a reproducible
 `RecursionError` blocker on the Silo closure, and the pinned Silo tag `4.26.0`
 does not map to the deployed in-scope assets (which are Silo `3.5.0`).
 `PILOT-007` is therefore unsatisfied; Silo is retained only as a non-bounty
-research corpus. The repair also reproduced the minimal 124-file compiler
-closure, completed all 81 private review-brief records, and added the missing
-regressions (221 tests).
+research corpus. The first repair completed all 81 private review-brief records
+and added two genuine regressions (221 tests). Its minimal checkout matched the
+124-file compiler closure by manual hashes, but omitted Git metadata and could
+not be validated or scanned through the public bounty workflow. The regression
+assertions and temporary-directory lifecycle also need a small follow-up.
 
-Next: **PILOT-008 — select, authorize, and scan a new independent real-world
-target whose deployed assets map exactly to a pinned immutable source
-revision.**
+Next: **REPAIR-007 — finish scanner-backed minimal-checkout reproduction,
+strengthen the two public regressions, and correct the completion record.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -641,21 +642,47 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   contact occurred. See
   [the evaluation](docs/research/PILOT_007_EVALUATION.md).
 
-  Completion review reopened the task. The repair (2026-08-13) reconstructed
+  Completion review reopened the task. The first repair (2026-08-13) reconstructed
   the untouched baseline, which is a reproducible `RecursionError` blocker at
   selection commit `08050a1`; it proved the source-to-scope gate fails because
   the deployed in-scope assets are Silo version `3.5.0` (commit `b1f428f`), not
-  the pinned `4.26.0` (commit `570a668`); it reproduced the minimal 124-file
-  compiler closure byte-for-byte from local objects; it completed every private
-  review-brief field for all 81 candidates; and it added the missing regressions
-  (221 tests now). Because the source-to-scope gate fails, `PILOT-007` is
+  the pinned `4.26.0` (commit `570a668`); it manually matched the minimal
+  124-file compiler closure byte-for-byte from local objects; it completed
+  every private review-brief field for all 81 candidates; and it added two
+  genuine regressions (221 tests now). Because the minimal checkout omitted
+  Git metadata, the public scanner could not validate its `git` source or
+  reproduce a source manifest and scan. Because the source-to-scope gate fails,
+  `PILOT-007` is
   **UNSATISFIED**. Silo is retained only as a non-bounty research corpus, and a
   new independent target trial is required before `PRECISION-002`.
+
+- [ ] **REPAIR-007** — Close the remaining `PILOT-007` completion-record
+  defects. Follow the [dedicated follow-up](docs/PILOT_007_PLAN.md#repair-007-follow-up) —
+  P1 — **NEXT**.
+
+  Acceptance criteria:
+
+  - a new private, user-read-only minimal checkout retains Git metadata and is
+    accepted by the public bounty scanner;
+  - a new private workspace reproduces the source manifest and compiler scan
+    offline, with semantic inputs and results checked against the canonical
+    post-repair workspace;
+  - the signature and call-kind regressions assert their expected semantic
+    result and exact stable public evidence without redundant compilation;
+  - the deep-AST compiler regression uses `TemporaryDirectory` for its full
+    lifecycle;
+  - public status documents distinguish the manual hash comparison from a
+    scanner reproduction and contain no contradictory completion claim;
+  - all tests, frozen evaluations, Git checks, and project CI pass without
+    private evidence entering the repository.
+
+  Depends on: the completed portions of the `PILOT-007` completion repair.
 
 - [ ] **PILOT-008** — Select, authorize, and scan a new independent real-world
   target whose deployed assets can be mapped exactly to a pinned immutable
   source revision. Follow the
-  [dedicated development plan](docs/PILOT_008_PLAN.md) — P1 — **NEXT**.
+  [dedicated development plan](docs/PILOT_008_PLAN.md) — P1 — **BLOCKED BY
+  REPAIR-007**.
 
   Acceptance criteria:
 
@@ -676,7 +703,8 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   - no proof, report, export, disclosure, submission, chain action, or target
     contact occurs without separate explicit authorization.
 
-  Depends on: `PILOT-007` (repair outcome), `PRECISION-001`.
+  Depends on: `REPAIR-007`, `PILOT-007` (unsatisfied trial outcome),
+  `PRECISION-001`.
 
 - [ ] **PRECISION-002** — Convert the generic false-positive families observed
   on the second independent target into regression fixtures and minimal

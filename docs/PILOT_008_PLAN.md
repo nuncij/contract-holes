@@ -1,6 +1,6 @@
 # PILOT-008 development plan
 
-Status: **NEXT**
+Status: **BLOCKED BY `REPAIR-007`**
 
 ## Goal
 
@@ -23,6 +23,11 @@ not be mapped exactly to the deployed in-scope assets. The repository's own
 not sufficient. Silo is retained only as a research corpus. `PILOT-008` selects
 a target where the deployed-source correspondence can be proved from official
 records before analysis.
+
+Before target selection starts, `REPAIR-007` must reproduce the Silo minimal
+closure through the public scanner from a read-only Git-backed checkout,
+strengthen the repair regressions, and correct the completion record. This is an
+evidence-quality gate; it does not change the unsatisfied Silo verdict.
 
 ## Work boundary
 

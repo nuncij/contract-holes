@@ -343,8 +343,8 @@ Project status and future work are tracked explicitly:
   queued behind a new independent target trial (`PILOT-008`).
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
-- [PILOT-008 development plan](docs/PILOT_008_PLAN.md) — next independent
-  target trial requiring an exact deployed-source mapping.
+- [PILOT-008 development plan](docs/PILOT_008_PLAN.md) — independent target
+  trial requiring an exact deployed-source mapping, blocked by `REPAIR-007`.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review
@@ -397,9 +397,13 @@ an untouched independent baseline: the untouched scanner at selection commit
 `08050a1` hits a reproducible `RecursionError` blocker, and the pinned Silo tag
 does not map to the deployed in-scope assets (which are Silo `3.5.0`, not
 `4.26.0`). `PILOT-007` is unsatisfied; Silo remains a research corpus.
-`PILOT-008` is next: a new independent target whose deployed assets map exactly
-to a pinned immutable source revision.
-`PRECISION-002` remains queued until this repair is complete.
+The first completion repair manually matched the minimal source closure, but
+its checkout omitted Git metadata and could not be validated or scanned through
+the public bounty workflow. `REPAIR-007` is next: reproduce that closure through
+the scanner, strengthen the public regression assertions, and correct the
+completion record. `PILOT-008` follows with a new independent target whose
+deployed assets map exactly to a pinned immutable source revision.
+`PRECISION-002` remains queued until `PILOT-008` completes.
 
 The compiler index, inheritance
 resolver, call graph, reusable

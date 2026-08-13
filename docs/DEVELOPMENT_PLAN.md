@@ -2,10 +2,9 @@
 
 Last updated: 2026-08-13
 Current release: `1.1.1`
-Current milestone: **Post-M8 — independent validation rework**
-Next: **Select, authorize, and scan a new independent real-world target whose
-deployed assets map exactly to a pinned immutable source revision
-(`PILOT-008`).**
+Current milestone: **Post-M8 — PILOT-007 completion-record repair**
+Next: **Finish the scanner-backed minimal-checkout reproduction and remaining
+regression/documentation corrections (`REPAIR-007`).**
 
 ## Product goal
 
@@ -472,11 +471,15 @@ closure, so there is no frozen baseline scan digest. The pinned Silo tag
 assets, which the repository's `DeployedSiloVersions.md` documents as version
 `3.5.0` (commit `b1f428f`, 2025-05-15). `PILOT-007` therefore does not satisfy
 its independent-bounty-trial gate. Silo is retained only as a non-bounty
-research corpus. The repair reproduced the minimal 124-file compiler closure
-byte-for-byte from local Git objects, completed all 81 private review-brief
-records, and added the missing regressions (221 tests, frozen gates unchanged).
-A new independent target trial, `PILOT-008`, is required before `PRECISION-002`
-starts.
+research corpus. The first repair manually matched the minimal 124-file compiler
+closure byte-for-byte from local Git objects, completed all 81 private
+review-brief records, and added two genuine regressions (221 tests, frozen gates
+unchanged). The minimal checkout omitted Git metadata, so the public bounty
+scanner could neither validate the declared Git source nor reproduce its source
+manifest and scan. `REPAIR-007` must close that evidence gap, strengthen the
+regression assertions, and standardize the temporary-directory lifecycle. A new
+independent target trial, `PILOT-008`, follows that repair and is required before
+`PRECISION-002` starts.
 
 ### Post-M8 — Compiler-only dependency boundary
 

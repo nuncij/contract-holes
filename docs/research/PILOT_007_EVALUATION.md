@@ -5,7 +5,8 @@ Target: Silo Finance v2/v3 (`silo-finance/silo-contracts-v3` tag `4.26.0`)
 Pinned commit: `570a668a98a88a6a2b92697e7b9a3b1c6299dce7`
 Operator authorization: single consolidated approval on 2026-08-13
 Status: **UNSATISFIED — Silo retained as a non-bounty research corpus; a new
-independent target trial (`PILOT-008`) is required before `PRECISION-002`.**
+independent target trial (`PILOT-008`) is required before `PRECISION-002`.
+`REPAIR-007` must close the completion-record evidence gap first.**
 
 ## Outcome
 
@@ -29,7 +30,7 @@ first OpenZeppelin Confidential Contracts trial, has an immutable repository
 tag, and names exact in-scope contract files. Details and the public comparison
 are in [PILOT_007_TARGET_SELECTION.md](PILOT_007_TARGET_SELECTION.md).
 
-## Frozen evidence
+## Post-repair operational evidence
 
 | Record | Value |
 | --- | --- |
@@ -65,13 +66,17 @@ before the preserved operational result was accepted:
 All 221 tests pass and the frozen synthetic and historical evaluation gates are
 unchanged (`1.0` precision/recall on the synthetic corpus; `0.875` candidate
 precision and `1.0` supported-class recall on the historical corpus). The
-call-graph change altered detector behavior after target feedback. Regression
-coverage for the signature and call-graph repairs remains part of the open
-completion repair.
+call-graph change altered detector behavior after target feedback. Two genuine
+regressions cover the signature and call-graph repairs, but `REPAIR-007` must
+strengthen their stable public evidence assertions before the completion record
+is closed.
 
 ## Completion repair results
 
-A completion review and repair on 2026-08-13 closed every finding.
+A completion review and initial repair on 2026-08-13 closed the baseline,
+source-mapping, and private-review findings. `REPAIR-007` remains open for the
+scanner-backed acquisition reproduction, regression assertions, test cleanup,
+and status corrections.
 
 1. **Untouched baseline reconstructed (reproducible blocker).** The
    released-plus-`PRECISION-001` scanner at selection commit
@@ -85,19 +90,26 @@ A completion review and repair on 2026-08-13 closed every finding.
    `570a668a98a88a6a2b92697e7b9a3b1c6299dce7`, 2026-07-27). This is documented
    in the repository's own `DeployedSiloVersions.md` and the Immunefi scope
    addresses. The trial does not meet its target-selection gate.
-3. **Minimal dependency closure reproduced.** A new checkout with only the
+3. **Minimal dependency closure matched manually.** A new checkout with only the
    three submodules intersecting the frozen 124-file compiler manifest was
    built from local Git objects. All 134 manifest file hashes match the
-   canonical record byte-for-byte. The historical over-retrieval of 87
-   submodule instances is recorded as an acquisition error.
+   canonical record byte-for-byte. The checkout contains no Git metadata, so
+   the public bounty scanner rejects its declared Git source; no source manifest
+   or scan was reproduced from this artifact. The historical over-retrieval of
+   87 submodule instances is recorded as an acquisition error.
 4. **Private review records completed.** All 81 candidates now have a complete
    review-brief entry with hypothesis, impact, assumptions, reachability,
    duplicate/known-issue status, reason, and remaining uncertainty. All 81
    remain operator-confirmed `rejected`.
-5. **Regressions added.** Public-seam tests now cover signature-domain
+5. **Regressions added; evidence assertions remain open.** Public-seam tests now
+   cover signature-domain
    recursion termination and error/event/struct member call classification. The
-   fixed `/tmp` test directory was replaced with a per-test temporary
-   directory. The suite is 221 tests; frozen gates unchanged.
+   tests fail under their corresponding pre-fix implementations. The retained
+   positive still needs exact stable path, line, kind, and evidence assertions,
+   and the signature test compiles redundantly instead of asserting one semantic
+   result. The fixed `/tmp` path was replaced with a unique directory, but it
+   still uses `mkdtemp` and manual cleanup rather than `TemporaryDirectory`.
+   The suite is 221 tests; frozen gates unchanged.
 
 Because the source-to-scope gate fails, `PILOT-007` is **UNSATISFIED**. Silo
 remains a research-only validation corpus. A new independent target trial
@@ -160,7 +172,8 @@ families.
 
 ## Recommended next product task
 
-Before any precision work, a new independent target trial (`PILOT-008`) must
+First, `REPAIR-007` must close the scanner-reproduction and public-regression
+evidence gaps. Then a new independent target trial (`PILOT-008`) must
 produce an untouched baseline whose deployed assets map exactly to a pinned
 immutable source revision. The generic families observed here then become
 `PRECISION-002` precision work. The highest-value items are:
@@ -187,6 +200,8 @@ immutable source revision. The generic families observed here then become
 - Reviewer labels are from one reviewer and one target and are not independent
   ground truth.
 - The historical acquisition over-retrieved 87 submodule instances; the later
-  minimal checkout reproduces only the approved 124-file closure.
+  minimal checkout manually matches only the approved 124-file closure but is
+  not a scanner-compatible Git source. `REPAIR-007` must create and scan a new
+  Git-backed minimal checkout without changing this artifact.
 - No proof, report, export, disclosure, submission, chain action, RPC, fork,
   or target contact occurred.

@@ -44,16 +44,19 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Validation
 
-- Reopened `PILOT-007` after completion review. The completion repair
+- Reopened `PILOT-007` after completion review. The initial repair
   (2026-08-13) reconstructed the untouched baseline, which is a reproducible
   `RecursionError` blocker at selection commit `08050a1`; proved the
   source-to-scope gate fails (the deployed in-scope assets are Silo `3.5.0`,
-  commit `b1f428f`, not the pinned `4.26.0`, commit `570a668`); reproduced the
-  minimal 124-file compiler closure byte-for-byte from local Git objects;
+  commit `b1f428f`, not the pinned `4.26.0`, commit `570a668`); manually matched
+  the minimal 124-file compiler closure byte-for-byte from local Git objects;
   completed every private review-brief field for all 81 candidates; and added
-  the missing regressions. `PILOT-007` is unsatisfied and Silo is retained only
-  as a research corpus. A new independent target trial (`PILOT-008`) is required
-  before `PRECISION-002` starts.
+  two genuine regressions. A follow-up is required because that checkout lacks
+  Git metadata and cannot reproduce a source manifest or scan through the
+  public bounty workflow; the regressions and temporary-directory lifecycle
+  also need small corrections. `PILOT-007` is unsatisfied and Silo is retained
+  only as a research corpus. `REPAIR-007` blocks a new independent target trial
+  (`PILOT-008`), which in turn blocks `PRECISION-002`.
 
 - Completed the first authorized external source-only trial against the exact
   bounty-pinned OpenZeppelin Confidential Contracts `v0.4.0` release. The
