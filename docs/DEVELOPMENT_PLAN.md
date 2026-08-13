@@ -4,7 +4,8 @@ Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
 Next: **Convert the rejected real-trial labels into generic precision fixes
-(`PRECISION-001`).**
+(`PRECISION-001`) using the
+[dedicated implementation plan](PRECISION_001_PLAN.md).**
 
 ## Product goal
 

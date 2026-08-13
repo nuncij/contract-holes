@@ -7,6 +7,9 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Documentation
 
+- Added a dedicated `PRECISION-001` development plan with test seams, ordered
+  red-to-green slices, false-negative guardrails, validation gates, and stop
+  conditions.
 - Added a copy-ready next-session prompt with the current private-trial state,
   authorization boundary, ordered work, and completion checks.
 - Recorded standing authorization for local, private, isolated, offline work on

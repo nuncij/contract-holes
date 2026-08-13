@@ -7,10 +7,10 @@ Holes repository root.
 Continue development of Contract Holes in this repository.
 
 Start by reading AGENTS.md if it exists, TASKS.md, docs/DEVELOPMENT_PLAN.md,
-docs/research/M8_TARGET_SELECTION.md,
+docs/PRECISION_001_PLAN.md, docs/research/M8_TARGET_SELECTION.md,
 docs/research/M8_OPENZEPPELIN_TRIAL.md, and this handoff. Inspect Git and the
-private records before changing anything. Treat the files and current command
-output as authoritative when they differ from this prompt.
+private records before changing anything. Treat current command output as
+authoritative for mutable hashes and state.
 
 Project state
 
@@ -65,33 +65,10 @@ Keep target-related network access disabled. RPC, forks, chains, target contact,
 report export, disclosure, submission, and platform APIs remain outside this
 work. Never commit private candidate details or target source.
 
-PRECISION-001 workflow
+Execution
 
-1. Verify Git, the private ledger hashes, and the 51 rejected state count.
-2. Read the PRECISION-001 acceptance criteria in TASKS.md.
-3. Inspect the shared call, data-flow, authorization, taint, and reentrancy
-   models before changing a detector.
-4. Add generic safe fixtures for each observed false-positive class.
-5. Cover pure or internal calls and user-defined value-type conversions.
-6. Cover infeasible post-callback branches and proven immutable call targets.
-7. Cover role checks, caller-owned mapping writes, and unreachable in-flight
-   reentrant state.
-8. Make the smallest shared analysis fixes that pass the new safe fixtures.
-9. Keep every existing positive fixture detected. Add no project-specific names
-   or FHE-specific suppressions.
-10. Update TASKS.md, docs/DEVELOPMENT_PLAN.md, README.md, and CHANGELOG.md.
-11. Run focused tests, documentation checks, the full suite, and
-    git diff --check.
-12. Review the final diff for unnecessary complexity. Commit, push main, and
-    verify project CI.
-
-Completion criteria
-
-- The target checkout and frozen source-only workspace stay unchanged.
-- Every observed false-positive class has a generic safe regression fixture.
-- Existing positive fixtures still pass.
-- Repository code and docs contain no candidate IDs, target source excerpts, or
-  candidate-specific evidence.
-- Tests pass and Git is clean after the pushed commit.
-- The next task in TASKS.md matches the actual remaining work.
+Follow docs/PRECISION_001_PLAN.md as the authoritative development sequence and
+completion gate. Work one red-to-green slice at a time. Keep the target checkout
+and canonical private workspaces unchanged. When the plan is complete, update
+this prompt to the next actual task before committing.
 ```

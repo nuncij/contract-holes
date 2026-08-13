@@ -337,6 +337,8 @@ Project status and future work are tracked explicitly:
   completed work, and the single next task.
 - [Next-session handoff](docs/NEXT_SESSION_PROMPT.md) — a copy-ready prompt with
   the current private-trial state, work boundary, and completion checklist.
+- [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
+  packages, safety constraints, validation gates, and completion criteria.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review

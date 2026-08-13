@@ -558,8 +558,8 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   ledger now holds 51 rejections, zero investigating, and zero confirmed.
 
 - [ ] **PRECISION-001** — Convert the 51 rejected real-trial labels into generic
-  safe regression fixtures and the smallest detector precision fixes — P1 —
-  **NEXT**.
+  safe regression fixtures and the smallest detector precision fixes. Follow
+  the [dedicated development plan](docs/PRECISION_001_PLAN.md) — P1 — **NEXT**.
 
   Acceptance criteria:
 
