@@ -52,9 +52,13 @@ produced zero candidates. The suite is 238 tests; frozen gates are unchanged.
 `main`, and GitHub CI run `31720097982` passed both Quality and Reproducible
 package.
 
-Next: **PILOT-009** is queued. It must validate the `PRECISION-002` detector
-commit `2574b6e` on a genuinely untouched target that is not OpenZeppelin,
-Silo, or Olas. See [the PILOT-009 plan](docs/PILOT_009_PLAN.md) and
+Next: **PILOT-009** is IN PROGRESS. The public selection gate passed for the
+EulerSwap v2 Ethereum subset at commit
+`81cf6dc988468fd56f690e6bc0e338a5be02d034`. Euler's pinned first-party
+verification record maps five deployed components to that commit. It validates
+the `PRECISION-002` detector commit `2574b6e` on a genuinely untouched target
+that is not OpenZeppelin, Silo, or Olas. See
+[the PILOT-009 plan](docs/PILOT_009_PLAN.md) and
 [the next-session prompt](docs/NEXT_SESSION_PROMPT.md).
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
@@ -838,7 +842,15 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
 - [ ] **PILOT-009** — Validate detector commit `2574b6e` on a genuinely
   untouched target that is not OpenZeppelin, Silo, or Olas. Follow the
-  [dedicated development plan](docs/PILOT_009_PLAN.md) — P1 — **QUEUED**.
+  [dedicated development plan](docs/PILOT_009_PLAN.md) — P1 — **IN PROGRESS**.
+
+  Status: public selection gate PASSED on 2026-08-13 for the EulerSwap v2
+  Ethereum subset at commit `81cf6dc988468fd56f690e6bc0e338a5be02d034`.
+  Euler's pinned first-party verification record (`euler-interfaces` commit
+  `d938bc264d6e1cee68a559798044d43ade8ac95e`) maps five deployed EulerSwap v2
+  components to that commit. Source acquisition, exact closure reproduction,
+  and the immutable pre-scan freeze are next. No target source has been
+  downloaded or scanned.
 
   Acceptance criteria:
 

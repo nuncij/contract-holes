@@ -1,9 +1,10 @@
 # PILOT-009 development plan
 
-Status: **QUEUED. Not started. `PRECISION-002` is COMPLETE on commit
-`2574b6e` (pushed to `main`, GitHub CI run `31720097982` passed Quality and
-Reproducible package). This task validates that detector commit on a genuinely
-untouched target that is not OpenZeppelin, Silo, or Olas.**
+Status: **IN PROGRESS. The public selection gate passed for the EulerSwap v2
+Ethereum subset at commit `81cf6dc988468fd56f690e6bc0e338a5be02d034`.
+Euler's pinned first-party verification record maps five deployed components to
+that commit. Source acquisition, exact closure reproduction, and the immutable
+pre-scan freeze are next. No target source has been downloaded or scanned.**
 
 ## Goal
 
@@ -37,10 +38,11 @@ Keep source checkouts and all candidate evidence outside this repository. Use
 private directories with mode `0700` and private files with mode `0600` where
 POSIX permissions are available.
 
-Do not send private target source or evidence to OpenCode, delegated agents, or
-another secondary model or service. The primary session can inspect it only
-through approved local tools. Cheaper agents can handle public research and
-public documentation.
+OpenCode with `opencode-go/deepseek-v4-flash` is the assigned development agent.
+It can operate the local private workspace for this task. Keep target source and
+candidate evidence outside this repository and out of public documentation,
+commits, remote messages, and reports. Do not delegate this private work to any
+additional model or service.
 
 ## Selection criteria
 

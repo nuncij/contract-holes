@@ -354,9 +354,10 @@ Project status and future work are tracked explicitly:
   milestone after the completed compiler-pin repair; COMPLETE. Commit `2574b6e`
   is pushed to `main`, and GitHub CI run `31720097982` passed both Quality and
   Reproducible package.
-- [PILOT-009 development plan](docs/PILOT_009_PLAN.md) — queued validation of
-  detector commit `2574b6e` on a genuinely untouched target that is not
-  OpenZeppelin, Silo, or Olas.
+- [PILOT-009 development plan](docs/PILOT_009_PLAN.md) — in-progress validation
+  of detector commit `2574b6e` on the EulerSwap v2 Ethereum subset (a
+  genuinely untouched target that is not OpenZeppelin, Silo, or Olas), with the
+  [public target-selection record](docs/research/PILOT_009_TARGET_SELECTION.md).
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
 - [PILOT-008 development plan](docs/PILOT_008_PLAN.md) and
@@ -461,9 +462,9 @@ The scan removed 22 findings and added none. The remaining findings are
 investigation leads, not vulnerabilities and not bounty
 submissions. No private source or evidence entered the repository. No target
 network, chain, RPC, proof, report, export, disclosure, submission, or
-bounty-platform write occurred. `PILOT-009` is queued to validate commit
-`2574b6e` on a genuinely untouched target that is not OpenZeppelin, Silo, or
-Olas.
+bounty-platform write occurred. `PILOT-009` is in progress to validate commit
+`2574b6e` on the selected EulerSwap v2 Ethereum subset, a genuinely untouched
+target that is not OpenZeppelin, Silo, or Olas.
 
 The compiler index, inheritance
 resolver, call graph, reusable

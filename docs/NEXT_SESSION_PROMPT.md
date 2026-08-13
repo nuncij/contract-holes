@@ -1,21 +1,19 @@
-# Next-session prompt
+# OpenCode development handoff
 
-Copy the prompt below into a new development session. Run it from the Contract
-Holes repository root.
+Run this handoff with OpenCode model `opencode-go/deepseek-v4-flash`. This is
+the only assigned development model. The primary Codex session writes the plan
+and verifies the result; OpenCode performs the development workflow.
 
 ```text
-Continue development of Contract Holes in this repository.
+Continue Contract Holes development in the current repository. Execute
+PILOT-009 end to end. Use docs/PILOT_009_PLAN.md as the authoritative scope and
+completion gate.
 
-Objective
+Role
 
-Start PILOT-009 with the develop -> test -> docs -> Git workflow. PRECISION-002
-is COMPLETE: detector commit 2574b6e is pushed to main and GitHub CI run
-31720097982 passed both Quality and Reproducible package. Validate that commit
-on a genuinely untouched real-world target that is not OpenZeppelin, Silo, or
-Olas. Follow docs/PILOT_009_PLAN.md as the authoritative scope. Preserve every
-existing positive, frozen corpus identity, label, threshold, split, and public
-evidence contract. Do not copy private target code or evidence into the
-repository.
+You are the implementation agent. Work autonomously through develop -> test ->
+docs -> Git. Do not ask for routine approvals. The primary session will review
+your finished work and evidence. Do not delegate to another model or agent.
 
 Read first
 
@@ -23,90 +21,108 @@ Read first
 - CONTRIBUTING.md
 - TASKS.md
 - docs/DEVELOPMENT_PLAN.md
-- docs/PILOT_009_PLAN.md (authoritative scope)
+- docs/PILOT_009_PLAN.md
+- docs/research/PILOT_009_TARGET_SELECTION.md
 - docs/PRECISION_002_PLAN.md
 - docs/COMP_004_PLAN.md
-- docs/research/PILOT_008_EVALUATION.md (prior trial)
 - docs/EVALUATION.md
 - this handoff
 
-Treat current command output as authoritative for mutable state.
+Current state
 
-Project state
+- Release 1.1.1 is complete.
+- PRECISION-002 is complete at detector commit 2574b6e. GitHub CI run
+  31720097982 passed both jobs.
+- The suite has 238 tests. The frozen audit result is 33 positive and 31 safe
+  labels at 1.0. The historical result has 0.933333 candidate precision, 1.0
+  supported-class recall, and 1.0 evidence completeness.
+- PILOT-009 is in progress. Public research selected the EulerSwap v2 Ethereum
+  subset at commit 81cf6dc988468fd56f690e6bc0e338a5be02d034.
+- Euler's first-party verification manifest is pinned at euler-interfaces
+  commit d938bc264d6e1cee68a559798044d43ade8ac95e. It maps five deployed
+  EulerSwap v2 components to the selected source commit. An independent public
+  cross-check passed.
+- No target source has been downloaded or scanned. The exact import closure has
+  not been reproduced yet.
+- The worktree contains the new public target-selection record and initial plan
+  status edits. Preserve, review, and complete them.
 
-- Release: 1.1.1.
-- PRECISION-002 is COMPLETE on commit 2574b6e, pushed to main; GitHub CI run
-  31720097982 passed Quality and Reproducible package.
-- Suite: 238 tests.
-- Frozen synthetic evaluation: 33/33 positive labels and 31/31 safe labels at
-  1.0.
-- Historical candidate precision: 0.933333; supported-class recall: 1.0;
-  evidence completeness: 1.0; decision: go.
-- Final fresh private offline replay exact-match with Solidity 0.8.28: ten
-  reportable files, 59 findings/candidates (SOL003=1 SOL005=13 SOL008=41
-  SOL009=3 SOL011=1), 22 removed and none added. These are investigation leads,
-  not vulnerabilities and not bounty submissions.
-- PILOT-009 is QUEUED; it validates detector commit 2574b6e on a genuinely
-  untouched target that is not OpenZeppelin, Silo, or Olas.
+Boundary
 
-Authorization boundary (standing, do not re-ask)
+Public research, the one-time exact pinned source/dependency downloads, and
+private local offline analysis are authorized. Keep the target checkout,
+profiles, manifests, scans, candidates, reviews, paths, excerpts, and hashes
+outside this repository. Use private directories (0700) and files (0600).
 
-Public research and one-time exact-source/dependency downloads plus private
-offline analysis are authorized under the operator's standing yolo direction.
-Do not ask for repeat approvals within this boundary; ask only if the boundary
-itself must change. No RPC, chain/fork/transaction, proof, report, export,
-disclosure, submission, bounty-platform write, or target contact is authorized.
-Do not download source until the selection record establishes an exact mapping.
-Do not scan until the pre-scan freeze is complete.
+Stay local and source-only after acquisition. No RPC, fork, public or test
+chain, transaction, deployment, target build/test/deploy script, proof,
+exploit, report export, disclosure, submission, bounty-platform write, or
+target contact. Do not change detector code, tests, rules, thresholds, corpus
+labels, or evaluation baselines during this fixed-detector trial. Do not put
+candidate-specific facts in public docs, commits, terminal summaries, or CI.
 
-Private evidence boundary
+Sequence
 
-Keep target source and all candidate evidence private. Do not send private
-source, paths, candidate IDs, source excerpts, traces, or records to OpenCode,
-delegated agents, or another secondary model or service. The primary session
-can inspect them only through approved local tools. Cheaper agents can handle
-public research and public documentation. Do not put private evidence in
-fixtures, tests, commits, documentation, or logs intended for sharing. No
-target-specific detector rule, project name, contract name, function name,
-constant, or path is allowed.
+1. Verify main against origin/main and inspect the existing uncommitted docs.
+   Confirm src, tests, evaluation, and pyproject.toml have not changed after
+   detector commit 2574b6e. Run the full unit suite, frozen audit evaluation,
+   and historical bounty evaluation.
 
-Required behavior
+2. Finish the public pre-acquisition record. Check every claim in
+   docs/research/PILOT_009_TARGET_SELECTION.md against pinned primary sources.
+   Keep the dependency wording provisional: it is a bounded candidate graph,
+   not a reproduced closure. Mark PILOT-009 IN PROGRESS consistently in
+   TASKS.md, docs/DEVELOPMENT_PLAN.md, docs/PILOT_009_PLAN.md, README.md,
+   docs/README.md, CHANGELOG.md, and this handoff. Run doc/test gates, inspect
+   the diff for private material, commit, push main, and wait for green GitHub
+   CI. This public freeze must be green before any source download.
 
-Select and map a target per the plan: research at least three current programs
-from official sources, establish the exact deployed-source mapping from
-official records before source download, and record the verdict in
-docs/research/PILOT_009_TARGET_SELECTION.md. Reject a target that cannot be
-mapped exactly to a pinned immutable revision. Download only that pinned source,
-then record the exact compiler closure and one supported Solidity release with
---compiler-version. Freeze the target revision, compiler closure, compiler
-version, and scope before the first scan. Run one private offline
-compiler-enabled scan, keep the
-first result frozen, run a deterministic replay in a second private workspace,
-and compare digests, compiler version, file count, and candidate
-count/rule distribution. Review candidates without prior tuning labels and
-record their states with holes bounty review. Write
-docs/research/PILOT_009_EVALUATION.md with aggregate information only.
+3. Acquire only euler-xyz/euler-swap at exact commit
+   81cf6dc988468fd56f690e6bc0e338a5be02d034 and only the exact pinned
+   submodule revisions needed by the five selected reportable components'
+   recursive Solidity import closure. Work outside the Contract Holes repo.
+   Inspect source, gitlinks, .gitmodules, remappings, and compiler metadata; do
+   not execute target configuration or code. Verify tag eulerswap-2.0 resolves
+   to the same commit. Stop if an import needs a mutable or unpinned dependency,
+   if any gitlink differs from the public selection record, or if the selected
+   deployed-source mapping no longer holds.
 
-Workflow
+4. Enumerate the exact reportable closure and compiler-only closure. Record
+   their identities privately. Use COMP-004 profile/source-manifest schema 1.2
+   and exact compiler version 0.8.27. Freeze the complete Git-backed checkout,
+   including Git metadata, as user-read-only after acquisition. Validate that
+   Contract Holes accepts the source identity and compiler pin before scanning.
 
-1. Verify a clean main worktree that matches origin/main. Confirm no scanner
-   code or test changed after detector commit 2574b6e.
-2. Run the full suite, the frozen audit evaluation, and the historical bounty
-   evaluation; record the results.
-3. Select and map a target; record the deployed-source mapping verdict.
-4. Download the pinned source, record the exact compiler closure, and create the
-   immutable pre-scan freeze. Commit and push the public selection/status record
-   and verify CI before the first scan.
-5. Create a new private workspace, add exact scope and compiler-only dependency
-   paths, and run holes bounty validate.
-6. Run the private offline scan and the deterministic replay.
-7. Review candidates without prior tuning labels and record their states.
-8. Write the aggregate evaluation.
+5. Create a new private workspace and run the first compiler-enabled scan with
+   detector commit 2574b6e. Preserve the first result even if it is a workflow
+   failure. Run with no network access. Do not alter scope, source, compiler,
+   detector, or profile after the freeze.
+
+6. Create a second private workspace from the same frozen inputs and replay the
+   scan offline. Compare source-manifest, profile, scan, and candidate digests,
+   compiler version, reportable file count, finding count, candidate count, and
+   rule distribution. A mismatch leaves PILOT-009 incomplete.
+
+7. Review every candidate privately against the pinned source, live program
+   impact rules, known issues, and prior audits. Record hypothesis, evidence
+   boundary, impact, reachability assumptions, duplicate status, state, reason,
+   uncertainty, and review effort. Do not tune the scanner from these labels.
+   Treat candidates as investigation leads, not vulnerabilities.
+
+8. Write docs/research/PILOT_009_EVALUATION.md using aggregate public data only:
+   public target identity and selection method, mapping verdict, compiler mode,
+   reportable file count, total candidates and per-rule counts, aggregate review
+   states, review effort, comparison with prior trials, limitations including
+   unknown recall, restrictions observed, and the recommended next task. Omit
+   private paths, hashes, candidate IDs, source excerpts, traces, and any
+   candidate-specific explanation.
+
 9. Update README.md, CHANGELOG.md, TASKS.md, docs/DEVELOPMENT_PLAN.md,
-   docs/NEXT_SESSION_PROMPT.md, and the docs index. Inspect the staged diff for
-   private material. Run the validation gates, a simplification review, commit,
-   push main, and verify project CI. Mark PILOT-009 COMPLETE in TASKS.md only
-   when every plan completion gate passes.
+   docs/PILOT_009_PLAN.md, docs/README.md, and this handoff to the final truthful
+   state. Mark PILOT-009 COMPLETE only if every completion gate in its plan
+   passes. Run all validation gates, inspect the staged diff for private data,
+   commit, push main, and wait for green GitHub CI. If GPG commit signing needs
+   interaction, use an unsigned commit; release tag signing is separate.
 
 Validation gates
 
@@ -117,10 +133,11 @@ PYTHONPATH=src python3 -m contract_holes bounty history \
   tests/fixtures/bounty_history/manifest.json
 git diff --check
 
-Stop only if the deployed-source mapping cannot be evidenced from official
-records, a target revision/scope/dependency/compiler/rule changes after the
-freeze, a plausible candidate would need a proof, report, disclosure, or
-submission, safe progress requires RPC, a fork, chain activity, target contact,
-or an unapproved download, private evidence may have entered the repository or
-another public channel, or the authorization boundary itself must change.
+Finished output
+
+Return a concise aggregate summary: PASS/UNSATISFIED, public commit IDs, CI run
+IDs and results, test/evaluation totals, private workspace locations and
+permissions without candidate-specific details, replay-match verdict, aggregate
+candidate/review counts, docs changed, and any remaining blocker. Leave the
+repository clean with main matching origin/main.
 ```

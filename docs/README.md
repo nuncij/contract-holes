@@ -52,9 +52,11 @@
 - [PRECISION-001 development plan](PRECISION_001_PLAN.md)
 - [PRECISION-002 development plan](PRECISION_002_PLAN.md) — complete at commit
   `2574b6e`. GitHub CI run `31720097982` passed
-- [PILOT-009 development plan](PILOT_009_PLAN.md) — queued validation of commit
-  `2574b6e` on a genuinely untouched target that is not OpenZeppelin, Silo, or
-  Olas
+- [PILOT-009 development plan](PILOT_009_PLAN.md) — in-progress validation of
+  commit `2574b6e` on the EulerSwap v2 Ethereum subset, a genuinely untouched
+  target that is not OpenZeppelin, Silo, or Olas
+- [PILOT-009 target selection](research/PILOT_009_TARGET_SELECTION.md) —
+  public pre-acquisition mapping record for the selected EulerSwap v2 subset
 - [Next-session handoff prompt](NEXT_SESSION_PROMPT.md)
 - [Threat model](THREAT_MODEL.md)
 - [Security policy](../SECURITY.md)

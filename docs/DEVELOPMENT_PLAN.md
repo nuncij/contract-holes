@@ -3,9 +3,14 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **`PILOT-009` is queued. It will validate detector commit `2574b6e` on a
-genuinely untouched target that is not OpenZeppelin, Silo, or Olas. See the
-[PILOT-009 plan](PILOT_009_PLAN.md).**
+Next: **`PILOT-009` is IN PROGRESS.** The public selection gate passed for the
+EulerSwap v2 Ethereum subset at commit
+`81cf6dc988468fd56f690e6bc0e338a5be02d034`; Euler's pinned first-party
+verification record maps five deployed components to that commit. It will
+validate detector commit `2574b6e` on a genuinely untouched target that is not
+OpenZeppelin, Silo, or Olas. See the
+[PILOT-009 plan](PILOT_009_PLAN.md) and the
+[target-selection record](research/PILOT_009_TARGET_SELECTION.md).**
 
 ## Product goal
 
@@ -524,8 +529,8 @@ recall and evidence completeness, and the `go` decision is unchanged. Suite:
 source and dependency identities, Solidity `0.8.28`, ten reportable files, 59
 findings/candidates versus 81 before tuning (SOL003=1, SOL005=13, SOL008=41,
 SOL009=3, SOL011=1), 22 removed and none added — investigation leads, not
-vulnerabilities and not bounty submissions. `PILOT-009` is queued to validate
-commit `2574b6e` on a genuinely untouched target.
+vulnerabilities and not bounty submissions. `PILOT-009` is in progress to
+validate commit `2574b6e` on a genuinely untouched target.
 
 ### Post-M8 — Compiler-only dependency boundary
 

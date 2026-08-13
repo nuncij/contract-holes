@@ -22,6 +22,15 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 - Added the queued `PILOT-009` plan and rewrote the next-session prompt to
   start `PILOT-009`: validate detector commit `2574b6e` on a genuinely
   untouched target that is not OpenZeppelin, Silo, or Olas.
+- Marked `PILOT-009` IN PROGRESS and added the public
+  [target-selection record](docs/research/PILOT_009_TARGET_SELECTION.md) for
+  the EulerSwap v2 Ethereum subset at commit
+  `81cf6dc988468fd56f690e6bc0e338a5be02d034`. Every claim was re-checked
+  against Euler's pinned first-party verification manifest (`euler-interfaces`
+  commit `d938bc264d6e1cee68a559798044d43ade8ac95e`) and the pinned source
+  trees; the tag `eulerswap-2.0` resolves to the same commit, `foundry.toml`
+  pins Solidity `0.8.27`, and the candidate dependency graph is a bounded,
+  fully pinned gitlink set. No target source has been downloaded or scanned.
 - Added a dedicated `PRECISION-001` development plan with test seams, ordered
   red-to-green slices, false-negative guardrails, validation gates, and stop
   conditions.
