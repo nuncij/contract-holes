@@ -248,6 +248,7 @@ class SignatureAnalysis:
                 callee_environment = self._callee_feature_environment(
                     event.edge,
                     function,
+                    next_stack,
                     feature_environment,
                 )
                 result.extend(
@@ -539,6 +540,7 @@ class SignatureAnalysis:
                         resolution.node,
                         function,
                         before,
+                        seen,
                         feature_environment,
                     )
                     for node in _walk_ast(body):
@@ -569,6 +571,7 @@ class SignatureAnalysis:
         self,
         edge: CallEdge,
         function: NodeKey,
+        seen: frozenset[NodeKey],
         feature_environment: dict[NodeKey, tuple[bool, bool, bool]],
     ) -> dict[NodeKey, tuple[bool, bool, bool]]:
         call = self.project.node_for_key(edge.call_site) if edge.call_site else None
@@ -581,6 +584,7 @@ class SignatureAnalysis:
             callee,
             function,
             span.byte_start if span is not None else None,
+            seen,
             feature_environment,
         )
 
@@ -590,6 +594,7 @@ class SignatureAnalysis:
         callee: Node,
         function: NodeKey,
         before: int | None,
+        seen: frozenset[NodeKey],
         feature_environment: dict[NodeKey, tuple[bool, bool, bool]],
     ) -> dict[NodeKey, tuple[bool, bool, bool]]:
         arguments = call.get("arguments", [])
@@ -606,7 +611,7 @@ class SignatureAnalysis:
                 argument,
                 function,
                 before,
-                frozenset(),
+                seen,
                 feature_environment,
             )
         return result
@@ -893,9 +898,12 @@ def _ast_children(node: Node):
 
 
 def _walk_ast(node: Node):
-    yield node
-    for child in _ast_children(node):
-        yield from _walk_ast(child)
+    stack = [node]
+    while stack:
+        current = stack.pop()
+        yield current
+        for child in reversed(list(_ast_children(current))):
+            stack.append(child)
 
 
 def _before_limit(span: SourceSpan | None, byte_limit: int) -> bool:

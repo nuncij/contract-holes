@@ -290,14 +290,22 @@ def _event_sort_key(
 
 
 def _walk_ast(node: Node):
-    yield node
-    for value in node.values():
-        if isinstance(value, dict) and "nodeType" in value:
-            yield from _walk_ast(value)
-        elif isinstance(value, list):
-            for child in value:
-                if isinstance(child, dict) and "nodeType" in child:
-                    yield from _walk_ast(child)
+    stack = [node]
+    while stack:
+        current = stack.pop()
+        yield current
+        children: list[Node] = []
+        for value in current.values():
+            if isinstance(value, dict) and "nodeType" in value:
+                children.append(value)
+            elif isinstance(value, list):
+                children.extend(
+                    child
+                    for child in value
+                    if isinstance(child, dict) and "nodeType" in child
+                )
+        for child in reversed(children):
+            stack.append(child)
 
 
 def _issue_sort_key(issue: AuthorizationIssue) -> tuple[str, int, int, int]:

@@ -939,14 +939,22 @@ class OracleAndSlippageHazardRule(Rule):
 def _walk_ast(
     node: dict[str, object], parent: dict[str, object] | None = None
 ) -> Iterable[tuple[dict[str, object], dict[str, object] | None]]:
-    yield node, parent
-    for value in node.values():
-        if isinstance(value, dict) and "nodeType" in value:
-            yield from _walk_ast(value, node)
-        elif isinstance(value, list):
-            for child in value:
-                if isinstance(child, dict) and "nodeType" in child:
-                    yield from _walk_ast(child, node)
+    stack: list[tuple[dict[str, object], dict[str, object] | None]] = [(node, parent)]
+    while stack:
+        current, current_parent = stack.pop()
+        yield current, current_parent
+        children: list[dict[str, object]] = []
+        for value in current.values():
+            if isinstance(value, dict) and "nodeType" in value:
+                children.append(value)
+            elif isinstance(value, list):
+                children.extend(
+                    child
+                    for child in value
+                    if isinstance(child, dict) and "nodeType" in child
+                )
+        for child in reversed(children):
+            stack.append((child, current))
 
 
 def _called_member(node: dict[str, object]) -> dict[str, object] | None:
