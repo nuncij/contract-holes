@@ -3,7 +3,7 @@
 Status: **UNSATISFIED — Silo retained as research corpus; a new independent
 target is required before `PRECISION-002`.**
 
-Completion record: **REPAIR-007 FOLLOW-UP REQUIRED before `PILOT-008`.**
+Completion record: **REPAIR-007 COMPLETE (2026-08-13); `PILOT-008` is NEXT.**
 
 ## Goal
 
@@ -251,9 +251,8 @@ before starting `PILOT-008` or `PRECISION-002`.
 ### Initial repair outcome (2026-08-13)
 
 The initial repair closed the baseline, source-mapping, and private-review
-findings. A follow-up remains open for scanner-backed acquisition reproduction,
-stronger regression evidence, deterministic test cleanup, and truthful status
-text. The conclusions are:
+findings. A follow-up (`REPAIR-007`) then closed the acquisition-reproduction,
+regression-evidence, and status-text findings. The conclusions are:
 
 1. **Untouched baseline reconstructed (reproducible blocker).** The
    released-plus-`PRECISION-001` scanner at selection commit
@@ -272,33 +271,28 @@ text. The conclusions are:
    `4.26.0` at commit `570a668a98a88a6a2b92697e7b9a3b1c6299dce7` (2026-07-27).
    The pinned commit does not exactly correspond to the deployed in-scope
    assets. Silo is therefore retained only as a non-bounty research corpus.
-3. **Minimal dependency closure matched manually, but not through the
-   scanner.** A new checkout was built from
-   local Git objects with only the three submodules intersecting the frozen
-   124-file compiler manifest. All 134 recorded file hashes are byte-identical
-   to the canonical source manifest, and the remappings digest matches. The
-   entire minimal checkout is user-read-only under a private parent and
-   contains no Git metadata. Because its profile declares a Git source, public
-   source validation fails and this artifact cannot reproduce a source manifest
-   or scan through the bounty CLI. The historical over-retrieval of 87
-   submodule instances is recorded as an acquisition error and is not erased by
-   the later minimal checkout. The original clone's `.git` directory remains
-   writable; that is a documented limitation of the original acquisition.
+3. **Minimal dependency closure reproduced through the scanner.** An earlier
+   manual, hash-only checkout was not scanner-compatible because it lacked Git
+   metadata. `REPAIR-007` built a new private checkout from existing local Git
+   objects with only the three submodules intersecting the frozen 124-file
+   compiler closure, retaining usable superproject Git metadata, then froze the
+   full checkout (including that metadata) as user-read-only. The public
+   `holes bounty validate` and `holes bounty scan` accept it and reproduce the
+   source manifest, scan, and candidate ledger offline. The historical
+   over-retrieval of 87 submodule instances is recorded as an acquisition error
+   and is not erased by the later minimal checkout.
 4. **Private review records completed.** Every one of the 81 candidates now has
    a review-brief entry recording the scanner hypothesis, relevant in-scope
    impact or lack of one, reachability, authorization, trust and state
    assumptions, duplicate/known-issue status, reason, and remaining
    uncertainty. All 81 remain operator-confirmed `rejected`.
-5. **Missing regressions added; assertion follow-up remains.** Public-seam
-   regressions now cover
+5. **Regressions added and strengthened.** Public-seam regressions cover
    signature-domain recursion termination and error/event/struct member call
-   classification, and mutation checks confirm they fail with their matching
-   pre-fix implementations. The retained-positive test still needs exact path,
-   line, kind, and evidence assertions, and the signature test should compile
-   once and assert the expected semantic result. The fixed `/tmp` path was
-   replaced with a unique directory, but its lifecycle still uses `mkdtemp`
-   plus manual cleanup instead of `TemporaryDirectory`. The suite grew from
-   219 to 221 tests; the frozen evaluation gates are unchanged.
+   classification. The signature test compiles once and asserts the expected
+   semantic result; the retained-positive test asserts exact stable path, line,
+   kind, entry function, evidence, and target-provenance fields. The deep-AST
+   compiler test uses `TemporaryDirectory` for its full lifecycle. The suite is
+   221 tests; the frozen evaluation gates are unchanged.
 
 Because the source-to-scope gate fails, `PILOT-007` does not satisfy its
 independent-bounty-trial completion gate. A new independent target must be
@@ -306,29 +300,33 @@ selected, authorized, and scanned before `PRECISION-002` starts.
 
 ### REPAIR-007 follow-up
 
-Finish this bounded repair before starting `PILOT-008`:
+This bounded repair is complete (2026-08-13):
 
-1. Preserve the existing minimal checkout and verification workspace. From the
-   existing local Git objects, create a new private checkout with only the three
-   submodules intersecting the 124-file compiler closure. Retain working Git
-   metadata and freeze the full checkout, including that metadata, as
-   user-read-only under a private parent.
-2. Point a new private bounty workspace at that checkout. Use the public CLI to
-   validate the profile and reproduce the source manifest, compiler-enabled
-   scan, and candidate ledger offline. Compare the semantic source sets,
-   per-file hashes, remappings, compiler identity, scan, and candidates with the
-   canonical post-repair workspace. Record profile-bound digest differences
-   accurately; a manual hash comparison alone is not completion evidence.
-3. Strengthen the two public compiler-backed regressions with the expected
-   semantic result and exact stable path, line, kind, entry function, and
-   evidence assertions required by `CONTRIBUTING.md`. Remove the redundant
-   second compilation from the signature test.
-4. Use `TemporaryDirectory` to own the entire deep-AST compiler-test lifecycle.
-5. Correct all public status documents and the next-session handoff. Keep the
-   final Silo source-to-scope verdict **UNSATISFIED**. `REPAIR-007` completion
-   unblocks `PILOT-008`; it does not convert Silo into a valid bounty trial.
+1. A new private checkout was built from the existing local Git objects with
+   only the three submodules intersecting the 124-file compiler closure. It
+   retains working superproject Git metadata and is frozen, including that
+   metadata, as user-read-only under a private parent. The earlier manual,
+   hash-only checkout is superseded; it lacked Git metadata and could not be
+   accepted by the public scanner.
+2. A new private bounty workspace points at that checkout. The public CLI
+   validated the profile and reproduced the source manifest, compiler-enabled
+   scan, and candidate ledger offline. Semantic source sets, per-file hashes,
+   remappings, compiler identity, scan finding set, and candidate observations
+   match the canonical post-repair workspace. The only differences are
+   profile-bound (program name, authorization note, and source root path),
+   which change the profile digest and therefore the candidate IDs but not the
+   scan semantics.
+3. The two public compiler-backed regressions assert the expected semantic
+   result and exact stable path, line, kind, entry function, and evidence
+   fields required by `CONTRIBUTING.md`. The redundant second compilation in
+   the signature test was removed.
+4. `TemporaryDirectory` owns the entire deep-AST compiler-test lifecycle.
+5. All public status documents and the next-session handoff were corrected.
+   The final Silo source-to-scope verdict remains **UNSATISFIED**.
+   `REPAIR-007` completion unblocks `PILOT-008`; it does not convert Silo into
+   a valid bounty trial.
 
-Completion criterion: the new Git-backed checkout is accepted by the public
+Completion criterion met: the new Git-backed checkout is accepted by the public
 scanner; the private workspace contains scanner-produced reproduction records;
 the focused and full tests and frozen evaluations pass; public text contains no
 contradictory or overstated claim; project CI is green; and no private evidence

@@ -8,156 +8,109 @@ Continue development of Contract Holes in this repository.
 
 Objective
 
-Finish REPAIR-007, the remaining PILOT-007 completion-record repair. Do not
-start PILOT-008 or PRECISION-002 in this session. Use the normal workflow:
-develop, test, update docs, inspect the diff, commit, push, and verify CI.
+Select, authorize, and scan a new independent real-world target whose deployed
+assets map exactly to a pinned immutable source revision (PILOT-008). Do not
+start PRECISION-002. Preserve the existing private evidence and the Silo
+research corpus unchanged. Keep candidate details and target source out of the
+repository.
 
 Read first
 
 - AGENTS.md, if present
-- CONTRIBUTING.md, especially the regression-test evidence requirements
+- CONTRIBUTING.md
 - TASKS.md
 - docs/DEVELOPMENT_PLAN.md
-- docs/PILOT_007_PLAN.md, especially "REPAIR-007 follow-up"
+- docs/PILOT_008_PLAN.md (authoritative sequence and gate)
+- docs/PILOT_007_PLAN.md (completion-repair and REPAIR-007 outcome)
+- docs/research/PILOT_007_TARGET_SELECTION.md
 - docs/research/PILOT_007_EVALUATION.md
-- docs/PILOT_008_PLAN.md (blocked follow-up boundary)
 - docs/PRECISION_002_PLAN.md (blocked follow-up boundary)
 - this handoff
 
-Treat current command output as authoritative for mutable Git and CI state.
+Treat current command output as authoritative for mutable state.
 
-Known project state
+Project state
 
-- Release: 1.1.1. M0 through M8 and PRECISION-001 are complete.
-- PILOT-007 is UNSATISFIED because the pinned Silo 4.26.0 source does not map
-  to the deployed in-scope Silo 3.5.0 assets. Silo remains a private,
-  non-bounty research corpus.
-- The untouched scanner at selection commit
-  08050a14437abaf47ff45b90a1392a9fbc460a93 has a reproducible RecursionError
-  on the full Silo closure. The 81-candidate scan is a separate post-repair
-  operational result, not an untouched baseline.
-- All 81 private review records are complete and operator-confirmed rejected.
-- The two new regression tests are genuine: substituting either pre-fix
-  implementation makes its matching test fail. Their assertions still need to
-  satisfy CONTRIBUTING.md by checking stable public path, line, kind, and
-  evidence where a finding is retained.
-- Suite at handoff: 221 tests. Frozen evaluation gates: 1.0 precision and
-  recall on the synthetic audit corpus; 0.875 candidate precision and 1.0
-  supported-class recall on the historical corpus.
-- Correct post-repair scan digest:
-  9784d71e91ae86d4380c738badb2c1dfcfa9d9871425064c814b4237183825e6.
+- Release: 1.1.1.
+- M0 through M8 and PRECISION-001 complete.
+- PILOT-007 is UNSATISFIED. The untouched scanner at selection commit
+  08050a14437abaf47ff45b90a1392a9fbc460a93 hits a reproducible RecursionError
+  blocker on the Silo closure, so there is no frozen baseline scan digest. The
+  pinned Silo tag 4.26.0 (commit 570a668a98a88a6a2b92697e7b9a3b1c6299dce7)
+  does not map to the deployed in-scope assets, which are Silo version 3.5.0
+  (commit b1f428f1c3d5fc989974fd8e7b3b84180e05e31f). Silo is retained only as a
+  research corpus.
+- REPAIR-007 completed on 2026-08-13. A new private Git-backed minimal checkout
+  (only the three submodules intersecting the frozen 124-file closure, with
+  superproject Git metadata, user-read-only) is accepted by the public scanner
+  and reproduces the canonical 81-finding result offline. The two
+  compiler-backed regressions assert expected semantic results and exact stable
+  public evidence; the deep-AST test uses TemporaryDirectory. The suite is 221
+  tests; frozen gates unchanged.
+- The post-repair Silo operational result (scan digest
+  9784d71e91ae86d4380c738badb2c1dfcfa9d9871425064c814b4237183825e6, candidate
+  ledger 8b1352ed188f4f2f6f93b7e365a9721c6f0a2204116b4e6eaa1a0109347f6b2f,
+  review ledger 3c58c01c81df6fe3c93c70e4d59c1b944360beaa289137c1cf80404519f72540)
+  is post-repair operational evidence, not an untouched frozen trial.
+- Next: PILOT-008, a new independent target with an exact deployed-source
+  mapping, before PRECISION-002 starts.
 
-Preserve these private artifacts unchanged
+Existing evidence — preserve unchanged
 
-- ../targets/silo-contracts-v3-4.26.0
-- ../bounty-workspaces/silo-contracts-v3-4.26.0
-- ../bounty-workspaces/silo-contracts-v3-4.26.0-replay
-- ../bounty-workspaces/silo-contracts-v3-4.26.0-baseline-a
-- ../bounty-workspaces/silo-contracts-v3-4.26.0-baseline-b
-- ../bounty-workspaces/silo-minimal-checkout
-- ../bounty-workspaces/silo-minimal-verify
-- all OpenZeppelin trial evidence
+- Silo target checkout: ../targets/silo-contracts-v3-4.26.0
+- Silo canonical workspace: ../bounty-workspaces/silo-contracts-v3-4.26.0
+- Silo replay workspace: ../bounty-workspaces/silo-contracts-v3-4.26.0-replay
+- Silo baseline workspaces: ../bounty-workspaces/silo-contracts-v3-4.26.0-baseline-a,
+  ../bounty-workspaces/silo-contracts-v3-4.26.0-baseline-b
+- Silo minimal checkouts: ../bounty-workspaces/silo-minimal-checkout,
+  ../bounty-workspaces/silo-repair-007/silo-contracts-v3-git
+- Silo verification workspaces: ../bounty-workspaces/silo-minimal-verify,
+  ../bounty-workspaces/silo-repair-007/silo-repair-verify
+- OpenZeppelin trial evidence (unchanged).
 
-Keep target source, candidate IDs, source paths, excerpts, traces, review notes,
-credentials, and generated private artifacts out of the repository and Git
-output.
+Keep candidate IDs, source paths, excerpts, traces, and review notes out of the
+repository and Git output.
 
-Required work
+Execution
 
-1. Verify the worktree, main versus origin/main, current project CI, the full
-   test suite, both frozen evaluations, and the recorded private-artifact
-   permissions and hashes. Do not rewrite existing evidence.
+1. Verify the worktree, origin/main, current CI, and the recorded hashes and
+   permissions. Run the full suite, frozen audit evaluation, and historical
+   bounty evaluation.
+2. Research at least three current programs from official sources. Prefer a
+   target whose scope maps exact deployed assets to a pinned immutable Git
+   revision or release, with a manageable dependency closure and no RPC or fork
+   need. Avoid repeating the PILOT-007 failure: filename equality is not proof
+   of deployed-source equivalence; use the program's own deployment/version
+   records and verified-source metadata.
+3. Record the selection and comparison in
+   docs/research/PILOT_008_TARGET_SELECTION.md. Present one complete target
+   boundary and request the single consolidated operator authorization.
+4. After approval, acquire the exact approved source and pinned dependencies,
+   build a minimal dependency-closure checkout, and run two private offline
+   scans. Preserve the first baseline result frozen before any detector
+   change. Do not tune detector behavior against the target.
+5. Review candidates privately and present proposed decisions in one batch for
+   operator confirmation. Complete the private review brief for every
+   candidate.
+6. Write docs/research/PILOT_008_EVALUATION.md with aggregate, redacted
+   results. Update README.md, CHANGELOG.md, TASKS.md,
+   docs/DEVELOPMENT_PLAN.md, docs/README.md, and this handoff. State the
+   current test count and the exact source-to-scope verdict.
+7. Run all validation gates, inspect the staged diff for private data, run a
+   simplification review, commit one coherent change, push main, verify CI, and
+   leave the worktree clean with main equal to origin/main.
 
-2. Fix the minimal-checkout reproduction in new private paths. Build a new
-   scanner-compatible Git checkout from the existing local Git objects, with
-   only the three submodules that intersect the frozen 124-file compiler
-   closure. Do not use the network. Retain usable Git metadata, then make the
-   entire checkout, including Git metadata, user-read-only under a private
-   parent. Create a new private verification workspace that points at it.
+Validation gates
 
-3. Through the public bounty CLI, validate the new profile and reproduce the
-   source manifest and compiler-enabled scan offline. Materialize the candidate
-   ledger too if that is a separate CLI step. Compare the reportable and
-   compiler-only file sets, per-file hashes, remappings, compiler identity,
-   scan result, and candidate result with the canonical post-repair workspace.
-   Explain any profile-bound digest difference; do not call a manual hash-only
-   comparison a scanner reproduction. The canonical reference digests are:
+PYTHONPATH=src python3 -m unittest discover -s tests -q
+PYTHONPATH=src python3 -m contract_holes evaluate \
+  tests/fixtures/evaluation/manifest.json
+PYTHONPATH=src python3 -m contract_holes bounty history \
+  tests/fixtures/bounty_history/manifest.json
+git diff --check
 
-   - source manifest:
-     9e2a7faed9326d4db51b717222d9227f92f7e3909fb0cdf91d6b62378aeb8f84
-   - scan:
-     9784d71e91ae86d4380c738badb2c1dfcfa9d9871425064c814b4237183825e6
-   - candidate ledger:
-     8b1352ed188f4f2f6f93b7e365a9721c6f0a2204116b4e6eaa1a0109347f6b2f
-
-   A changed candidate set, unexpected source difference, or plausible
-   security state change is a stop condition. Do not copy private records into
-   the repository.
-
-4. Improve tests/test_repair_007.py with the smallest useful assertions. Compile
-   the signature fixture once and assert its expected semantic result, not
-   merely non-None output or equality with a second run. For the call-kind
-   fixture, assert that error/event/struct members create no external
-   interaction and that the real retained interaction/finding has the exact
-   stable public fixture path, line, kind, entry function, and evidence fields
-   required by CONTRIBUTING.md. Keep the tests at the public compiler-backed
-   seam and avoid new abstractions.
-
-5. Replace mkdtemp plus manual cleanup in tests/test_deep_ast.py with a
-   context-managed tempfile.TemporaryDirectory. Keep the change local to the
-   test.
-
-6. Correct all public status text. In particular:
-
-   - describe the first minimal checkout as a manual, hash-only reproduction
-     that was not scanner-compatible because it lacked Git metadata;
-   - remove the contradictory claims that regression work was open and that
-     every review finding was already closed;
-   - use the correct 64-character scan digest above;
-   - state that REPAIR-007 blocks PILOT-008 until this work passes;
-   - keep PRECISION-002 blocked by PILOT-008;
-   - keep the final source-to-scope verdict UNSATISFIED even if this repair
-     succeeds.
-
-   Update README.md, CHANGELOG.md, TASKS.md, docs/DEVELOPMENT_PLAN.md,
-   docs/PILOT_007_PLAN.md, docs/PILOT_008_PLAN.md,
-   docs/research/PILOT_007_EVALUATION.md, and this handoff as needed. Keep all
-   target reporting aggregate and redacted.
-
-7. Run the focused regressions, then all gates:
-
-   PYTHONPATH=src python3 -m unittest tests.test_repair_007 tests.test_deep_ast -v
-   PYTHONPATH=src python3 -m unittest discover -s tests -q
-   PYTHONPATH=src python3 -m contract_holes evaluate \
-     tests/fixtures/evaluation/manifest.json
-   PYTHONPATH=src python3 -m contract_holes bounty history \
-     tests/fixtures/bounty_history/manifest.json
-   git diff --check
-
-8. Inspect the staged file list and staged diff for private data and accidental
-   complexity. If every completion criterion passes, mark REPAIR-007 complete,
-   make PILOT-008 NEXT, update this handoff for PILOT-008, commit one coherent
-   change, push main, verify CI, and leave the worktree clean with main equal to
-   origin/main. If a criterion does not pass, leave REPAIR-007 open and report
-   the exact blocker. Do not start PILOT-008 in the same session.
-
-Completion criteria
-
-- A new read-only, Git-backed minimal checkout is accepted by the public scanner.
-- A new private workspace contains an offline scanner-produced source manifest
-  and scan; its semantic inputs and result match the canonical operational run.
-- The repaired regressions assert stable public evidence and fail for their
-  corresponding pre-fix behavior.
-- TemporaryDirectory owns the deep-AST test lifecycle.
-- Public documents make no contradictory or overstated completion claim.
-- All public tests and frozen evaluations pass.
-- No private target or candidate content enters Git.
-- One coherent commit is pushed, project CI is green, and the worktree is clean.
-
-No new operator approval is needed for this local, private, offline repair.
-Stop only for a changed candidate/security state, missing local source needed
-to continue, or any action requiring network target acquisition, RPC, a fork,
-a chain action, proof, report, export, disclosure, submission, external bounty
-or target-platform writing, or target contact. The normal project-repository
-push and CI check in step 8 remain part of this task.
+Stop only for operator approval, a plausible candidate/state change, or if
+progress would require RPC, a fork, a chain action, a proof, a report,
+disclosure, submission, platform writing, target contact, or an unapproved
+target download.
 ```

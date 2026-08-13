@@ -36,9 +36,9 @@
 - [PILOT-007 independent target selection](research/PILOT_007_TARGET_SELECTION.md)
 - [PILOT-007 evaluation](research/PILOT_007_EVALUATION.md)
 - [PILOT-007 development and completion-repair plan](PILOT_007_PLAN.md) —
-  `REPAIR-007` is the current scanner-reproduction follow-up
+  `REPAIR-007` completed the scanner reproduction, regressions, and status text
 - [PILOT-008 development plan](PILOT_008_PLAN.md) — independent target trial
-  with an exact deployed-source mapping, blocked by `REPAIR-007`
+  with an exact deployed-source mapping, next after `REPAIR-007`
 
 ## Project governance
 

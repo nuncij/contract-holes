@@ -6,7 +6,7 @@ Pinned commit: `570a668a98a88a6a2b92697e7b9a3b1c6299dce7`
 Operator authorization: single consolidated approval on 2026-08-13
 Status: **UNSATISFIED — Silo retained as a non-bounty research corpus; a new
 independent target trial (`PILOT-008`) is required before `PRECISION-002`.
-`REPAIR-007` must close the completion-record evidence gap first.**
+`REPAIR-007` completed the completion-record evidence gap.**
 
 ## Outcome
 
@@ -67,16 +67,15 @@ All 221 tests pass and the frozen synthetic and historical evaluation gates are
 unchanged (`1.0` precision/recall on the synthetic corpus; `0.875` candidate
 precision and `1.0` supported-class recall on the historical corpus). The
 call-graph change altered detector behavior after target feedback. Two genuine
-regressions cover the signature and call-graph repairs, but `REPAIR-007` must
-strengthen their stable public evidence assertions before the completion record
-is closed.
+regressions cover the signature and call-graph repairs; `REPAIR-007`
+strengthened their stable public evidence assertions and closed the completion
+record.
 
 ## Completion repair results
 
-A completion review and initial repair on 2026-08-13 closed the baseline,
-source-mapping, and private-review findings. `REPAIR-007` remains open for the
-scanner-backed acquisition reproduction, regression assertions, test cleanup,
-and status corrections.
+A completion review and repair on 2026-08-13 closed the baseline,
+source-mapping, private-review, acquisition-reproduction, regression, and
+status-text findings.
 
 1. **Untouched baseline reconstructed (reproducible blocker).** The
    released-plus-`PRECISION-001` scanner at selection commit
@@ -90,30 +89,36 @@ and status corrections.
    `570a668a98a88a6a2b92697e7b9a3b1c6299dce7`, 2026-07-27). This is documented
    in the repository's own `DeployedSiloVersions.md` and the Immunefi scope
    addresses. The trial does not meet its target-selection gate.
-3. **Minimal dependency closure matched manually.** A new checkout with only the
-   three submodules intersecting the frozen 124-file compiler manifest was
-   built from local Git objects. All 134 manifest file hashes match the
-   canonical record byte-for-byte. The checkout contains no Git metadata, so
-   the public bounty scanner rejects its declared Git source; no source manifest
-   or scan was reproduced from this artifact. The historical over-retrieval of
-   87 submodule instances is recorded as an acquisition error.
+3. **Minimal dependency closure reproduced through the scanner.** An earlier
+   manual, hash-only checkout was not scanner-compatible because it lacked Git
+   metadata. `REPAIR-007` built a new private checkout from existing local Git
+   objects with only the three submodules intersecting the frozen 124-file
+   compiler closure, retaining usable superproject Git metadata, then froze the
+   full checkout (including that metadata) as user-read-only. The public
+   `holes bounty validate` and `holes bounty scan` accept it and reproduce the
+   source manifest, scan, and candidate ledger offline. The scan produces the
+   same 81 findings with the same rule distribution and byte-identical finding
+   objects; the only digest differences are profile-bound (program name,
+   authorization note, and source root path), which change the candidate IDs but
+   not the scan semantics. The historical over-retrieval of 87 submodule
+   instances is recorded as an acquisition error.
 4. **Private review records completed.** All 81 candidates now have a complete
    review-brief entry with hypothesis, impact, assumptions, reachability,
    duplicate/known-issue status, reason, and remaining uncertainty. All 81
    remain operator-confirmed `rejected`.
-5. **Regressions added; evidence assertions remain open.** Public-seam tests now
-   cover signature-domain
-   recursion termination and error/event/struct member call classification. The
-   tests fail under their corresponding pre-fix implementations. The retained
-   positive still needs exact stable path, line, kind, and evidence assertions,
-   and the signature test compiles redundantly instead of asserting one semantic
-   result. The fixed `/tmp` path was replaced with a unique directory, but it
-   still uses `mkdtemp` and manual cleanup rather than `TemporaryDirectory`.
-   The suite is 221 tests; frozen gates unchanged.
+5. **Regressions strengthened and test cleanup complete.** Public-seam tests now
+   cover signature-domain recursion termination and error/event/struct member
+   call classification. The signature test compiles once and asserts the
+   expected semantic result; the retained-positive test asserts exact stable
+   path, line, kind, entry function, evidence, and target-provenance fields. The
+   tests fail under their corresponding pre-fix implementations. The deep-AST
+   compiler test uses `TemporaryDirectory` for its full lifecycle. The suite is
+   221 tests; frozen gates unchanged.
 
 Because the source-to-scope gate fails, `PILOT-007` is **UNSATISFIED**. Silo
-remains a research-only validation corpus. A new independent target trial
-(`PILOT-008`) is required before `PRECISION-002` starts.
+remains a research-only validation corpus. `REPAIR-007` completion does not
+change that verdict; it only unblocks the next independent target trial
+(`PILOT-008`), which is required before `PRECISION-002` starts.
 
 ## Results
 
@@ -172,11 +177,12 @@ families.
 
 ## Recommended next product task
 
-First, `REPAIR-007` must close the scanner-reproduction and public-regression
-evidence gaps. Then a new independent target trial (`PILOT-008`) must
-produce an untouched baseline whose deployed assets map exactly to a pinned
-immutable source revision. The generic families observed here then become
-`PRECISION-002` precision work. The highest-value items are:
+The completion-record repair (`REPAIR-007`) is complete: the Git-backed minimal
+checkout reproduces the scan through the public scanner, and the regressions
+assert stable public evidence. Next, a new independent target trial
+(`PILOT-008`) must produce an untouched baseline whose deployed assets map
+exactly to a pinned immutable source revision. The generic families observed
+here then become `PRECISION-002` precision work. The highest-value items are:
 
 - distinguish custom error/event members from external interactions (already
   fixed in this trial, with regression coverage);
@@ -200,8 +206,8 @@ immutable source revision. The generic families observed here then become
 - Reviewer labels are from one reviewer and one target and are not independent
   ground truth.
 - The historical acquisition over-retrieved 87 submodule instances; the later
-  minimal checkout manually matches only the approved 124-file closure but is
-  not a scanner-compatible Git source. `REPAIR-007` must create and scan a new
-  Git-backed minimal checkout without changing this artifact.
+  minimal checkout matches only the approved 124-file closure. A newer
+  Git-backed minimal checkout (with superproject Git metadata, user-read-only)
+  reproduces the scan through the public scanner.
 - No proof, report, export, disclosure, submission, chain action, RPC, fork,
   or target contact occurred.

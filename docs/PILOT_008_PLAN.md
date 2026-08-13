@@ -1,6 +1,6 @@
 # PILOT-008 development plan
 
-Status: **BLOCKED BY `REPAIR-007`**
+Status: **NEXT**
 
 ## Goal
 

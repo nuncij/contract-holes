@@ -76,15 +76,13 @@ class DeepAstTraversalTests(unittest.TestCase):
             "    }\n"
             "}\n"
         )
-        root = Path(tempfile.mkdtemp(prefix="holes-deep-ast-regression-"))
-        (root / "DeepNest.sol").write_text(source_text, encoding="utf-8")
-        try:
+        with tempfile.TemporaryDirectory(prefix="holes-deep-ast-regression-") as tmp:
+            root = Path(tmp)
+            (root / "DeepNest.sol").write_text(source_text, encoding="utf-8")
             files = discover_sources([root])
             compilation = ForgeCompiler().compile(files, project_root=root, offline=True)
             index = ProjectIndex(compilation)
             self.assertEqual(len(index.sources), 1)
-        finally:
-            shutil.rmtree(root, ignore_errors=True)
 
 
 if __name__ == "__main__":

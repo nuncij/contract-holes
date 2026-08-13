@@ -48,15 +48,19 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   (2026-08-13) reconstructed the untouched baseline, which is a reproducible
   `RecursionError` blocker at selection commit `08050a1`; proved the
   source-to-scope gate fails (the deployed in-scope assets are Silo `3.5.0`,
-  commit `b1f428f`, not the pinned `4.26.0`, commit `570a668`); manually matched
-  the minimal 124-file compiler closure byte-for-byte from local Git objects;
-  completed every private review-brief field for all 81 candidates; and added
-  two genuine regressions. A follow-up is required because that checkout lacks
-  Git metadata and cannot reproduce a source manifest or scan through the
-  public bounty workflow; the regressions and temporary-directory lifecycle
-  also need small corrections. `PILOT-007` is unsatisfied and Silo is retained
-  only as a research corpus. `REPAIR-007` blocks a new independent target trial
-  (`PILOT-008`), which in turn blocks `PRECISION-002`.
+  commit `b1f428f`, not the pinned `4.26.0`, commit `570a668`); completed every
+  private review-brief field for all 81 candidates; and added two genuine
+  regressions. `PILOT-007` is unsatisfied and Silo is retained only as a
+  research corpus.
+- Completed `REPAIR-007` (2026-08-13). A new private Git-backed minimal
+  checkout (only the three submodules intersecting the frozen 124-file compiler
+  closure, with superproject Git metadata, user-read-only) is accepted by the
+  public scanner; `holes bounty scan` reproduces the canonical 81-finding result
+  offline, with only profile-bound digest differences (name, note, source root).
+  The two compiler-backed regressions now assert expected semantic results and
+  exact stable public evidence, and the deep-AST test uses `TemporaryDirectory`.
+  The final Silo source-to-scope verdict stays **UNSATISFIED**. `PILOT-008` is
+  next; `PRECISION-002` remains queued until `PILOT-008` completes.
 
 - Completed the first authorized external source-only trial against the exact
   bounty-pinned OpenZeppelin Confidential Contracts `v0.4.0` release. The
