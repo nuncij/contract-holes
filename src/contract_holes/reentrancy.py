@@ -30,6 +30,7 @@ class TraceEvent:
     fact: FlowFact | None = None
     edge: CallEdge | None = None
     guarded: bool = False
+    branch_context: tuple[tuple[NodeKey, str], ...] = ()
 
 
 @dataclass(frozen=True, slots=True)
@@ -135,7 +136,14 @@ class ReentrancyAnalysis:
             kind = self._fact_event_kind(fact)
             if kind is not None:
                 local_events.append(
-                    TraceEvent(kind, function, fact.span, fact=fact, guarded=guarded)
+                    TraceEvent(
+                        kind,
+                        function,
+                        fact.span,
+                        fact=fact,
+                        guarded=guarded,
+                        branch_context=self._branch_context(fact.node),
+                    )
                 )
         for edge in self.project.call_graph.edges_from(function):
             if (
@@ -145,7 +153,14 @@ class ReentrancyAnalysis:
             ):
                 continue
             local_events.append(
-                TraceEvent("call", function, edge.span, edge=edge, guarded=guarded)
+                TraceEvent(
+                    "call",
+                    function,
+                    edge.span,
+                    edge=edge,
+                    guarded=guarded,
+                    branch_context=self._branch_context(edge.call_site),
+                )
             )
         function_node = self.project.node_for_key(function)
         order = (
@@ -176,6 +191,8 @@ class ReentrancyAnalysis:
                 write = trace[write_index]
                 if write.kind != "write" or self._is_guard_write(write):
                     continue
+                if self._branches_are_incompatible(interaction, write):
+                    continue
                 issues.append(
                     ReentrancyIssue(
                         entry=entry,
@@ -186,6 +203,36 @@ class ReentrancyAnalysis:
                 )
                 break
         return issues
+
+    @staticmethod
+    def _branches_are_incompatible(
+        interaction: TraceEvent, write: TraceEvent
+    ) -> bool:
+        interaction_context = dict(interaction.branch_context)
+        write_context = dict(write.branch_context)
+        return any(
+            key in write_context and interaction_context[key] != write_context[key]
+            for key in interaction_context
+        )
+
+    def _branch_context(
+        self, node_key: NodeKey | None
+    ) -> tuple[tuple[NodeKey, str], ...]:
+        node = self.project.node_for_key(node_key) if node_key is not None else None
+        context: list[tuple[NodeKey, str]] = []
+        current = node
+        while current is not None:
+            parent = self.project.parent(current)
+            if parent is None:
+                break
+            if parent.get("nodeType") == "IfStatement":
+                arm = _if_arm(parent, current, self.project)
+                if arm is not None:
+                    parent_key = self.project.key_for_node(parent)
+                    if parent_key is not None:
+                        context.append((parent_key, arm))
+            current = parent
+        return tuple(reversed(context))
 
     def _manually_guarded(
         self, trace: tuple[TraceEvent, ...], interaction_index: int
@@ -300,6 +347,22 @@ def _walk_ast(node: Node):
             for child in value:
                 if isinstance(child, dict) and "nodeType" in child:
                     yield from _walk_ast(child)
+
+
+def _if_arm(
+    statement: Node, descendant: Node, project: "ProjectIndex"
+) -> str | None:
+    current = descendant
+    while current is not None:
+        parent = project.parent(current)
+        if parent is statement:
+            if current is statement.get("trueBody"):
+                return "true"
+            if current is statement.get("falseBody"):
+                return "false"
+            return None
+        current = parent
+    return None
 
 
 def _event_sort_key(

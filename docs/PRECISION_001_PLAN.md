@@ -1,6 +1,6 @@
 # PRECISION-001 development plan
 
-Status: **NEXT**
+Status: **COMPLETE**
 
 ## Goal
 
@@ -223,6 +223,21 @@ repository docs.
 
 Do not define success as zero findings. A remaining evidence-backed unknown is
 safer than suppressing a possible vulnerability.
+
+## Result
+
+Completed on 2026-08-13. The generic compiler corpus covers all five observed
+false-positive groups without target names, paths, identifiers, or excerpts.
+The fix removed four conversion-driven `SOL005` candidates from a fresh
+private rescan of the pinned trial. The rescan covered 22 reportable files and
+produced 47 candidates remaining across the generic groups: 23
+call-semantics, 8 branch-feasibility, 12 target-provenance, 3
+authorization-context, and 1 reentrancy-trust-boundary. The canonical private
+workspace and target checkout were unchanged. The synthetic evaluation remains
+33 positive and 31 safe labels with 1.0 precision and recall; the historical
+evaluation remains at 0.875 candidate precision and 1.0 supported-class recall.
+The labels are reviewer-derived from one target and are not independent ground
+truth. The next task is an independently authorized second real-world target.
 
 ## Stop conditions
 

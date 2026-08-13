@@ -189,6 +189,15 @@ resolve the one investigating candidate, which is now rejected. `PRECISION-001`
 converts the 51 rejected labels into generic safe fixtures and minimal
 detector fixes.
 
+`PRECISION-001` completed on 2026-08-13. A fresh private rescan of the pinned
+trial scanned 22 reportable files and produced 47 candidates after the generic
+fixes. The remaining workload is 23 call-semantics, 8 branch-feasibility, 12
+target-provenance, 3 authorization-context, and 1 reentrancy-trust-boundary
+candidate. Four conversion-driven `SOL005` candidates no longer appear. The
+canonical private workspace and target checkout were unchanged. These are
+reviewer-derived labels from one target, not independent ground truth; an
+independent second target is required before drawing broader precision claims.
+
 ## Decision
 
 M8 passes its release gate. The authorized target and rules were pinned before

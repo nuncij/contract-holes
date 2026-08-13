@@ -1,0 +1,18 @@
+{
+  "sol005_clean": ["PrecisionCases.infeasibleBranch"],
+  "sol005_positive": [
+    "PrecisionCases.feasibleBranch",
+    "PrecisionCases.fixedTargetStillNeedsReview"
+  ],
+  "sol008_positive": [
+    "PrecisionCases.callerSelectedTarget",
+    "PrecisionCases.feasibleBranch",
+    "PrecisionCases.infeasibleBranch"
+  ],
+  "sol009_clean": [
+    "PrecisionCases.roleProtectedWrite",
+    "PrecisionCases.callerOwnedWrite"
+  ],
+  "sol009_positive": ["PrecisionCases.arbitraryAccountWrite"],
+  "call_semantics_clean": true
+}

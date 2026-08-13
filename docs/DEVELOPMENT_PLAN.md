@@ -3,9 +3,8 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Convert the rejected real-trial labels into generic precision fixes
-(`PRECISION-001`) using the
-[dedicated implementation plan](PRECISION_001_PLAN.md).**
+Next: **Select and evaluate an independent second real-world target
+(`PILOT-007`).**
 
 ## Product goal
 
@@ -47,11 +46,11 @@ The scanner is successful when it:
 | `SOL002` unchecked call | Compiler evidence when available | Does not track an assigned success value to its later use |
 | `SOL003` `delegatecall` | Source signal | Does not yet determine whether the target is user-controlled or trusted |
 | `SOL004` `selfdestruct` | Direct evidence | Protocol impact still depends on the call path and deployment assumptions |
-| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence plus configurable callback probe | Branch paths remain conservative; target deployment, setup, and impact assertions remain project-specific |
+| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence plus configurable callback probe | Opposite `if`/`else` arms are kept separate; target deployment, setup, callback reachability, and impact assertions remain project-specific |
 | `SOL006` weak randomness | Source heuristic | Does not trace the random value to a value-bearing decision |
 | `SOL007` packed hash collision | Compiler evidence plus primitive proof | Does not trace the hash to authorization, signatures, or identifiers |
-| `SOL008` controlled call target | Compiler-backed interprocedural taint | Does not yet prove allowlist dominance or persist taint through state across transactions |
-| `SOL009` exposed privileged write | Compiler-backed authorization reachability | Privileged-state names and branch dominance are conservative; custom protocol authorization may require review |
+| `SOL008` controlled call target | Compiler-backed interprocedural taint | Immutable/fixed receivers retain provenance; the rule does not prove allowlist dominance or persist taint through state across transactions |
+| `SOL009` exposed privileged write | Compiler-backed authorization reachability | Dominating role checks and `msg.sender` mapping keys are recognized; privileged-state names, branch dominance, and custom protocol authorization may require review |
 | `SOL010` signature authorization | Compiler-backed recovery-to-action path | Protection and domain recognition are conservative; external library and cross-function digest provenance may require review |
 | `SOL011` proxy and upgrade safety | Compiler-backed initializer, delegatecall-storage, and versioned-layout evidence | Custom proxy standards and unnamed upgrade relationships require project-specific review |
 | `SOL012` ERC-20 interaction safety | Compiler-backed typed-call and amount-origin flow | Custom wrappers, accepted-token policy, and indirect recipients may require review |
@@ -428,9 +427,22 @@ confirmed. The reviewer-labelled candidate precision is 0/51. The review is
 not independent ground truth, and recall remains unknown. RPC, chain activity,
 target contact, report export,
 disclosure, and submission remained outside the authorization and did not
-occur. `PRECISION-001` captures only the generic detector gaps shown by the
-51 rejected labels. Private target evidence will not become a repository
+occur. `PRECISION-001` completed on 2026-08-13. Its generic compiler corpus
+covers all five observed detector gaps. A fresh private rescan of the same
+pinned trial scanned 22 reportable files and produced 47 candidates: 23
+call-semantics, 8 branch-feasibility, 12 target-provenance, 3
+authorization-context, and 1 reentrancy-trust-boundary. The canonical private
+workspace and target checkout were unchanged. The synthetic and historical
+evaluation gates remain unchanged and passing. These reviewer labels are not
+independent ground truth; the next step is an independently authorized second
+real-world target. Private target evidence will not become a repository
 fixture.
+
+The next validation step is `PILOT-007`: select and evaluate an independent
+second real-world target only after its program rules, source identity, scope,
+and authorization are explicitly pinned. It must remain local, private,
+isolated, and offline; no target contact, proof, report, export, disclosure,
+submission, chain action, or platform interaction is implied.
 
 ### Post-M8 — Compiler-only dependency boundary
 

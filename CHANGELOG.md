@@ -56,6 +56,15 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   generic proof workflow could not test that question without inventing setup
   facts. The compiler trial's reviewer-labelled candidate precision is 0/51.
   The review is not independent ground truth, and recall remains unknown.
+- Completed `PRECISION-001` with generic compiler fixtures for all five observed
+  precision groups. Call classification now excludes pure/internal calls and
+  user-defined value conversions, reentrancy traces retain minimal branch
+  context, fixed target provenance remains visible, and authorization facts
+  recognize caller-owned mapping writes. The fresh private rescan covered 22
+  files and produced 47 remaining candidates: 23 call-semantics, 8
+  branch-feasibility, 12 target-provenance, 3 authorization-context, and 1
+  reentrancy-trust-boundary. The canonical private workspace and target
+  checkout were unchanged.
 
 ## 1.1.1 — 2026-08-10
 

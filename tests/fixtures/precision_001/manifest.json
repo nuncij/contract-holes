@@ -1,0 +1,11 @@
+{
+  "corpus_version": "precision-001",
+  "compiler": "0.8.25",
+  "cases": [
+    {"name": "call-semantics", "rule_ids": [], "behavior": "pure and internal calls plus user-defined value conversions are not external interactions"},
+    {"name": "branch-feasibility", "rule_ids": ["SOL005"], "behavior": "opposite if/else arms are not one execution path"},
+    {"name": "target-provenance", "rule_ids": ["SOL008", "SOL005"], "behavior": "fixed receivers retain provenance while caller-selected receivers remain reportable"},
+    {"name": "authorization-context", "rule_ids": ["SOL009"], "behavior": "role checks dominate protected writes and msg.sender mapping keys are caller-owned"},
+    {"name": "reentrancy-trust-boundary", "rule_ids": ["SOL005"], "behavior": "fixed targets do not suppress reentrancy review solely because they are immutable"}
+  ]
+}

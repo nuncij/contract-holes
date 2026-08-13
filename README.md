@@ -365,8 +365,13 @@ report, export, disclosure, submission, chain action, or target interaction
 occurred. The final candidate was resolved on 2026-08-12 under standing local
 offline authorization: trust-boundary analysis and a mechanical external-call
 enumeration showed no untrusted callback is reachable in the reported window.
-`PRECISION-001` is next: it converts the 51 rejected labels into generic safe
-fixtures and minimal detector precision fixes.
+`PRECISION-001` is complete. Its generic compiler corpus covers all five
+observed precision groups, and a fresh private rescan of the pinned trial
+produced 47 remaining candidates across those groups: 23 call-semantics, 8
+branch-feasibility, 12 target-provenance, 3 authorization-context, and 1
+reentrancy-trust-boundary. The canonical private workspace and target checkout
+were unchanged. `PILOT-007` is next: select and evaluate an independent second
+real-world target under new explicit authorization.
 
 The compiler index, inheritance
 resolver, call graph, reusable

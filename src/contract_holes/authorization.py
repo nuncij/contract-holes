@@ -80,6 +80,11 @@ class AuthorizationAnalysis:
             for index, event in enumerate(trace):
                 if event.kind != "write":
                     continue
+                if (
+                    event.fact is not None
+                    and event.fact.metadata.get("index_ownership") == "msg.sender"
+                ):
+                    continue
                 if any(candidate.protective for candidate in trace[:index]):
                     continue
                 issue = AuthorizationIssue(entry, event, trace[: index + 1])

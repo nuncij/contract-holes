@@ -16,7 +16,8 @@ Project state
 
 - The current release is 1.1.1.
 - M0 through M8 are complete.
-- PILOT-006 is complete. The next task is PRECISION-001.
+- PILOT-006 and PRECISION-001 are complete. The next task is PILOT-007:
+  select and evaluate an independent second real-world target.
 - The private compiler trial scanned 22 reportable files with 58 exact
   compiler-only dependencies.
 - The trial produced 51 candidates. Human review rejected all 51. No candidate
@@ -50,6 +51,12 @@ Local evidence
   ../bounty-workspaces/openzeppelin-confidential-v0.4.0-pilot-006
 - Expected external-call enumeration SHA-256:
   039930c0a09d9987f011c6dd7ebec807ce523ce137ed5a0d4110d3df7deaddee
+- Private PRECISION-001 rescan workspace:
+  ../bounty-workspaces/openzeppelin-confidential-v0.4.0-precision-001
+- Expected PRECISION-001 rescan digest:
+  8bcf4e1b910588932998161b3f4df5f4cd8dc02a6efacd4dc3c670e1f301c66e
+- Expected PRECISION-001 candidate-ledger digest:
+  92654835b8aa11f95b83bc070547a823a32a0bd3a8ed113ab5c328501c6a437e
 - Expected solc version:
   0.8.27+commit.40a35a09.Linux.g++
 - Expected solc SHA-256:

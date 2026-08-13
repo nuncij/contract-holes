@@ -25,8 +25,8 @@ offline mechanical enumeration showed no untrusted actor can reach a callback
 in the reported interaction window, and the existing proof workflow could not
 test that question without inventing setup facts.
 
-Next: **PRECISION-001 — Convert the 51 rejected real-trial labels into generic
-safe regression fixtures and the smallest detector precision fixes.**
+Next: **PILOT-007 — Select and evaluate an independent second real-world target
+with the improved scanner.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -557,9 +557,9 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   decisive question. The human decision is `rejected`; the private review
   ledger now holds 51 rejections, zero investigating, and zero confirmed.
 
-- [ ] **PRECISION-001** — Convert the 51 rejected real-trial labels into generic
+- [x] **PRECISION-001** — Convert the 51 rejected real-trial labels into generic
   safe regression fixtures and the smallest detector precision fixes. Follow
-  the [dedicated development plan](docs/PRECISION_001_PLAN.md) — P1 — **NEXT**.
+  the [dedicated development plan](docs/PRECISION_001_PLAN.md) — P1 — **COMPLETE**.
 
   Acceptance criteria:
 
@@ -573,6 +573,34 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
     project-specific suppressions are not added.
 
   Depends on: `PILOT-005`.
+
+  Completed on 2026-08-13. The generic corpus covers all five observed groups.
+  Compiler call classification now ignores pure/internal calls and
+  user-defined value-type conversions. Reentrancy traces retain minimal
+  `if`/`else` branch context, while fixed receivers remain reviewable rather
+  than automatically safe. Authorization facts recognize dominating role
+  checks and caller-owned `msg.sender` mapping writes without suppressing
+  arbitrary-account writes. The frozen positive and historical gates remain
+  unchanged. A fresh private rescan of the pinned trial scanned 22 files and
+  produced 47 candidates: 23 call-semantics, 8 branch-feasibility, 12
+  target-provenance, 3 authorization-context, and 1 reentrancy-trust-boundary.
+  The canonical private workspace and target checkout were unchanged.
+
+- [ ] **PILOT-007** — Select and evaluate an independent second real-world target
+  with the improved scanner — P1 — **NEXT, NEW AUTHORIZATION REQUIRED**.
+
+  Acceptance criteria:
+
+  - the program rules, source revision, scope, impacts, and restrictions are
+    explicitly authorized and pinned before acquisition;
+  - the target is independent of the OpenZeppelin trial and remains private;
+  - source-only or compiler-enabled analysis stays local, isolated, and offline;
+  - candidate review uses generic evidence without copying private target data
+    into repository fixtures or documentation;
+  - no proof, report, export, disclosure, submission, chain action, or target
+    contact occurs without separate explicit authorization.
+
+  Depends on: `PRECISION-001`.
 
 ## Definition of done for every task
 

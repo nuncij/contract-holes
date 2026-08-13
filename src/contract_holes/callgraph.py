@@ -237,6 +237,22 @@ class CallGraph:
         member_name = str(member.get("memberName", "<member>"))
         owner = member.get("expression")
         owner_name = str(owner.get("name", "")) if isinstance(owner, dict) else ""
+        owner_resolution = (
+            self.project.resolve_reference_detail(owner)
+            if isinstance(owner, dict) and owner.get("nodeType") == "Identifier"
+            else None
+        )
+        is_value_type_owner = bool(
+            owner_resolution is not None
+            and owner_resolution.node is not None
+            and owner_resolution.node.get("nodeType")
+            == "UserDefinedValueTypeDefinition"
+        )
+        if isinstance(owner, dict) and (
+            owner.get("nodeType") == "ElementaryTypeNameExpression"
+            or is_value_type_owner
+        ):
+            return None
         if member_name in LOW_LEVEL_MEMBERS:
             return self._edge(
                 caller,

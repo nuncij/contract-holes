@@ -644,9 +644,19 @@ class _FunctionAnalyzer:
         for declaration in declarations:
             node = self.project.node_for_key(declaration)
             if node is not None:
-                self._write_declaration(node, value, site)
+                metadata = {}
+                if _caller_owned_mapping_target(target):
+                    metadata["index_ownership"] = "msg.sender"
+                self._write_declaration(node, value, site, metadata=metadata)
 
-    def _write_declaration(self, declaration: Node, value: FlowValue, site: Node) -> None:
+    def _write_declaration(
+        self,
+        declaration: Node,
+        value: FlowValue,
+        site: Node,
+        *,
+        metadata: dict[str, object] | None = None,
+    ) -> None:
         key = self.project.key_for_node(declaration)
         if key is None:
             return
@@ -659,7 +669,11 @@ class _FunctionAnalyzer:
             site,
             declaration=key,
             value=value,
-            metadata={"name": str(declaration.get("name", "")), "scope": scope},
+            metadata={
+                "name": str(declaration.get("name", "")),
+                "scope": scope,
+                **(metadata or {}),
+            },
         )
         if not state_variable and (value.origins or value.taints):
             self._fact(
@@ -741,6 +755,21 @@ def _target_declarations(project: "ProjectIndex", target: Node) -> tuple[NodeKey
                 result.extend(_target_declarations(project, component))
         return tuple(dict.fromkeys(result))
     return ()
+
+
+def _caller_owned_mapping_target(target: Node) -> bool:
+    if target.get("nodeType") != "IndexAccess":
+        return False
+    index = target.get("indexExpression")
+    if not isinstance(index, dict) or index.get("nodeType") != "MemberAccess":
+        return False
+    owner = index.get("expression")
+    return bool(
+        isinstance(owner, dict)
+        and owner.get("nodeType") == "Identifier"
+        and owner.get("name") == "msg"
+        and index.get("memberName") == "sender"
+    )
 
 
 def _authorization_mechanisms(condition: Node) -> set[str]:
