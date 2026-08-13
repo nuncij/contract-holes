@@ -339,6 +339,8 @@ Project status and future work are tracked explicitly:
   the current private-trial state, work boundary, and completion checklist.
 - [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
   packages, safety constraints, validation gates, and completion criteria.
+- [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
+  selection, one approval boundary, private replay, review, and evaluation.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review

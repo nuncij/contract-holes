@@ -12,6 +12,8 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   conditions.
 - Added a copy-ready next-session prompt with the current private-trial state,
   authorization boundary, ordered work, and completion checks.
+- Added the `PILOT-007` plan for independent target selection, one consolidated
+  authorization, deterministic private replay, review, and redacted evaluation.
 - Recorded standing authorization for local, private, isolated, offline work on
   `PILOT-006`. Target-related network activity, report export, disclosure, and
   submission remain outside that authorization.

@@ -7,14 +7,15 @@ Holes repository root.
 Continue development of Contract Holes in this repository.
 
 Start by reading AGENTS.md if it exists, TASKS.md, docs/DEVELOPMENT_PLAN.md,
-docs/PRECISION_001_PLAN.md, docs/research/M8_TARGET_SELECTION.md,
-docs/research/M8_OPENZEPPELIN_TRIAL.md, and this handoff. Inspect Git and the
-private records before changing anything. Treat current command output as
-authoritative for mutable hashes and state.
+docs/PILOT_007_PLAN.md, docs/research/M8_TARGET_SELECTION.md,
+docs/research/M8_OPENZEPPELIN_TRIAL.md, and this handoff. Treat
+docs/PILOT_007_PLAN.md as the authoritative sequence and completion gate.
 
 Project state
 
 - The current release is 1.1.1.
+- The detector repair baseline is c882f6b. Start from the later planning commit
+  on origin/main and verify the current Git state.
 - M0 through M8 are complete.
 - PILOT-006 and PRECISION-001 are complete. The next task is PILOT-007:
   select and evaluate an independent second real-world target.
@@ -74,19 +75,27 @@ Local evidence
 
 Work boundary
 
-Continue local development, tests, documentation, Git commits, pushes, and
-project CI without another approval prompt. Keep the target checkout and
-private evidence read-only. Use private evidence only to derive generic tests.
+Complete routine local research, development, tests, documentation, Git commits,
+pushes, and project CI without extra approval prompts. Keep the prior target and
+private evidence read-only.
 
-Keep target-related network access disabled. RPC, forks, chains, target contact,
-report export, disclosure, submission, and platform APIs remain outside this
-work. Never commit private candidate details or target source.
+Use public network access only for current official target-selection sources.
+Before source acquisition, present one complete target boundary and request the
+single consolidated authorization specified in docs/PILOT_007_PLAN.md.
+
+After that approval, retrieve only the approved source and pinned dependencies.
+Keep all analysis private, isolated, and offline. Keep RPC, forks, chains,
+proofs, reports, exports, disclosure, submission, platform writes, and target
+contact outside this task.
 
 Execution
 
-Follow the `PILOT-007` acceptance criteria in TASKS.md. Select and document an
-independent candidate target first. Pin its current program rules, exact source
-revision, scope, impacts, restrictions, and work authorization before acquiring
-or scanning it. Keep the existing target checkout and canonical private
-workspaces unchanged.
+Start at step 1 of docs/PILOT_007_PLAN.md. Work through the plan until a listed
+stop condition needs operator input. The first expected stop is the single
+target-authorization request after public selection research. The second is one
+batch confirmation of proposed candidate decisions, unless the scan is empty.
+
+Do not tune detector behavior after seeing the target. Freeze the independent
+evaluation first and create later product tasks for generic gaps. Update all
+status documents and this prompt, commit, push, and verify CI before completion.
 ```

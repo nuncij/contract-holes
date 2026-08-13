@@ -3,8 +3,8 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Select and evaluate an independent second real-world target
-(`PILOT-007`).**
+Next: **Select and evaluate an independent second real-world target. Follow the
+[`PILOT-007` development plan](PILOT_007_PLAN.md).**
 
 ## Product goal
 

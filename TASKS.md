@@ -597,7 +597,9 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   claimed from the repair.
 
 - [ ] **PILOT-007** — Select and evaluate an independent second real-world target
-  with the improved scanner — P1 — **NEXT, NEW AUTHORIZATION REQUIRED**.
+  with the improved scanner. Follow the
+  [dedicated development plan](docs/PILOT_007_PLAN.md) — P1 — **NEXT, NEW
+  AUTHORIZATION REQUIRED**.
 
   Acceptance criteria:
 
@@ -605,6 +607,10 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
     explicitly authorized and pinned before acquisition;
   - the target is independent of the OpenZeppelin trial and remains private;
   - source-only or compiler-enabled analysis stays local, isolated, and offline;
+  - two new private workspaces reproduce the same source, scan, and candidate
+    digests before detector tuning;
+  - every candidate receives one operator-confirmed private decision, unless the
+    scan produces no candidates;
   - candidate review uses generic evidence without copying private target data
     into repository fixtures or documentation;
   - no proof, report, export, disclosure, submission, chain action, or target
