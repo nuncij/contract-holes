@@ -5,9 +5,11 @@ the only assigned development model. The primary Codex session writes the plan
 and verifies the result; OpenCode performs the development workflow.
 
 ```text
-Continue Contract Holes development in the current repository. Execute
-PILOT-009 end to end. Use docs/PILOT_009_PLAN.md as the authoritative scope and
-completion gate.
+Continue Contract Holes development in the current repository. PILOT-009 is
+UNSATISFIED. Add the generic compiler-boundary repair (reproduce Foundry
+automatic submodule remapping in the isolated bounty compiler) and re-run the
+frozen EulerSwap v2 closure privately. Use docs/PILOT_009_PLAN.md as the
+authoritative scope, its completion gate, and its stop conditions.
 
 Role
 
@@ -23,6 +25,7 @@ Read first
 - docs/DEVELOPMENT_PLAN.md
 - docs/PILOT_009_PLAN.md
 - docs/research/PILOT_009_TARGET_SELECTION.md
+- docs/research/PILOT_009_EVALUATION.md
 - docs/PRECISION_002_PLAN.md
 - docs/COMP_004_PLAN.md
 - docs/EVALUATION.md
@@ -36,16 +39,26 @@ Current state
 - The suite has 238 tests. The frozen audit result is 33 positive and 31 safe
   labels at 1.0. The historical result has 0.933333 candidate precision, 1.0
   supported-class recall, and 1.0 evidence completeness.
-- PILOT-009 is in progress. Public research selected the EulerSwap v2 Ethereum
-  subset at commit 81cf6dc988468fd56f690e6bc0e338a5be02d034.
-- Euler's first-party verification manifest is pinned at euler-interfaces
-  commit d938bc264d6e1cee68a559798044d43ade8ac95e. It maps five deployed
-  EulerSwap v2 components to the selected source commit. An independent public
-  cross-check passed.
-- No target source has been downloaded or scanned. The exact import closure has
-  not been reproduced yet.
-- The worktree contains the new public target-selection record and initial plan
-  status edits. Preserve, review, and complete them.
+- PILOT-009 is UNSATISFIED. The public selection gate passed for the EulerSwap
+  v2 Ethereum subset at commit 81cf6dc988468fd56f690e6bc0e338a5be02d034.
+  Euler's pinned first-party verification manifest (euler-interfaces commit
+  d938bc264d6e1cee68a559798044d43ade8ac95e) maps five deployed components to
+  that commit. The exact pinned source and recursive submodule closure were
+  acquired, enumerated (5 reportable and 56 compiler-only Solidity files), and
+  frozen clean and user-read-only with Git metadata.
+- Both private workspaces reproduced byte-identical schema-1.2 source manifests
+  and failed deterministically at the compile stage before any scan: the fixed
+  detector commit 2574b6e cannot reproduce Foundry's automatic submodule
+  remapping (its isolated compiler writes libs = [] and loads only the target
+  remappings.txt). The unresolved import is v4-periphery/src/utils/BaseHook.sol
+  from src/UniswapHook.sol, in the closure of reportable src/EulerSwap.sol; the
+  target itself resolves it through libs = ["lib"] in foundry.toml. A
+  standalone offline trial compile of the identical 61-file closure with the
+  automatic remapping succeeds with Solidity 0.8.27.
+- No scan record or candidate identity exists. EulerSwap is retained as a
+  research corpus. The frozen target checkout is at
+  targets/euler-swap-v2-81cf6dc9 and the freeze record is at
+  bounty-workspaces/euler-swap-v2-0.8.27-freeze (outside this repository).
 
 Boundary
 
@@ -57,59 +70,45 @@ outside this repository. Use private directories (0700) and files (0600).
 Stay local and source-only after acquisition. No RPC, fork, public or test
 chain, transaction, deployment, target build/test/deploy script, proof,
 exploit, report export, disclosure, submission, bounty-platform write, or
-target contact. Do not change detector code, tests, rules, thresholds, corpus
-labels, or evaluation baselines during this fixed-detector trial. Do not put
-candidate-specific facts in public docs, commits, terminal summaries, or CI.
+target contact. Do not change detector rules, thresholds, corpus labels, or
+evaluation baselines for target-specific reasons; a generic compiler-boundary
+repair must keep every frozen corpus identity and public evidence contract
+unchanged. Do not put candidate-specific facts in public docs, commits,
+terminal summaries, or CI.
 
 Sequence
 
-1. Verify main against origin/main and inspect the existing uncommitted docs.
-   Confirm src, tests, evaluation, and pyproject.toml have not changed after
-   detector commit 2574b6e. Run the full unit suite, frozen audit evaluation,
-   and historical bounty evaluation.
+1. Verify main against origin/main. Confirm src, tests, evaluation, and
+   pyproject.toml have not changed after detector commit 2574b6e. Run the full
+   unit suite, frozen audit evaluation, and historical bounty evaluation.
 
-2. Finish the public pre-acquisition record. Check every claim in
-   docs/research/PILOT_009_TARGET_SELECTION.md against pinned primary sources.
-   Keep the dependency wording provisional: it is a bounded candidate graph,
-   not a reproduced closure. Mark PILOT-009 IN PROGRESS consistently in
-   TASKS.md, docs/DEVELOPMENT_PLAN.md, docs/PILOT_009_PLAN.md, README.md,
-   docs/README.md, CHANGELOG.md, and this handoff. Run doc/test gates, inspect
-   the diff for private material, commit, push main, and wait for green GitHub
-   CI. This public freeze must be green before any source download.
+2. Design the generic compiler-boundary repair at the existing isolated
+   compiler seam: reproduce Foundry's automatic submodule remappings (the
+   prefixes the target's libs/ directories imply) in the temporary staging
+   project, or accept a profile-declared additive remapping extension, so a
+   closure that relies on automatic remapping compiles offline. Keep legacy
+   digests and behavior unchanged for targets whose remappings.txt is
+   self-contained. Add generic fixtures and tests for a target that relies on
+   automatic remapping (a root import that resolves only via a libs/ prefix).
 
-3. Acquire only euler-xyz/euler-swap at exact commit
-   81cf6dc988468fd56f690e6bc0e338a5be02d034 and only the exact pinned
-   submodule revisions needed by the five selected reportable components'
-   recursive Solidity import closure. Work outside the Contract Holes repo.
-   Inspect source, gitlinks, .gitmodules, remappings, and compiler metadata; do
-   not execute target configuration or code. Verify tag eulerswap-2.0 resolves
-   to the same commit. Stop if an import needs a mutable or unpinned dependency,
-   if any gitlink differs from the public selection record, or if the selected
-   deployed-source mapping no longer holds.
+3. Run the full suite and both frozen evaluations. Verify the frozen audit,
+   historical, and prior corpus identities are unchanged and that legacy
+   unpinned profiles/digests are byte-identical.
 
-4. Enumerate the exact reportable closure and compiler-only closure. Record
-   their identities privately. Use COMP-004 profile/source-manifest schema 1.2
-   and exact compiler version 0.8.27. Freeze the complete Git-backed checkout,
-   including Git metadata, as user-read-only after acquisition. Validate that
-   Contract Holes accepts the source identity and compiler pin before scanning.
+4. Re-run the frozen EulerSwap closure privately with the repaired detector in
+   two new workspaces (schema 1.2, Solidity 0.8.27, the same 5 reportable and
+   56 compiler-only files). Compare source-manifest, profile, scan, and
+   candidate digests, compiler version, reportable file count, finding count,
+   candidate count, and rule distribution. A mismatch leaves the repair
+   incomplete.
 
-5. Create a new private workspace and run the first compiler-enabled scan with
-   detector commit 2574b6e. Preserve the first result even if it is a workflow
-   failure. Run with no network access. Do not alter scope, source, compiler,
-   detector, or profile after the freeze.
-
-6. Create a second private workspace from the same frozen inputs and replay the
-   scan offline. Compare source-manifest, profile, scan, and candidate digests,
-   compiler version, reportable file count, finding count, candidate count, and
-   rule distribution. A mismatch leaves PILOT-009 incomplete.
-
-7. Review every candidate privately against the pinned source, live program
+5. Review every candidate privately against the pinned source, live program
    impact rules, known issues, and prior audits. Record hypothesis, evidence
    boundary, impact, reachability assumptions, duplicate status, state, reason,
    uncertainty, and review effort. Do not tune the scanner from these labels.
    Treat candidates as investigation leads, not vulnerabilities.
 
-8. Write docs/research/PILOT_009_EVALUATION.md using aggregate public data only:
+6. Write docs/research/PILOT_009_EVALUATION.md using aggregate public data only:
    public target identity and selection method, mapping verdict, compiler mode,
    reportable file count, total candidates and per-rule counts, aggregate review
    states, review effort, comparison with prior trials, limitations including
@@ -117,7 +116,7 @@ Sequence
    private paths, hashes, candidate IDs, source excerpts, traces, and any
    candidate-specific explanation.
 
-9. Update README.md, CHANGELOG.md, TASKS.md, docs/DEVELOPMENT_PLAN.md,
+7. Update README.md, CHANGELOG.md, TASKS.md, docs/DEVELOPMENT_PLAN.md,
    docs/PILOT_009_PLAN.md, docs/README.md, and this handoff to the final truthful
    state. Mark PILOT-009 COMPLETE only if every completion gate in its plan
    passes. Run all validation gates, inspect the staged diff for private data,

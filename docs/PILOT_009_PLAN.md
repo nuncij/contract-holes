@@ -1,10 +1,15 @@
 # PILOT-009 development plan
 
-Status: **IN PROGRESS. The public selection gate passed for the EulerSwap v2
+Status: **UNSATISFIED. The public selection gate passed for the EulerSwap v2
 Ethereum subset at commit `81cf6dc988468fd56f690e6bc0e338a5be02d034`.
 Euler's pinned first-party verification record maps five deployed components to
-that commit. Source acquisition, exact closure reproduction, and the immutable
-pre-scan freeze are next. No target source has been downloaded or scanned.**
+that commit, and the exact pinned source with its recursive submodule closure
+was acquired, enumerated (five reportable and 56 compiler-only files), and
+frozen user-read-only. Both private workspaces then failed deterministically at
+the compile stage: the fixed detector commit `2574b6e` cannot reproduce
+Foundry's automatic submodule remapping, so the frozen closure cannot be
+compiled and no scan or candidate identity exists. EulerSwap is retained as a
+research corpus; a detector repair and a private re-scan are required.**
 
 ## Goal
 

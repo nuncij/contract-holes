@@ -52,11 +52,15 @@
 - [PRECISION-001 development plan](PRECISION_001_PLAN.md)
 - [PRECISION-002 development plan](PRECISION_002_PLAN.md) — complete at commit
   `2574b6e`. GitHub CI run `31720097982` passed
-- [PILOT-009 development plan](PILOT_009_PLAN.md) — in-progress validation of
+- [PILOT-009 development plan](PILOT_009_PLAN.md) — unsatisfied validation of
   commit `2574b6e` on the EulerSwap v2 Ethereum subset, a genuinely untouched
-  target that is not OpenZeppelin, Silo, or Olas
+  target that is not OpenZeppelin, Silo, or Olas (fixed-detector compile
+  blocker; no scan)
 - [PILOT-009 target selection](research/PILOT_009_TARGET_SELECTION.md) —
   public pre-acquisition mapping record for the selected EulerSwap v2 subset
+- [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md) — unsatisfied trial
+  outcome: exact closure frozen, fixed detector cannot reproduce the target's
+  automatic submodule remapping
 - [Next-session handoff prompt](NEXT_SESSION_PROMPT.md)
 - [Threat model](THREAT_MODEL.md)
 - [Security policy](../SECURITY.md)

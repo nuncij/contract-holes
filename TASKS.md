@@ -52,14 +52,22 @@ produced zero candidates. The suite is 238 tests; frozen gates are unchanged.
 `main`, and GitHub CI run `31720097982` passed both Quality and Reproducible
 package.
 
-Next: **PILOT-009** is IN PROGRESS. The public selection gate passed for the
+Next: **PILOT-009** is UNSATISFIED. The public selection gate passed for the
 EulerSwap v2 Ethereum subset at commit
-`81cf6dc988468fd56f690e6bc0e338a5be02d034`. Euler's pinned first-party
-verification record maps five deployed components to that commit. It validates
-the `PRECISION-002` detector commit `2574b6e` on a genuinely untouched target
-that is not OpenZeppelin, Silo, or Olas. See
-[the PILOT-009 plan](docs/PILOT_009_PLAN.md) and
-[the next-session prompt](docs/NEXT_SESSION_PROMPT.md).
+`81cf6dc988468fd56f690e6bc0e338a5be02d034`, and the exact pinned source with
+its recursive submodule closure was acquired, enumerated (five reportable and
+56 compiler-only files), and frozen user-read-only. Both private workspaces
+then failed deterministically at the compile stage: the fixed detector commit
+`2574b6e` cannot reproduce Foundry's automatic submodule remapping (its
+isolated staging writes `libs = []` and loads only the target's
+`remappings.txt`, which omits the `v4-periphery/` prefix the target resolves
+through its own `libs = ["lib"]`). No scan or candidate identity exists.
+EulerSwap is retained as a research corpus; a product repair to reproduce
+automatic submodule remapping, followed by a private re-scan of the frozen
+closure, is required before the next trial. See
+[the PILOT-009 plan](docs/PILOT_009_PLAN.md),
+[the evaluation](docs/research/PILOT_009_EVALUATION.md), and
+[the target-selection record](docs/research/PILOT_009_TARGET_SELECTION.md).
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -842,15 +850,32 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
 - [ ] **PILOT-009** — Validate detector commit `2574b6e` on a genuinely
   untouched target that is not OpenZeppelin, Silo, or Olas. Follow the
-  [dedicated development plan](docs/PILOT_009_PLAN.md) — P1 — **IN PROGRESS**.
+  [dedicated development plan](docs/PILOT_009_PLAN.md) — P1 — **UNSATISFIED**.
 
-  Status: public selection gate PASSED on 2026-08-13 for the EulerSwap v2
+  Status: the public selection gate PASSED on 2026-08-13 for the EulerSwap v2
   Ethereum subset at commit `81cf6dc988468fd56f690e6bc0e338a5be02d034`.
   Euler's pinned first-party verification record (`euler-interfaces` commit
   `d938bc264d6e1cee68a559798044d43ade8ac95e`) maps five deployed EulerSwap v2
-  components to that commit. Source acquisition, exact closure reproduction,
-  and the immutable pre-scan freeze are next. No target source has been
-  downloaded or scanned.
+  components to that commit. The exact source and its recursively pinned
+  submodules were acquired, the tag `eulerswap-2.0` was verified to resolve to
+  the same commit, and every gitlink matched the public record. The exact
+  closure was enumerated (5 reportable files, 56 compiler-only dependency
+  files, all pinned) and the checkout was frozen clean and user-read-only with
+  Git metadata. Two private workspaces then produced byte-identical schema-1.2
+  source manifests and failed deterministically at the compile stage with the
+  identical fixed-detector error: the isolated compiler writes `libs = []` and
+  loads only the target `remappings.txt`, so the import
+  `v4-periphery/src/utils/BaseHook.sol` (from `src/UniswapHook.sol`, in the
+  closure of reportable `src/EulerSwap.sol`) cannot resolve even though the
+  target itself resolves it via Foundry's automatic submodule remapping
+  (`libs = ["lib"]` in its `foundry.toml`). A standalone offline trial compile
+  with the automatic remapping compiled the identical 61-file closure cleanly
+  with Solidity `0.8.27`. No scan record or candidate exists. PILOT-009 does
+  not satisfy its completion gate, so it is **UNSATISFIED**; EulerSwap is
+  retained only as a research corpus. A detector repair to reproduce Foundry's
+  automatic submodule remapping (or a profile-declared remapping extension),
+  followed by a private re-scan of this same frozen closure, is the required
+  next step.
 
   Acceptance criteria:
 

@@ -3,13 +3,18 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **`PILOT-009` is IN PROGRESS.** The public selection gate passed for the
+Next: **`PILOT-009` is UNSATISFIED.** The public selection gate passed for the
 EulerSwap v2 Ethereum subset at commit
 `81cf6dc988468fd56f690e6bc0e338a5be02d034`; Euler's pinned first-party
-verification record maps five deployed components to that commit. It will
-validate detector commit `2574b6e` on a genuinely untouched target that is not
-OpenZeppelin, Silo, or Olas. See the
-[PILOT-009 plan](PILOT_009_PLAN.md) and the
+verification record maps five deployed components to that commit. The exact
+pinned source and recursive submodule closure were acquired, enumerated (five
+reportable and 56 compiler-only files), and frozen user-read-only, but the
+fixed detector commit `2574b6e` cannot compile the frozen closure: its isolated
+compiler does not reproduce Foundry's automatic submodule remapping. Both
+private workspaces failed deterministically before any scan. EulerSwap is
+retained as a research corpus. See the
+[PILOT-009 plan](PILOT_009_PLAN.md), the
+[evaluation](research/PILOT_009_EVALUATION.md), and the
 [target-selection record](research/PILOT_009_TARGET_SELECTION.md).**
 
 ## Product goal
@@ -529,8 +534,14 @@ recall and evidence completeness, and the `go` decision is unchanged. Suite:
 source and dependency identities, Solidity `0.8.28`, ten reportable files, 59
 findings/candidates versus 81 before tuning (SOL003=1, SOL005=13, SOL008=41,
 SOL009=3, SOL011=1), 22 removed and none added — investigation leads, not
-vulnerabilities and not bounty submissions. `PILOT-009` is in progress to
-validate commit `2574b6e` on a genuinely untouched target.
+vulnerabilities and not bounty submissions. `PILOT-009` was started to validate
+commit `2574b6e` on the selected EulerSwap v2 Ethereum subset, a genuinely
+untouched target that is not OpenZeppelin, Silo, or Olas, but is UNSATISFIED:
+the fixed detector cannot compile the frozen EulerSwap closure (Foundry's
+automatic submodule remapping is not reproduced by the isolated compiler), so
+no scan or candidate identity exists. EulerSwap is retained as a research
+corpus; a repair to reproduce automatic submodule remapping and a re-trial are
+required.
 
 ### Post-M8 — Compiler-only dependency boundary
 

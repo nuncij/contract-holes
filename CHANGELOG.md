@@ -31,6 +31,21 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   trees; the tag `eulerswap-2.0` resolves to the same commit, `foundry.toml`
   pins Solidity `0.8.27`, and the candidate dependency graph is a bounded,
   fully pinned gitlink set. No target source has been downloaded or scanned.
+- Completed the PILOT-009 acquisition and freeze, then recorded the trial as
+  UNSATISFIED. The exact pinned EulerSwap v2 source and its recursive
+  submodule closure (five reportable and 56 compiler-only Solidity files) were
+  acquired, verified against the public record, and frozen clean and
+  user-read-only with Git metadata. Both private workspaces then failed
+  deterministically at the compile stage before any scan: the fixed detector
+  commit `2574b6e` cannot reproduce Foundry's automatic submodule remapping
+  (its isolated compiler writes `libs = []` and loads only the target
+  `remappings.txt`), so the import `v4-periphery/src/utils/BaseHook.sol` from
+  `src/UniswapHook.sol` in the reportable closure cannot resolve even though a
+  standalone offline trial compile of the identical 61-file closure succeeds
+  with Solidity `0.8.27` when the automatic remapping is present. No scan or
+  candidate identity exists, so the completion gate fails; EulerSwap is
+  retained as a research corpus and a detector repair plus a re-trial are
+  required. See [the evaluation](docs/research/PILOT_009_EVALUATION.md).
 - Added a dedicated `PRECISION-001` development plan with test seams, ordered
   red-to-green slices, false-negative guardrails, validation gates, and stop
   conditions.
