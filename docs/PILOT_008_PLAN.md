@@ -1,6 +1,6 @@
 # PILOT-008 development plan
 
-Status: **NEXT**
+Status: **IN PROGRESS — Olas subset selected; consolidated authorization pending**
 
 ## Goal
 

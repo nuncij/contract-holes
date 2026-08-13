@@ -39,9 +39,9 @@ the two compiler-backed regressions assert expected semantic results and exact
 stable public evidence; and the deep-AST test uses `TemporaryDirectory`. The
 suite is 221 tests; frozen gates unchanged.
 
-Next: **PILOT-008 — select, authorize, and scan a new independent real-world
-target whose deployed assets map exactly to a pinned immutable source
-revision.**
+In progress: **PILOT-008 — Olas governance subset selected with an exact
+deployed-asset-to-source mapping; one consolidated acquisition and offline-scan
+authorization is pending.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -695,7 +695,7 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 - [ ] **PILOT-008** — Select, authorize, and scan a new independent real-world
   target whose deployed assets can be mapped exactly to a pinned immutable
   source revision. Follow the
-  [dedicated development plan](docs/PILOT_008_PLAN.md) — P1 — **NEXT**.
+  [dedicated development plan](docs/PILOT_008_PLAN.md) — P1 — **IN PROGRESS**.
 
   Acceptance criteria:
 

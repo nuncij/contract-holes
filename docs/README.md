@@ -38,7 +38,9 @@
 - [PILOT-007 development and completion-repair plan](PILOT_007_PLAN.md) —
   `REPAIR-007` completed the scanner reproduction, regressions, and status text
 - [PILOT-008 development plan](PILOT_008_PLAN.md) — independent target trial
-  with an exact deployed-source mapping, next after `REPAIR-007`
+  with an exact deployed-source mapping, now in progress after `REPAIR-007`
+- [PILOT-008 target selection](research/PILOT_008_TARGET_SELECTION.md) — Olas
+  governance subset and pre-acquisition evidence
 
 ## Project governance
 
