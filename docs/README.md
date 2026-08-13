@@ -33,6 +33,8 @@
 - [M7 Bounty Hunter Mode plan](BOUNTY_HUNTER_PLAN.md)
 - [M8 external target selection](research/M8_TARGET_SELECTION.md)
 - [M8 OpenZeppelin trial evaluation](research/M8_OPENZEPPELIN_TRIAL.md)
+- [PILOT-007 independent target selection](research/PILOT_007_TARGET_SELECTION.md)
+- [PILOT-007 development plan](PILOT_007_PLAN.md)
 
 ## Project governance
 

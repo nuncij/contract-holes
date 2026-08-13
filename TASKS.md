@@ -598,8 +598,7 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
 - [ ] **PILOT-007** — Select and evaluate an independent second real-world target
   with the improved scanner. Follow the
-  [dedicated development plan](docs/PILOT_007_PLAN.md) — P1 — **NEXT, NEW
-  AUTHORIZATION REQUIRED**.
+  [dedicated development plan](docs/PILOT_007_PLAN.md) — P1 — **IN PROGRESS**.
 
   Acceptance criteria:
 
