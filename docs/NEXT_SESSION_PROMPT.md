@@ -22,6 +22,10 @@ Project state
   compiler-only dependencies.
 - The trial produced 51 candidates. Human review rejected all 51. No candidate
   is investigating or confirmed.
+- PRECISION-001 added generic compiler fixtures for all five observed groups.
+  The fresh private rescan produced 47 candidates: 23 call-semantics, 8
+  branch-feasibility, 12 target-provenance, 3 authorization-context, and 1
+  reentrancy-trust-boundary.
 - The final trust-boundary analysis found no reachable untrusted callback. The
   generic proof workflow was unsupported for that question, so no proof ran.
 - No report, export, disclosure, submission, chain action, or target contact
@@ -57,6 +61,8 @@ Local evidence
   8bcf4e1b910588932998161b3f4df5f4cd8dc02a6efacd4dc3c670e1f301c66e
 - Expected PRECISION-001 candidate-ledger digest:
   92654835b8aa11f95b83bc070547a823a32a0bd3a8ed113ab5c328501c6a437e
+- Expected Contract Holes commit:
+  c4c7b99
 - Expected solc version:
   0.8.27+commit.40a35a09.Linux.g++
 - Expected solc SHA-256:
