@@ -7,7 +7,7 @@ Holes repository root.
 Continue development of Contract Holes in this repository.
 
 Start by reading AGENTS.md if it exists, TASKS.md, docs/DEVELOPMENT_PLAN.md,
-docs/PRECISION_001_PLAN.md, docs/research/M8_TARGET_SELECTION.md,
+docs/PRECISION_002_PLAN.md, docs/research/M8_TARGET_SELECTION.md,
 docs/research/M8_OPENZEPPELIN_TRIAL.md, docs/research/PILOT_007_TARGET_SELECTION.md,
 docs/research/PILOT_007_EVALUATION.md, and this handoff. Treat current command
 output as authoritative for mutable hashes and state.

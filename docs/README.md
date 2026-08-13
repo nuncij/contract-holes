@@ -41,6 +41,7 @@
 
 - [Development plan](DEVELOPMENT_PLAN.md)
 - [PRECISION-001 development plan](PRECISION_001_PLAN.md)
+- [PRECISION-002 development plan](PRECISION_002_PLAN.md)
 - [Next-session handoff prompt](NEXT_SESSION_PROMPT.md)
 - [Threat model](THREAT_MODEL.md)
 - [Security policy](../SECURITY.md)

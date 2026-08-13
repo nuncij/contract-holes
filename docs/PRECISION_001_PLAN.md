@@ -237,7 +237,8 @@ workspace and target checkout were unchanged. The synthetic evaluation remains
 33 positive and 31 safe labels with 1.0 precision and recall; the historical
 evaluation remains at 0.875 candidate precision and 1.0 supported-class recall.
 The labels are reviewer-derived from one target and are not independent ground
-truth. The next task is an independently authorized second real-world target.
+truth. The next task was an independently authorized second real-world target,
+completed as `PILOT-007` on 2026-08-13.
 
 A completion review on 2026-08-13 found gaps in the first fixture. It did not
 cover a pure public-library call or an interaction reached through an internal
@@ -259,6 +260,6 @@ Stop the slice and record the limitation if a proposed fix requires:
 - a breaking `1.0` JSON, SARIF, fingerprint, or proof-schema change;
 - loss of an existing positive or historical supported case.
 
-After this task, use an independent second real-world target to evaluate the
-improved scanner. Do not infer bounty viability from the same labels used to
+After this task, an independent second real-world target was used to evaluate
+the improved scanner. Do not infer bounty viability from the same labels used to
 tune `PRECISION-001`.

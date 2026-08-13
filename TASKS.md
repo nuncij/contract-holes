@@ -643,7 +643,26 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
 - [ ] **PRECISION-002** — Convert the generic false-positive families observed
   on the second independent target into regression fixtures and minimal
-  detector fixes — P1 — **NEXT**.
+  detector fixes. Follow the
+  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **NEXT**.
+
+  Acceptance criteria:
+
+  - private target code, paths, candidate IDs, and evidence are not copied into
+    repository fixtures or documentation;
+  - read-only view interactions do not form reentrancy paths, while a real
+    state-changing interaction before a write still reports `SOL005`;
+  - timelock-style modifiers protect the following privileged write, while
+    unprotected writes still report `SOL009`;
+  - freshly deployed clones, governance-configured call lists, and immutable
+    assets are not labelled user-controlled targets, while caller-selected
+    targets still report `SOL008`;
+  - caller-harm-only read-only query arguments are not controlled-call-target
+    findings;
+  - existing positive corpus findings remain detected; broad name- or
+    project-specific suppressions are not added.
+
+  Depends on: `PILOT-007`.
 
 ## Definition of done for every task
 
