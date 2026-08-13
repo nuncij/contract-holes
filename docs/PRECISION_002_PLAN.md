@@ -1,14 +1,14 @@
 # PRECISION-002 development plan
 
-Status: **BLOCKED — waits for a new independent target trial (`PILOT-008`)**
+Status: **QUEUED — `PILOT-008` complete; starts after `COMP-004`**
 
 ## Goal
 
 Reduce the generic false-positive families observed during the Silo
-compiler-enabled operational validation. Start only after a new independent
-target trial (`PILOT-008`) produces an untouched baseline with an exact
-deployed-source mapping. Preserve every existing positive finding and
-historical supported case.
+compiler-enabled operational validation. `PILOT-008` supplied the required
+untouched independent baseline with an exact deployed-source mapping. Start
+after `COMP-004` binds the compiler version used by private replay profiles.
+Preserve every existing positive finding and historical supported case.
 
 This task improves triage quality. It does not prove audit completeness,
 unknown-bug recall, bounty eligibility, or commercial viability.

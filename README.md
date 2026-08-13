@@ -340,11 +340,14 @@ Project status and future work are tracked explicitly:
 - [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
   packages, safety constraints, validation gates, and completion criteria.
 - [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — precision work
-  queued behind a new independent target trial (`PILOT-008`).
+  queued after the compiler-pin repair.
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
-- [PILOT-008 development plan](docs/PILOT_008_PLAN.md) — independent target
-  trial requiring an exact deployed-source mapping, next after `REPAIR-007`.
+- [PILOT-008 development plan](docs/PILOT_008_PLAN.md) and
+  [evaluation](docs/research/PILOT_008_EVALUATION.md) — completed independent
+  Olas trial with an exact deployed-source mapping and zero candidates.
+- [COMP-004 development plan](docs/COMP_004_PLAN.md) — bind an exact Solidity
+  release into new bounty profiles before `PRECISION-002`.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review
@@ -402,10 +405,15 @@ minimal checkout (only the three submodules intersecting the frozen 124-file
 closure, with superproject Git metadata, user-read-only) is accepted by the
 public scanner and reproduces the canonical 81-finding result offline; the two
 compiler-backed regressions assert expected semantic results and exact stable
-public evidence; and the deep-AST test uses `TemporaryDirectory`. `PILOT-008`
-is next: a new independent target whose deployed assets map exactly to a pinned
-immutable source revision. `PRECISION-002` remains queued until `PILOT-008`
-completes.
+public evidence; and the deep-AST test uses `TemporaryDirectory`.
+
+`PILOT-008` completed on 2026-08-13 against an exactly mapped Olas governance
+subset at commit `8ce095f`. Two private offline Solidity `0.8.30` scans covered
+two reportable and two compiler-only files and reproduced identical manifests,
+scans, and zero-candidate ledgers. The tiny clean result does not establish
+recall, safety, or bounty viability. A preserved first run selected cached
+Solidity `0.8.28`, exposing that bounty profiles do not bind an exact compiler.
+`COMP-004` is next; `PRECISION-002` follows that repair.
 
 The compiler index, inheritance
 resolver, call graph, reusable

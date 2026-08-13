@@ -2,8 +2,8 @@
 
 Reviewed: 2026-08-13
 
-Status: **SELECTED — Olas governance subset clears the pre-acquisition gates;
-authorization has not been granted.**
+Status: **COMPLETED — Olas governance subset was authorized and scanned; see
+[the evaluation](PILOT_008_EVALUATION.md).**
 
 ## Decision
 
@@ -141,8 +141,7 @@ separate authorization.
 
 ## Proposed one-time authorization
 
-This text is a proposal. It records no approval until the operator supplies it
-explicitly:
+The operator supplied this authorization on 2026-08-13:
 
 > I approve one-time network acquisition of only the official
 > `valory-xyz/autonolas-governance` repository at tag object
@@ -162,10 +161,11 @@ explicitly:
 > platform write, target contact, or detector tuning before the first scan is
 > frozen is approved.
 
-Immediately before acquisition, recheck the Immunefi program, source resource,
-tag object, peeled commit, compiler configuration, and complete four-file import
-closure. Stop if any identity, scope, rule, path, or dependency differs.
+Immediately before acquisition, the Immunefi program, source resource, tag
+object, peeled commit, compiler configuration, and complete four-file import
+closure were rechecked and matched this record.
 
-This research used public official records only. It did not create a target
-checkout, run a target scan, use RPC, contact a target, write to a platform, or
-make a vulnerability claim.
+The selection research used public official records only. The later authorized
+checkout and private scans are recorded in
+[the evaluation](PILOT_008_EVALUATION.md). No RPC, target contact, platform
+write, or vulnerability claim occurred.

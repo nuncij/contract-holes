@@ -8,11 +8,11 @@ Continue development of Contract Holes in this repository.
 
 Objective
 
-Select, authorize, and scan a new independent real-world target whose deployed
-assets map exactly to a pinned immutable source revision (PILOT-008). Do not
-start PRECISION-002. Preserve the existing private evidence and the Silo
-research corpus unchanged. Keep candidate details and target source out of the
-repository.
+Complete COMP-004 using the develop -> test -> docs -> Git workflow. Add one
+optional exact Solidity compiler version to new compiler-enabled bounty
+profiles. Bind it into isolated compilation and fail if the observed compiler
+differs. Preserve all existing unpinned profiles and digests exactly. After
+COMP-004 is complete, PRECISION-002 is the next task.
 
 Read first
 
@@ -20,11 +20,12 @@ Read first
 - CONTRIBUTING.md
 - TASKS.md
 - docs/DEVELOPMENT_PLAN.md
-- docs/PILOT_008_PLAN.md (authoritative sequence and gate)
-- docs/PILOT_007_PLAN.md (completion-repair and REPAIR-007 outcome)
-- docs/research/PILOT_007_TARGET_SELECTION.md
-- docs/research/PILOT_007_EVALUATION.md
-- docs/PRECISION_002_PLAN.md (blocked follow-up boundary)
+- docs/COMP_004_PLAN.md (authoritative scope)
+- docs/PILOT_008_PLAN.md
+- docs/research/PILOT_008_TARGET_SELECTION.md
+- docs/research/PILOT_008_EVALUATION.md
+- docs/PRECISION_002_PLAN.md
+- docs/BOUNTY_PROFILE.md
 - this handoff
 
 Treat current command output as authoritative for mutable state.
@@ -32,73 +33,71 @@ Treat current command output as authoritative for mutable state.
 Project state
 
 - Release: 1.1.1.
-- M0 through M8 and PRECISION-001 complete.
-- PILOT-007 is UNSATISFIED. The untouched scanner at selection commit
-  08050a14437abaf47ff45b90a1392a9fbc460a93 hits a reproducible RecursionError
-  blocker on the Silo closure, so there is no frozen baseline scan digest. The
-  pinned Silo tag 4.26.0 (commit 570a668a98a88a6a2b92697e7b9a3b1c6299dce7)
-  does not map to the deployed in-scope assets, which are Silo version 3.5.0
-  (commit b1f428f1c3d5fc989974fd8e7b3b84180e05e31f). Silo is retained only as a
-  research corpus.
-- REPAIR-007 completed on 2026-08-13. A new private Git-backed minimal checkout
-  (only the three submodules intersecting the frozen 124-file closure, with
-  superproject Git metadata, user-read-only) is accepted by the public scanner
-  and reproduces the canonical 81-finding result offline. The two
-  compiler-backed regressions assert expected semantic results and exact stable
-  public evidence; the deep-AST test uses TemporaryDirectory. The suite is 221
-  tests; frozen gates unchanged.
-- The post-repair Silo operational result (scan digest
-  9784d71e91ae86d4380c738badb2c1dfcfa9d9871425064c814b4237183825e6, candidate
-  ledger 8b1352ed188f4f2f6f93b7e365a9721c6f0a2204116b4e6eaa1a0109347f6b2f,
-  review ledger 3c58c01c81df6fe3c93c70e4d59c1b944360beaa289137c1cf80404519f72540)
-  is post-repair operational evidence, not an untouched frozen trial.
-- Next: PILOT-008, a new independent target with an exact deployed-source
-  mapping, before PRECISION-002 starts.
+- M0 through M8, PRECISION-001, REPAIR-007, and PILOT-008 are complete.
+- Suite: 221 tests before COMP-004; frozen synthetic evaluation is 33/33
+  positives and 31/31 safe labels; historical candidate precision is 0.875 and
+  supported-class recall is 1.0.
+- PILOT-008 scanned the program-mapped Olas governance v1.2.5 subset at commit
+  8ce095fec0efd935af39a89b8ae9c90e6581d1e4. The exact profile is
+  53226e80f049e085272f72e0a918992fe5b748e2a2e976fe229f97f195847299,
+  source manifest 3c1df4684335834bd473d9c40647d839a0b077f044c6980a6983910b05550a16,
+  Solidity 0.8.30 scan 875a0f1badf8852bfb8f7eda5ef471f0bfe48d95489cb97c7702783f6a6efc11,
+  and zero-candidate ledger
+  c0701335650ff9967d897b887a750272f9b5fb3a51d3f5138e2d0bcc06715b14.
+- An initial unchanged-profile scan selected cached Solidity 0.8.28. It was
+  preserved. This proves the concrete COMP-004 failure: the profile binds
+  offline mode but not an exact compiler version.
+- Solidity 0.8.30 is already installed and SHA-256 verified in Foundry's local
+  cache. No network download is needed. The user's global solc-select version
+  was restored to 0.8.36.
 
-Existing evidence — preserve unchanged
+Private evidence — preserve unchanged
 
-- Silo target checkout: ../targets/silo-contracts-v3-4.26.0
-- Silo canonical workspace: ../bounty-workspaces/silo-contracts-v3-4.26.0
-- Silo replay workspace: ../bounty-workspaces/silo-contracts-v3-4.26.0-replay
-- Silo baseline workspaces: ../bounty-workspaces/silo-contracts-v3-4.26.0-baseline-a,
-  ../bounty-workspaces/silo-contracts-v3-4.26.0-baseline-b
-- Silo minimal checkouts: ../bounty-workspaces/silo-minimal-checkout,
-  ../bounty-workspaces/silo-repair-007/silo-contracts-v3-git
-- Silo verification workspaces: ../bounty-workspaces/silo-minimal-verify,
-  ../bounty-workspaces/silo-repair-007/silo-repair-verify
-- OpenZeppelin trial evidence (unchanged).
+- Target: ../targets/olas-governance-v1.2.5 (detached, clean, user-read-only)
+- Preserved initial mismatch: ../bounty-workspaces/olas-governance-v1.2.5-a
+- Exact primary: ../bounty-workspaces/olas-governance-v1.2.5-b
+- Exact replay: ../bounty-workspaces/olas-governance-v1.2.5-c
+- All prior OpenZeppelin and Silo targets/workspaces.
 
-Keep candidate IDs, source paths, excerpts, traces, and review notes out of the
-repository and Git output.
+Do not send private source, scan records, candidate details, paths, excerpts, or
+traces to an external model or service. Keep all target validation offline. No
+RPC, fork, chain action, proof, report, export, disclosure, submission, platform
+write, or target contact is authorized.
 
-Execution
+Required interface
 
-1. Verify the worktree, origin/main, current CI, and the recorded hashes and
-   permissions. Run the full suite, frozen audit evaluation, and historical
-   bounty evaluation.
-2. Research at least three current programs from official sources. Prefer a
-   target whose scope maps exact deployed assets to a pinned immutable Git
-   revision or release, with a manageable dependency closure and no RPC or fork
-   need. Avoid repeating the PILOT-007 failure: filename equality is not proof
-   of deployed-source equivalence; use the program's own deployment/version
-   records and verified-source metadata.
-3. Record the selection and comparison in
-   docs/research/PILOT_008_TARGET_SELECTION.md. Present one complete target
-   boundary and request the single consolidated operator authorization.
-4. After approval, acquire the exact approved source and pinned dependencies,
-   build a minimal dependency-closure checkout, and run two private offline
-   scans. Preserve the first baseline result frozen before any detector
-   change. Do not tune detector behavior against the target.
-5. Review candidates privately and present proposed decisions in one batch for
-   operator confirmation. Complete the private review brief for every
-   candidate.
-6. Write docs/research/PILOT_008_EVALUATION.md with aggregate, redacted
-   results. Update README.md, CHANGELOG.md, TASKS.md,
-   docs/DEVELOPMENT_PLAN.md, docs/README.md, and this handoff. State the
-   current test count and the exact source-to-scope verdict.
-7. Run all validation gates, inspect the staged diff for private data, run a
-   simplification review, commit one coherent change, push main, verify CI, and
-   leave the worktree clean with main equal to origin/main.
+1. Add `holes bounty init --compiler-version X.Y.Z` for compiler-enabled
+   profiles.
+2. Accept only an exact release in the published supported Solidity range.
+3. Reject it with `--source-only`.
+4. Emit additive normalized profile and source-manifest schema 1.2 when pinned.
+5. Keep every existing unpinned 1.0/1.1 payload, digest, and behavior unchanged.
+6. In the fixed temporary Foundry project, use `solc_version = "X.Y.Z"` for a
+   pinned profile instead of auto-detection.
+7. Fail closed unless exactly one observed compiler release matches the pin.
+8. Do not load target Foundry configuration and do not add optimizer/EVM options;
+   this scanner consumes isolated ASTs and does not claim bytecode reproduction.
+
+Workflow
+
+1. Verify clean main, origin/main, current CI, and baseline gates.
+2. Mark COMP-004 IN PROGRESS.
+3. Add failing interface-level tests first: CLI/profile normalization, invalid
+   combinations, legacy digest stability, pinned temporary configuration, and
+   observed-version mismatch.
+4. Implement the smallest change at the existing bounty profile/compiler seam.
+5. Add packaged 1.2 schemas and update docs/schema tests.
+6. Run focused tests, full suite, frozen synthetic evaluation, historical
+   evaluation, and git diff --check.
+7. Create a new private validation workspace (do not modify a/b/c), set
+   compiler-version 0.8.30, and reproduce the existing zero-candidate Olas scan
+   semantics offline.
+8. Update README.md, CHANGELOG.md, TASKS.md, docs/DEVELOPMENT_PLAN.md,
+   docs/BOUNTY_PROFILE.md, docs/README.md, and this handoff. Mark PRECISION-002
+   NEXT only after all COMP-004 gates pass.
+9. Run a simplification review, inspect the staged diff for private data, commit
+   one coherent change, push main, verify CI, and leave main clean and equal to
+   origin/main.
 
 Validation gates
 
@@ -109,8 +108,7 @@ PYTHONPATH=src python3 -m contract_holes bounty history \
   tests/fixtures/bounty_history/manifest.json
 git diff --check
 
-Stop only for operator approval, a plausible candidate/state change, or if
-progress would require RPC, a fork, a chain action, a proof, a report,
-disclosure, submission, platform writing, target contact, or an unapproved
-target download.
+Stop only if a legacy digest changes, a positive/historical gate regresses, the
+private replay cannot remain offline, or work would cross the prohibited
+external-action boundary.
 ```

@@ -1,9 +1,10 @@
 # PILOT-007 development plan
 
-Status: **UNSATISFIED — Silo retained as research corpus; a new independent
-target is required before `PRECISION-002`.**
+Status: **UNSATISFIED — Silo retained as research corpus; the required
+independent follow-up `PILOT-008` later completed.**
 
-Completion record: **REPAIR-007 COMPLETE (2026-08-13); `PILOT-008` is NEXT.**
+Completion record: **REPAIR-007 COMPLETE (2026-08-13); `PILOT-008` COMPLETE;
+`COMP-004` is NEXT.**
 
 ## Goal
 
@@ -295,8 +296,8 @@ regression-evidence, and status-text findings. The conclusions are:
    221 tests; the frozen evaluation gates are unchanged.
 
 Because the source-to-scope gate fails, `PILOT-007` does not satisfy its
-independent-bounty-trial completion gate. A new independent target must be
-selected, authorized, and scanned before `PRECISION-002` starts.
+independent-bounty-trial completion gate. The required new independent target
+was later selected, authorized, and scanned in `PILOT-008`.
 
 ### REPAIR-007 follow-up
 

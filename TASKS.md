@@ -39,9 +39,15 @@ the two compiler-backed regressions assert expected semantic results and exact
 stable public evidence; and the deep-AST test uses `TemporaryDirectory`. The
 suite is 221 tests; frozen gates unchanged.
 
-In progress: **PILOT-008 — Olas governance subset selected with an exact
-deployed-asset-to-source mapping; one consolidated acquisition and offline-scan
-authorization is pending.**
+`PILOT-008` completed against an exactly mapped Olas governance subset. Two
+private Solidity `0.8.30` scans reproduced identical source, scan, and
+candidate identities over two reportable files and produced zero candidates.
+The preserved first run exposed an unbound compiler-selection gap without
+changing detector behavior.
+
+Next: **COMP-004 — bind an optional exact Solidity release into new bounty
+profiles and isolated compilation while preserving every legacy profile and
+digest.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -692,10 +698,10 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   tests; frozen gates unchanged. The final Silo source-to-scope verdict stays
   **UNSATISFIED**; `REPAIR-007` only unblocks `PILOT-008`.
 
-- [ ] **PILOT-008** — Select, authorize, and scan a new independent real-world
+- [x] **PILOT-008** — Select, authorize, and scan a new independent real-world
   target whose deployed assets can be mapped exactly to a pinned immutable
   source revision. Follow the
-  [dedicated development plan](docs/PILOT_008_PLAN.md) — P1 — **IN PROGRESS**.
+  [dedicated development plan](docs/PILOT_008_PLAN.md) — P1 — **COMPLETE**.
 
   Acceptance criteria:
 
@@ -719,10 +725,38 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   Depends on: `REPAIR-007`, `PILOT-007` (unsatisfied trial outcome),
   `PRECISION-001`.
 
+  Completed on 2026-08-13 against the Olas governance `v1.2.5` subset at
+  commit `8ce095f`. Official program records map the five selected deployed
+  addresses to two reportable contracts; the exact closure adds two
+  compiler-only files. Two private offline Solidity `0.8.30` scans reproduced
+  identical source manifest (`3c1df46`), scan (`875a0f1`), and zero-candidate
+  ledger (`c070133`) identities. The preserved initial scan used cached
+  Solidity `0.8.28`, also produced zero candidates, and exposed that the profile
+  did not bind an exact compiler. No detector changed, and no proof, report,
+  export, disclosure, submission, RPC, chain action, platform write, or target
+  contact occurred. See [the evaluation](docs/research/PILOT_008_EVALUATION.md).
+
+- [ ] **COMP-004** — Bind an optional exact supported Solidity release into a
+  bounty profile and its isolated compiler execution. Follow the
+  [dedicated development plan](docs/COMP_004_PLAN.md) — P1 — **NEXT**.
+
+  Acceptance criteria:
+
+  - new profiles can declare one exact supported `MAJOR.MINOR.PATCH` compiler;
+  - the pin is bound into additive profile and source-manifest schema `1.2`;
+  - isolated Foundry configuration selects the pin and rejects an observed
+    version mismatch;
+  - source-only profiles reject a compiler pin;
+  - existing unpinned `1.0`/`1.1` payloads, digests, and behavior are unchanged;
+  - a new private Olas replay reproduces the zero-candidate `0.8.30` result
+    offline without modifying the canonical trial evidence.
+
+  Depends on: `PILOT-008`.
+
 - [ ] **PRECISION-002** — Convert the generic false-positive families observed
   on the second independent target into regression fixtures and minimal
   detector fixes. Follow the
-  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **BLOCKED: waits for a new independent target trial (`PILOT-008`)**.
+  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **QUEUED AFTER `COMP-004`**.
 
   Acceptance criteria:
 
@@ -740,7 +774,7 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   - existing positive corpus findings remain detected; broad name- or
     project-specific suppressions are not added.
 
-  Depends on: `PILOT-008` (a new independent target trial).
+  Depends on: `PILOT-008` (complete) and `COMP-004`.
 
 ## Definition of done for every task
 

@@ -19,8 +19,8 @@ resolves to commit `b1f428f1c3d5fc989974fd8e7b3b84180e05e31f` (release dated
 equality between the scope list and the repo is insufficient; the exact
 content correspondence to the deployed bytecode is not established and the two
 commits differ. Silo is therefore not usable as a bounty-scoped independent
-trial and is retained only as a research corpus. A new independent target trial
-(`PILOT-008`) is required.
+trial and is retained only as a research corpus. The required independent
+follow-up, `PILOT-008`, later completed.
 
 ## Decision
 

@@ -4,9 +4,9 @@ Trial date: 2026-08-13
 Target: Silo Finance v2/v3 (`silo-finance/silo-contracts-v3` tag `4.26.0`)
 Pinned commit: `570a668a98a88a6a2b92697e7b9a3b1c6299dce7`
 Operator authorization: single consolidated approval on 2026-08-13
-Status: **UNSATISFIED — Silo retained as a non-bounty research corpus; a new
-independent target trial (`PILOT-008`) is required before `PRECISION-002`.
-`REPAIR-007` completed the completion-record evidence gap.**
+Status: **UNSATISFIED — Silo retained as a non-bounty research corpus.
+`REPAIR-007` completed the completion-record evidence gap; the required
+follow-up `PILOT-008` later completed before `PRECISION-002`.**
 
 ## Outcome
 
@@ -117,8 +117,8 @@ status-text findings.
 
 Because the source-to-scope gate fails, `PILOT-007` is **UNSATISFIED**. Silo
 remains a research-only validation corpus. `REPAIR-007` completion does not
-change that verdict; it only unblocks the next independent target trial
-(`PILOT-008`), which is required before `PRECISION-002` starts.
+change that verdict; it only unblocked the next independent target trial
+(`PILOT-008`), which later completed before `PRECISION-002`.
 
 ## Results
 
@@ -179,10 +179,11 @@ families.
 
 The completion-record repair (`REPAIR-007`) is complete: the Git-backed minimal
 checkout reproduces the scan through the public scanner, and the regressions
-assert stable public evidence. Next, a new independent target trial
-(`PILOT-008`) must produce an untouched baseline whose deployed assets map
+assert stable public evidence. The required independent follow-up,
+`PILOT-008`, later produced an untouched baseline whose deployed assets map
 exactly to a pinned immutable source revision. The generic families observed
-here then become `PRECISION-002` precision work. The highest-value items are:
+here are therefore available for `PRECISION-002` precision work. The
+highest-value items are:
 
 - distinguish custom error/event members from external interactions (already
   fixed in this trial, with regression coverage);

@@ -3,9 +3,8 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **Select, authorize, and scan a new independent real-world target whose
-deployed assets map exactly to a pinned immutable source revision
-(`PILOT-008`).**
+Next: **Bind an optional exact supported Solidity release into bounty profiles
+and isolated compilation (`COMP-004`), then start `PRECISION-002`.**
 
 ## Product goal
 
@@ -482,8 +481,16 @@ accepts, and reproduced the source manifest, compiler-enabled scan, and
 candidate ledger offline with the same semantics as the canonical post-repair
 result. It also strengthened the two compiler-backed regressions and switched
 the deep-AST test to `TemporaryDirectory`. The final Silo source-to-scope
-verdict stays **UNSATISFIED**. A new independent target trial, `PILOT-008`, is
-next and is required before `PRECISION-002` starts.
+verdict stays **UNSATISFIED**.
+
+`PILOT-008` completed on 2026-08-13 against two Olas governance contracts at
+the program-mapped `v1.2.5` commit `8ce095f`. Two private offline Solidity
+`0.8.30` scans reproduced identical source-manifest, scan, and zero-candidate
+ledger identities. The trial therefore satisfies the independent target gate,
+but its two-file scope is too small to establish broad real-world recall or
+bounty viability. The preserved initial run selected cached Solidity `0.8.28`,
+showing that compiler-enabled profiles do not bind an exact compiler release.
+`COMP-004` fixes that profile/compiler interface before `PRECISION-002` starts.
 
 ### Post-M8 — Compiler-only dependency boundary
 
