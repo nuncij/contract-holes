@@ -244,9 +244,9 @@ the result, Git is clean, `main` matches `origin/main`, and CI is green.
 
 ## Completion-review repair
 
-The 2026-08-13 completion review found that the operational scan and replay are
-deterministic, but the trial does not yet satisfy this plan. Repair the record
-before starting `PILOT-008` or `PRECISION-002`.
+The 2026-08-13 completion review found that the operational scan and replay were
+deterministic, but the trial did not satisfy this plan. The initial repair and
+`REPAIR-007` completed the record and unblocked `PILOT-008`.
 
 ### Initial repair outcome (2026-08-13)
 
