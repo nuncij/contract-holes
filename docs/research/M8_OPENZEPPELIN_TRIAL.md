@@ -88,7 +88,7 @@ eligible to produce a reportable finding. The subsequent scans were offline.
 | Compiler-dependency set | `0837f1adb6cae49fdc2aabd3e7af5debfed1f299bc92fb2e36e8e1094bb2597a` |
 | Scan | `8fa3093b06c7bb23710f2d663d728032bc7eb107fb82513982b8560137483433` |
 | Candidate ledger | `889e58b1f0cf91a9db4e011882a40a2b7455e90aeaa68e0e600bda1a10a5d15e` |
-| Review ledger | `0a321f9e919175b8879019d1b80996a434bd35b9866d2c214d2750ccd162f238` |
+| Review ledger | `6815bf2ea95356be8f44e4627578412d5e1ffed9e84b8de856c32dde86232ce8` |
 
 The canonical scan compiled 22 reportable files, materialized 51 candidates,
 and initially left all 51 in review state `new`. The operator later approved
@@ -156,13 +156,14 @@ authorization and did not occur.
 | Synthetic `audit-1` | 33 positive and 31 safe labels | `1.0` precision and recall on the curated regression corpus |
 | Historical `m7-history-1` | 10 disclosed cases from 10 projects | `0.875` candidate precision and `1.0` supported-class recall |
 | OpenZeppelin source-only trial | No independent labels for the pinned release | 22 files scanned, zero candidates; precision undefined and recall unknown |
-| OpenZeppelin compiler trial | 51 rejected, none confirmed | False-positive modes measured; candidate precision 0/51 on this target and recall unknown |
+| OpenZeppelin compiler trial | 51 reviewer rejections, none confirmed | False-positive modes measured; reviewer-labelled candidate precision 0/51 on this target and recall unknown |
 
 The source-only phase had no candidates, so its precision is undefined and its
-recall is unknown. The compiler phase now has 51 reviewed false positives and
-no unresolved candidates, giving a measured candidate precision of 0/51 on
-this target. Neither phase provides ground truth for counting false negatives,
-so recall remains unknown.
+recall is unknown. The compiler phase now has 51 reviewer-labelled false
+positives and no unresolved candidates. This gives reviewer-labelled candidate
+precision of 0/51 on this target. The review is not independent ground truth,
+and neither phase provides labels for counting false negatives. Recall remains
+unknown.
 
 ## Observed gaps and decisions
 

@@ -1,6 +1,6 @@
 # Contract Holes Development Plan
 
-Last updated: 2026-08-12
+Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
 Next: **Convert the rejected real-trial labels into generic precision fixes
@@ -422,9 +422,10 @@ dependency closure found zero actor-controlled external call targets in the
 reported window. The existing proof workflow could not test that decisive
 question without inventing setup facts, so proof execution is recorded as
 unsupported. The final human decision rejected the last investigating
-candidate. All 51 candidates are now rejected false positives, none is
-confirmed, and the trial's candidate precision is measured at 0/51 with
-unknown recall. RPC, chain activity, target contact, report export,
+candidate. All 51 candidates are now rejected false positives, and none is
+confirmed. The reviewer-labelled candidate precision is 0/51. The review is
+not independent ground truth, and recall remains unknown. RPC, chain activity,
+target contact, report export,
 disclosure, and submission remained outside the authorization and did not
 occur. `PRECISION-001` captures only the generic detector gaps shown by the
 51 rejected labels. Private target evidence will not become a repository

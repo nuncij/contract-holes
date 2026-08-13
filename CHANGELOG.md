@@ -51,8 +51,8 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   external-call enumeration of the pinned dependency closure showed no
   untrusted actor can reach a callback in the reported interaction window; the
   generic proof workflow could not test that question without inventing setup
-  facts. The compiler trial's measured candidate precision is 0/51 with
-  unknown recall.
+  facts. The compiler trial's reviewer-labelled candidate precision is 0/51.
+  The review is not independent ground truth, and recall remains unknown.
 
 ## 1.1.1 — 2026-08-10
 
