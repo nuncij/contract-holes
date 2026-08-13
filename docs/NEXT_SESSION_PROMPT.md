@@ -20,6 +20,7 @@ Read first
 - CONTRIBUTING.md
 - TASKS.md
 - docs/DEVELOPMENT_PLAN.md
+- docs/PILOT_008_PLAN.md (authoritative sequence and gate)
 - docs/PILOT_007_PLAN.md (completion-repair outcome)
 - docs/research/PILOT_007_TARGET_SELECTION.md
 - docs/research/PILOT_007_EVALUATION.md

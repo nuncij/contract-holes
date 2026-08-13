@@ -340,9 +340,11 @@ Project status and future work are tracked explicitly:
 - [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
   packages, safety constraints, validation gates, and completion criteria.
 - [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — precision work
-  queued behind the independent-trial repair.
+  queued behind a new independent target trial (`PILOT-008`).
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
+- [PILOT-008 development plan](docs/PILOT_008_PLAN.md) — next independent
+  target trial requiring an exact deployed-source mapping.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review

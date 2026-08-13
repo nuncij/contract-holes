@@ -654,7 +654,29 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
 - [ ] **PILOT-008** — Select, authorize, and scan a new independent real-world
   target whose deployed assets can be mapped exactly to a pinned immutable
-  source revision — P1 — **NEXT**.
+  source revision. Follow the
+  [dedicated development plan](docs/PILOT_008_PLAN.md) — P1 — **NEXT**.
+
+  Acceptance criteria:
+
+  - the deployed-source mapping is evidenced from official program or
+    repository records before acquisition, not inferred from matching
+    filenames;
+  - the program rules, source revision, scope, impacts, and restrictions are
+    explicitly authorized and pinned before acquisition;
+  - the target is independent of the OpenZeppelin and Silo trials and remains
+    private;
+  - source-only or compiler-enabled analysis stays local, isolated, and offline;
+  - two new private workspaces reproduce the same source, scan, and candidate
+    digests before detector tuning;
+  - every candidate receives one operator-confirmed private decision, unless the
+    scan produces no candidates;
+  - candidate review uses generic evidence without copying private target data
+    into repository fixtures or documentation;
+  - no proof, report, export, disclosure, submission, chain action, or target
+    contact occurs without separate explicit authorization.
+
+  Depends on: `PILOT-007` (repair outcome), `PRECISION-001`.
 
 - [ ] **PRECISION-002** — Convert the generic false-positive families observed
   on the second independent target into regression fixtures and minimal
