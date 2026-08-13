@@ -76,6 +76,20 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   assertions now cover retained `SOL005`, `SOL008`, and `SOL009` positives. All
   216 tests and both frozen evaluation gates pass. A separate locked-down
   offline rescan reproduced the same 47 candidates and deterministic digests.
+- Completed the independent `PILOT-007` trial against Silo Finance v2/v3 pinned
+  to tag `4.26.0`. Two private workspaces reproduced identical digests over ten
+  reportable files and 124 pinned compiler-only dependencies with Solidity
+  `0.8.28`. The scan produced 81 candidates; the operator confirmed all 81
+  rejections after source review, with zero investigating or confirmed.
+- Fixed three generic scanner defects surfaced by the second independent trial:
+  analysis AST walkers now traverse iteratively instead of overflowing Python's
+  recursion limit on large contracts; signature domain analysis is cycle-safe
+  across mutually recursive call arguments; and custom error and event members
+  are excluded from the call graph so reverted errors and emitted events are not
+  treated as external interactions. All 219 tests and both frozen evaluation
+  gates pass unchanged.
+- Recorded the observed generic false-positive families from `PILOT-007` as the
+  next product task, `PRECISION-002`.
 
 ## 1.1.1 — 2026-08-10
 

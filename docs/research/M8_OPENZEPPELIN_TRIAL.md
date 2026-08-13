@@ -195,8 +195,12 @@ fixes. The remaining workload is 23 call-semantics, 8 branch-feasibility, 12
 target-provenance, 3 authorization-context, and 1 reentrancy-trust-boundary
 candidate. Four conversion-driven `SOL005` candidates no longer appear. The
 canonical private workspace and target checkout were unchanged. These are
-reviewer-derived labels from one target, not independent ground truth; an
-independent second target is required before drawing broader precision claims.
+reviewer-derived labels from one target, not independent ground truth.
+
+The independent second trial (`PILOT-007`, 2026-08-13) scanned Silo Finance
+v2/v3 at tag `4.26.0` and produced 81 candidates, all rejected after review.
+Its observed generic false-positive families become `PRECISION-002`. See
+[the PILOT-007 evaluation](PILOT_007_EVALUATION.md).
 
 A completion review later on 2026-08-13 repaired four generic boundaries in the
 first implementation. They cover pure public-library calls, internal-call branch

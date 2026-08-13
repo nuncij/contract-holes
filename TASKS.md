@@ -25,8 +25,19 @@ offline mechanical enumeration showed no untrusted actor can reach a callback
 in the reported interaction window, and the existing proof workflow could not
 test that question without inventing setup facts.
 
-Next: **PILOT-007 — Select and evaluate an independent second real-world target
-with the improved scanner.**
+A second independent trial (`PILOT-007`) completed on 2026-08-13 against Silo
+Finance v2/v3 pinned to tag `4.26.0`. Two private workspaces reproduced
+identical digests over ten reportable files and 124 pinned compiler-only
+dependencies with Solidity `0.8.28`. The scan produced 81 candidates; the
+operator confirmed all 81 rejections, with zero investigating or confirmed. The
+trial surfaced and fixed three generic scanner defects (iterative AST
+traversal, cycle-safe signature domain analysis, and error/event members
+excluded from the call graph). No proof, report, export, disclosure,
+submission, chain action, or target contact occurred.
+
+Next: **PRECISION-002 — Convert the generic false-positive families observed
+on the second independent target into regression fixtures and minimal detector
+fixes.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -596,9 +607,9 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   candidates and deterministic digests, so no target-specific reduction is
   claimed from the repair.
 
-- [ ] **PILOT-007** — Select and evaluate an independent second real-world target
+- [x] **PILOT-007** — Select and evaluate an independent second real-world target
   with the improved scanner. Follow the
-  [dedicated development plan](docs/PILOT_007_PLAN.md) — P1 — **IN PROGRESS**.
+  [dedicated development plan](docs/PILOT_007_PLAN.md) — P1 — **COMPLETE**.
 
   Acceptance criteria:
 
@@ -616,6 +627,23 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
     contact occurs without separate explicit authorization.
 
   Depends on: `PRECISION-001`.
+
+  Completed on 2026-08-13. Silo Finance v2/v3 was selected as an independent
+  target and pinned to tag `4.26.0` (`570a668a98a88a6a2b92697e7b9a3b1c6299dce7`)
+  after one consolidated operator authorization. Two private workspaces
+  reproduced identical digests over ten reportable files and 124 pinned
+  compiler-only dependencies with Solidity `0.8.28`. The scan produced 81
+  candidates; the operator confirmed all 81 rejections after source review,
+  with zero investigating or confirmed. The trial surfaced and fixed three
+  generic scanner defects (iterative AST traversal, cycle-safe signature
+  domain analysis, and error/event members excluded from the call graph). No
+  proof, report, export, disclosure, submission, chain action, or target
+  contact occurred. See
+  [the evaluation](docs/research/PILOT_007_EVALUATION.md).
+
+- [ ] **PRECISION-002** — Convert the generic false-positive families observed
+  on the second independent target into regression fixtures and minimal
+  detector fixes — P1 — **NEXT**.
 
 ## Definition of done for every task
 

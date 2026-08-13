@@ -1,6 +1,6 @@
 # PILOT-007 development plan
 
-Status: **IN PROGRESS**
+Status: **COMPLETE**
 
 ## Goal
 

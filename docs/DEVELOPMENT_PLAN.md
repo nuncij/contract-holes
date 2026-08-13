@@ -3,8 +3,9 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Select and evaluate an independent second real-world target. Follow the
-[`PILOT-007` development plan](PILOT_007_PLAN.md).**
+Next: **Convert the generic false-positive families observed on the second
+independent target into regression fixtures and minimal detector fixes
+(`PRECISION-002`).**
 
 ## Product goal
 
@@ -447,11 +448,23 @@ metadata. All 216 tests and both frozen evaluations pass. A new private offline
 workspace reproduced the same 47-candidate scan and both prior digests. The
 repair does not claim a lower workload for this target.
 
-The next validation step is `PILOT-007`: select and evaluate an independent
-second real-world target only after its program rules, source identity, scope,
-and authorization are explicitly pinned. It must remain local, private,
+The next validation step was `PILOT-007`: an independent second real-world
+target selected and evaluated only after its program rules, source identity,
+scope, and authorization were explicitly pinned. It remained local, private,
 isolated, and offline; no target contact, proof, report, export, disclosure,
-submission, chain action, or platform interaction is implied.
+submission, chain action, or platform interaction occurred.
+
+`PILOT-007` completed on 2026-08-13 against Silo Finance v2/v3 pinned to tag
+`4.26.0`. Two private workspaces reproduced identical digests over ten
+reportable files and 124 pinned compiler-only dependencies with Solidity
+`0.8.28`. The scan produced 81 candidates; the operator confirmed all 81
+rejections after source review, with zero investigating or confirmed. The trial
+surfaced and fixed three generic scanner defects: recursive AST walkers now
+traverse iteratively, signature domain analysis is cycle-safe across mutually
+recursive call arguments, and custom error/event members are excluded from the
+call graph. All 219 tests and both frozen evaluations pass unchanged. The
+observed generic false-positive families are captured as the next product task,
+`PRECISION-002`.
 
 ### Post-M8 — Compiler-only dependency boundary
 
