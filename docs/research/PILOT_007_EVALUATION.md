@@ -4,9 +4,8 @@ Trial date: 2026-08-13
 Target: Silo Finance v2/v3 (`silo-finance/silo-contracts-v3` tag `4.26.0`)
 Pinned commit: `570a668a98a88a6a2b92697e7b9a3b1c6299dce7`
 Operator authorization: single consolidated approval on 2026-08-13
-Status: **COMPLETION REVIEW OPEN** — this document currently describes the
-post-repair operational result, not the untouched baseline required by the
-trial plan.
+Status: **UNSATISFIED — Silo retained as a non-bounty research corpus; a new
+independent target trial (`PILOT-008`) is required before `PRECISION-002`.**
 
 ## Outcome
 
@@ -16,6 +15,10 @@ materialized 81 candidates; human review rejected all 81 after source
 verification. No candidate is investigating or confirmed. This is an
 operational result, not evidence that the target is free of vulnerabilities,
 and it is not a bounty submission.
+
+The completion repair proved that this operational result is **not an
+untouched independent baseline** and that the trial did not meet its
+target-selection gate. Silo is therefore kept only as a research corpus.
 
 ## Target-selection method
 
@@ -59,12 +62,46 @@ before the preserved operational result was accepted:
    reentrancy findings. Resolved member targets that are error or event
    definitions are now excluded from the call graph.
 
-All 219 tests pass and the frozen synthetic and historical evaluation gates are
+All 221 tests pass and the frozen synthetic and historical evaluation gates are
 unchanged (`1.0` precision/recall on the synthetic corpus; `0.875` candidate
 precision and `1.0` supported-class recall on the historical corpus). The
 call-graph change altered detector behavior after target feedback. Regression
 coverage for the signature and call-graph repairs remains part of the open
 completion repair.
+
+## Completion repair results
+
+A completion review and repair on 2026-08-13 closed every finding.
+
+1. **Untouched baseline reconstructed (reproducible blocker).** The
+   released-plus-`PRECISION-001` scanner at selection commit
+   `08050a14437abaf47ff45b90a1392a9fbc460a93` was run against the same approved
+   Silo profile in two new private workspaces. Both fail with the identical
+   `RecursionError` in the signature-domain analysis over the full closure. The
+   untouched baseline is therefore a reproducible blocker, not a scan digest.
+2. **Source-to-scope gate fails.** The deployed in-scope assets are Silo
+   version `3.5.0` (commit `b1f428f1c3d5fc989974fd8e7b3b84180e05e31f`,
+   2025-05-15), not the pinned tag `4.26.0` (commit
+   `570a668a98a88a6a2b92697e7b9a3b1c6299dce7`, 2026-07-27). This is documented
+   in the repository's own `DeployedSiloVersions.md` and the Immunefi scope
+   addresses. The trial does not meet its target-selection gate.
+3. **Minimal dependency closure reproduced.** A new checkout with only the
+   three submodules intersecting the frozen 124-file compiler manifest was
+   built from local Git objects. All 134 manifest file hashes match the
+   canonical record byte-for-byte. The historical over-retrieval of 87
+   submodule instances is recorded as an acquisition error.
+4. **Private review records completed.** All 81 candidates now have a complete
+   review-brief entry with hypothesis, impact, assumptions, reachability,
+   duplicate/known-issue status, reason, and remaining uncertainty. All 81
+   remain operator-confirmed `rejected`.
+5. **Regressions added.** Public-seam tests now cover signature-domain
+   recursion termination and error/event/struct member call classification. The
+   fixed `/tmp` test directory was replaced with a per-test temporary
+   directory. The suite is 221 tests; frozen gates unchanged.
+
+Because the source-to-scope gate fails, `PILOT-007` is **UNSATISFIED**. Silo
+remains a research-only validation corpus. A new independent target trial
+(`PILOT-008`) is required before `PRECISION-002` starts.
 
 ## Results
 
@@ -123,8 +160,10 @@ families.
 
 ## Recommended next product task
 
-Convert the observed generic families into precision work. The highest-value
-items are:
+Before any precision work, a new independent target trial (`PILOT-008`) must
+produce an untouched baseline whose deployed assets map exactly to a pinned
+immutable source revision. The generic families observed here then become
+`PRECISION-002` precision work. The highest-value items are:
 
 - distinguish custom error/event members from external interactions (already
   fixed in this trial, with regression coverage);
@@ -137,11 +176,17 @@ items are:
 
 ## Limitations
 
+- The Silo result is a post-repair operational replay, not an untouched frozen
+  trial; the untouched baseline is a reproducible scanner blocker.
+- The source-to-scope gate failed: the pinned Silo tag does not correspond to
+  the deployed in-scope assets. Silo is a research corpus, not a bounty trial.
 - Recall is unknown: the trial provides no independent ground-truth labels.
 - An all-rejected scan does not show that the target is safe.
 - A confirmed candidate would remain private and would not authorize a proof
   or report.
 - Reviewer labels are from one reviewer and one target and are not independent
   ground truth.
+- The historical acquisition over-retrieved 87 submodule instances; the later
+  minimal checkout reproduces only the approved 124-file closure.
 - No proof, report, export, disclosure, submission, chain action, RPC, fork,
   or target contact occurred.

@@ -1,8 +1,26 @@
 # PILOT-007 Target Selection
 
 Reviewed: 2026-08-13
-Status: **COMPLETION REVIEW OPEN** — the selected Git tag has not yet been
-mapped exactly to the deployed assets in the program scope.
+Status: **UNSATISFIED — source-to-scope gate failed; Silo retained as a
+research-only corpus.**
+
+## Source-to-scope verdict
+
+The 2026-08-13 completion repair determined that the selected Git tag does not
+exactly correspond to the deployed in-scope assets. The Immunefi scope maps the
+in-scope contracts to deployed addresses on Sonic (Silo Factory
+`0x4e9dE3a64c911A37f7EB2fCb06D1e68c3cBe9203`, Silo Implementation
+`0x435Ab368F5fCCcc71554f4A8ac5F5b922bC4Dc06`, and others). The repository's own
+`DeployedSiloVersions.md` at the pinned commit documents that these addresses
+correspond to Silo version `3.5.0` (id `101`-`current` on Sonic), which
+resolves to commit `b1f428f1c3d5fc989974fd8e7b3b84180e05e31f` (release dated
+2025-05-15). The trial pinned tag `4.26.0` at commit
+`570a668a98a88a6a2b92697e7b9a3b1c6299dce7` (release dated 2026-07-27). Filename
+equality between the scope list and the repo is insufficient; the exact
+content correspondence to the deployed bytecode is not established and the two
+commits differ. Silo is therefore not usable as a bounty-scoped independent
+trial and is retained only as a research corpus. A new independent target trial
+(`PILOT-008`) is required.
 
 ## Decision
 

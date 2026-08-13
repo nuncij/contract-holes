@@ -1,6 +1,7 @@
 # PILOT-007 development plan
 
-Status: **REPAIR REQUIRED**
+Status: **UNSATISFIED — Silo retained as research corpus; a new independent
+target is required before `PRECISION-002`.**
 
 ## Goal
 
@@ -244,6 +245,52 @@ the result, Git is clean, `main` matches `origin/main`, and CI is green.
 The 2026-08-13 completion review found that the operational scan and replay are
 deterministic, but the trial does not yet satisfy this plan. Repair the record
 before starting `PRECISION-002`.
+
+### Repair outcome (2026-08-13)
+
+The repair closed every completion-review finding. The conclusions are:
+
+1. **Untouched baseline reconstructed (reproducible blocker).** The
+   released-plus-`PRECISION-001` scanner at selection commit
+   `08050a14437abaf47ff45b90a1392a9fbc460a93` was run against the same approved
+   Silo profile in two new private workspaces. Both attempts fail with the
+   identical `RecursionError: maximum recursion depth exceeded` in
+   `signature.py` `_walk_ast` while building the project index over the full
+   dependency closure. This is the frozen untouched-baseline result: a
+   reproducible blocker, not a scan digest. The post-repair 81-candidate result
+   is a separate operational replay made after the target-exposed fixes.
+2. **Source-to-scope gate fails.** The deployed in-scope assets named by the
+   Immunefi scope (Silo Factory `0x4e9dE3a...`, Silo Implementation
+   `0x435Ab368...` on Sonic) are documented in the repo's own
+   `DeployedSiloVersions.md` as version `3.5.0`, which resolves to commit
+   `b1f428f1c3d5fc989974fd8e7b3b84180e05e31f` (2025-05-15). The trial pinned tag
+   `4.26.0` at commit `570a668a98a88a6a2b92697e7b9a3b1c6299dce7` (2026-07-27).
+   The pinned commit does not exactly correspond to the deployed in-scope
+   assets. Silo is therefore retained only as a non-bounty research corpus.
+3. **Minimal dependency closure reproduced.** A new checkout was built from
+   local Git objects with only the three submodules intersecting the frozen
+   124-file compiler manifest. All 134 recorded file hashes are byte-identical
+   to the canonical source manifest, and the remappings digest matches. The
+   entire minimal checkout is user-read-only under a private parent and
+   contains no Git metadata. The historical over-retrieval of 87 submodule
+   instances is recorded as an acquisition error and is not erased by the later
+   minimal checkout. The original clone's `.git` directory remains writable;
+   that is a documented limitation of the original acquisition, not of the
+   reproduction artifact.
+4. **Private review records completed.** Every one of the 81 candidates now has
+   a review-brief entry recording the scanner hypothesis, relevant in-scope
+   impact or lack of one, reachability, authorization, trust and state
+   assumptions, duplicate/known-issue status, reason, and remaining
+   uncertainty. All 81 remain operator-confirmed `rejected`.
+5. **Missing regressions added.** Public-seam regressions now cover
+   signature-domain recursion termination and error/event/struct member call
+   classification. The fixed `/tmp/holes-deep-ast-regression` directory was
+   replaced with a per-test temporary directory. The suite grew from 219 to 221
+   tests; the frozen evaluation gates are unchanged.
+
+Because the source-to-scope gate fails, `PILOT-007` does not satisfy its
+independent-bounty-trial completion gate. A new independent target must be
+selected, authorized, and scanned before `PRECISION-002` starts.
 
 ### 1. Reconstruct the untouched baseline
 

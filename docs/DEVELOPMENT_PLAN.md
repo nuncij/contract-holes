@@ -2,9 +2,10 @@
 
 Last updated: 2026-08-13
 Current release: `1.1.1`
-Current milestone: **Post-M8 — PILOT-007 completion repair**
-Next: **Repair the independent-trial record and validation boundary before
-starting `PRECISION-002`.**
+Current milestone: **Post-M8 — independent validation rework**
+Next: **Select, authorize, and scan a new independent real-world target whose
+deployed assets map exactly to a pinned immutable source revision
+(`PILOT-008`).**
 
 ## Product goal
 
@@ -35,7 +36,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 219 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 221 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -461,17 +462,21 @@ rejections after source review, with zero investigating or confirmed. The trial
 surfaced and fixed three generic scanner defects: recursive AST walkers now
 traverse iteratively, signature domain analysis is cycle-safe across mutually
 recursive call arguments, and custom error/event members are excluded from the
-call graph. All 219 tests and both frozen evaluations pass unchanged. The
-observed generic false-positive families are captured in `PRECISION-002`.
+call graph.
 
-A completion review reopened `PILOT-007`. Both preserved scans were created
-after target-exposed scanner repairs, and the selected Git tag is not yet
-mapped exactly to the deployed assets named by the bounty scope. The repair
-also needs a minimal dependency checkout, complete private review fields, two
-missing regressions, and deterministic temporary test isolation. The existing
-81-candidate result is post-repair operational evidence. `PRECISION-002`
-remains blocked until the repair documents an untouched baseline result or
-blocker and resolves the source-to-scope gate.
+A completion review and repair on 2026-08-13 found the operational result is
+not an untouched independent baseline. The untouched scanner at selection
+commit `08050a1` hits a reproducible `RecursionError` blocker on the full Silo
+closure, so there is no frozen baseline scan digest. The pinned Silo tag
+`4.26.0` (commit `570a668`, 2026-07-27) does not map to the deployed in-scope
+assets, which the repository's `DeployedSiloVersions.md` documents as version
+`3.5.0` (commit `b1f428f`, 2025-05-15). `PILOT-007` therefore does not satisfy
+its independent-bounty-trial gate. Silo is retained only as a non-bounty
+research corpus. The repair reproduced the minimal 124-file compiler closure
+byte-for-byte from local Git objects, completed all 81 private review-brief
+records, and added the missing regressions (221 tests, frozen gates unchanged).
+A new independent target trial, `PILOT-008`, is required before `PRECISION-002`
+starts.
 
 ### Post-M8 — Compiler-only dependency boundary
 

@@ -10,6 +10,7 @@ and confirm a deep Solidity source compiles and analyzes through the scanner.
 import json
 from pathlib import Path
 import shutil
+import tempfile
 import unittest
 
 from contract_holes import authorization, callgraph, dataflow, market, proxy
@@ -75,13 +76,15 @@ class DeepAstTraversalTests(unittest.TestCase):
             "    }\n"
             "}\n"
         )
-        root = Path("/tmp/holes-deep-ast-regression")
-        root.mkdir(parents=True, exist_ok=True)
+        root = Path(tempfile.mkdtemp(prefix="holes-deep-ast-regression-"))
         (root / "DeepNest.sol").write_text(source_text, encoding="utf-8")
-        files = discover_sources([root])
-        compilation = ForgeCompiler().compile(files, project_root=root, offline=True)
-        index = ProjectIndex(compilation)
-        self.assertEqual(len(index.sources), 1)
+        try:
+            files = discover_sources([root])
+            compilation = ForgeCompiler().compile(files, project_root=root, offline=True)
+            index = ProjectIndex(compilation)
+            self.assertEqual(len(index.sources), 1)
+        finally:
+            shutil.rmtree(root, ignore_errors=True)
 
 
 if __name__ == "__main__":

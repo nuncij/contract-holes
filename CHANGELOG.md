@@ -44,11 +44,16 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Validation
 
-- Reopened `PILOT-007` after completion review. The deterministic Silo scans
-  remain post-repair operational evidence, while the untouched baseline,
-  exact deployed source mapping, minimal dependency acquisition, complete
-  private review brief, and missing regressions require repair before
-  `PRECISION-002` starts.
+- Reopened `PILOT-007` after completion review. The completion repair
+  (2026-08-13) reconstructed the untouched baseline, which is a reproducible
+  `RecursionError` blocker at selection commit `08050a1`; proved the
+  source-to-scope gate fails (the deployed in-scope assets are Silo `3.5.0`,
+  commit `b1f428f`, not the pinned `4.26.0`, commit `570a668`); reproduced the
+  minimal 124-file compiler closure byte-for-byte from local Git objects;
+  completed every private review-brief field for all 81 candidates; and added
+  the missing regressions. `PILOT-007` is unsatisfied and Silo is retained only
+  as a research corpus. A new independent target trial (`PILOT-008`) is required
+  before `PRECISION-002` starts.
 
 - Completed the first authorized external source-only trial against the exact
   bounty-pinned OpenZeppelin Confidential Contracts `v0.4.0` release. The
@@ -92,10 +97,14 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   recursion limit on large contracts; signature domain analysis is cycle-safe
   across mutually recursive call arguments; and custom error and event members
   are excluded from the call graph so reverted errors and emitted events are not
-  treated as external interactions. All 219 tests and both frozen evaluation
+  treated as external interactions. All 221 tests and both frozen evaluation
   gates pass unchanged.
-- Recorded the observed generic false-positive families from `PILOT-007` as the
-  next product task, `PRECISION-002`.
+- Added public-seam regressions for signature-domain recursion termination and
+  for error, event, and struct member call classification, and replaced the
+  fixed `/tmp` deep-AST test directory with a per-test temporary directory.
+- Recorded the observed generic false-positive families from the Silo research
+  corpus as `PRECISION-002` work, gated on a new independent target trial
+  (`PILOT-008`).
 
 ## 1.1.1 — 2026-08-10
 

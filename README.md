@@ -390,9 +390,13 @@ rejections, with zero investigating or confirmed. The trial surfaced and fixed
 three generic scanner defects (iterative AST traversal, cycle-safe signature
 domain analysis, and error/event members excluded from the call graph). No
 proof, report, export, disclosure, submission, chain action, or target contact
-occurred. A completion review reopened the task because the untouched baseline
-was not preserved, the Git tag is not yet mapped exactly to the deployed bounty
-assets, and supporting test and private-review records are incomplete.
+occurred. The 2026-08-13 completion repair proved the operational result is not
+an untouched independent baseline: the untouched scanner at selection commit
+`08050a1` hits a reproducible `RecursionError` blocker, and the pinned Silo tag
+does not map to the deployed in-scope assets (which are Silo `3.5.0`, not
+`4.26.0`). `PILOT-007` is unsatisfied; Silo remains a research corpus.
+`PILOT-008` is next: a new independent target whose deployed assets map exactly
+to a pinned immutable source revision.
 `PRECISION-002` remains queued until this repair is complete.
 
 The compiler index, inheritance
