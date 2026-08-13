@@ -427,16 +427,16 @@ class Comp004CompilerTests(unittest.TestCase):
 
 class Comp004ManifestTests(unittest.TestCase):
     @unittest.skipUnless(shutil.which("forge"), "Foundry is required")
-    def test_pinned_scan_emits_source_manifest_1_2_and_observed_long_version(self) -> None:
+    def test_pinned_scan_emits_source_manifest_1_2_and_observed_version(self) -> None:
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             create_source(root)
-            profile = directory_profile(root, compiler_version="0.8.30")
+            profile = directory_profile(root, compiler_version="0.8.25")
             result = scan_bounty_workspace(profile.workspace)
 
             self.assertEqual(result.source_manifest["schema_version"], "1.2")
             self.assertEqual(
-                result.source_manifest["compiler"]["version"], "0.8.30"
+                result.source_manifest["compiler"]["version"], "0.8.25"
             )
             self.assertFalse(
                 result.source_manifest["compiler"]["target_configuration_loaded"]
@@ -451,7 +451,7 @@ class Comp004ManifestTests(unittest.TestCase):
             )
             versions = result.scan_record["compiler"]["versions"]
             self.assertEqual(len(versions), 1)
-            self.assertEqual(parse_version(versions[0]), (0, 8, 30))
+            self.assertEqual(parse_version(versions[0]), (0, 8, 25))
             self.assertEqual(
                 result.scan_record["profile_sha256"], profile.digest
             )
