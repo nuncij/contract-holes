@@ -8,11 +8,14 @@ Continue development of Contract Holes in this repository.
 
 Objective
 
-Complete PRECISION-002 with the develop -> test -> docs -> Git workflow. Turn
-the generic false-positive families recorded in docs/PRECISION_002_PLAN.md into
-small public compiler-backed fixtures and the minimum generic detector fixes.
-Preserve every existing positive, frozen corpus identity, and public evidence
-contract. Do not copy private target code or evidence into the repository.
+Finish PRECISION-002 with the develop -> test -> docs -> Git workflow. All
+independent-review blockers on the first green diff are resolved and the private
+offline replay is complete; the work is left as a reviewable uncommitted diff.
+Review that diff, run every validation gate, and finish the remaining
+completion-gate steps: commit one coherent change, push main, and verify project
+CI. Preserve every existing positive, frozen corpus identity, label, threshold,
+split, and public evidence contract. Do not copy private target code or evidence
+into the repository.
 
 Read first
 
@@ -33,9 +36,33 @@ Project state
 - Release: 1.1.1.
 - M0 through M8, PRECISION-001, REPAIR-007, PILOT-008, and COMP-004 are
   complete.
-- Suite: 234 tests after COMP-004.
+- PRECISION-002 is IN PROGRESS. All independent-review blockers are
+  resolved in the uncommitted diff by narrowing or retaining findings: `SOL005`
+  no longer forms paths for compiler-resolved view/pure and staticcall
+  interactions, while state-changing calls, contract creation, and fresh-target
+  initializers remain reportable (there is no no-callback proof and no blanket
+  fresh or creation suppression); `external-return` taint is never cleared by an
+  immutable receiver; timelock recognition is strict (separate unconditional
+  nonzero-pending and `block.timestamp >= deadline` guards over distinct
+  declarations, with the pending value feeding the protected write without
+  user-controlled taint or an exact
+  zero-clear of a guarded field; no unrelated later write inherits it); and the
+  read-result use tracer was deleted in favor of a narrow ignore-or-view-entry
+  suppression. Unsatisfied manual-review boundaries by design: governance/
+  config-derived call lists (`executeGovernance` reports `SOL008`), factory-owned
+  target provenance, callback safety for creation and fresh targets, broader
+  timelock shapes, and harmless used-read analysis. The private offline replay
+  is complete: unchanged source and dependency identities, cached Solidity
+  0.8.28, ten reportable files, 59 findings/candidates versus 81 before tuning
+  (22 removed, no new findings), which are investigation leads, not
+  vulnerabilities and not bounty submissions.
+- Suite: 238 tests after PRECISION-002 local slices.
 - Frozen synthetic evaluation: 33/33 positive labels and 31/31 safe labels.
-- Historical candidate precision: 0.875; supported-class recall: 1.0.
+- Historical candidate precision: 0.933333; supported-class recall: 1.0;
+  evidence completeness: 1.0; decision: go. The `m7-history-1` raw result was
+  versioned in `evaluation/bounty-history-1.0.json` because the
+  view-interaction fix removed one out-of-model Enzyme `SOL005` candidate; no
+  label, fixture, threshold, or split changed.
 - COMP-004 added optional `--compiler-version X.Y.Z`, additive normalized
   profile/source-manifest schema 1.2, exact isolated Foundry selection, and
   fail-closed observed-version checking. Frozen unpinned 1.0/1.1 profile
@@ -58,48 +85,58 @@ allowed.
 
 Required behavior
 
-Build one compiler corpus under tests/fixtures/precision_002 and test through
+Keep the compiler corpus under tests/fixtures/precision_002 and test through
 ProjectIndex plus Scanner.scan_source as specified by the plan. Each safe case
 must have a nearby positive neighbor that keeps the original rule reportable.
 
 Cover these generic distinctions:
 
-1. Read-only view/static interactions do not create a SOL005 reentrancy path;
-   a real state-changing external interaction before a write still does.
-2. A structural timelock-style pending-value plus elapsed-delay guard protects
-   the following privileged write from SOL009; an unprotected write still
-   reports.
-3. Freshly deployed clones used during registration are not untrusted callback
-   targets; caller-supplied existing targets remain reportable.
-4. Governance-configured call lists are not attacker-controlled delegatecall
-   targets; caller-selected targets remain reportable under SOL008/SOL003 as
-   applicable.
+1. Read-only view/static interactions do not create a SOL005 reentrancy path; a
+   real state-changing external interaction before a write still does.
+2. Only separate unconditional direct guards — a nonzero pending-state
+   comparison plus a different state deadline with block.timestamp >= deadline
+   (or deadline <= timestamp) — where the pending value feeds the protected
+   sensitive write without user-controlled taint, protect the following
+   privileged write from SOL009. Wrong directions, timestamp `==`/`!=`,
+   OR/optional delay, unrelated zero/nonzero flags, timestamp-only, mixed
+   pending/caller values, deadline-derived writes, local pending reads,
+   unrelated later privileged writes, compound expressions, and combined
+   boolean guards still report.
+3. Contract creation and fresh-target initializers remain `SOL005`-reportable;
+   only compiler-resolved view/pure and staticcall interactions are suppressed.
+   A created address is non-user-controlled fresh provenance for `SOL008`, but
+   that says nothing about callback safety for `SOL005`.
+4. Governance-configured call lists are not proven non-attacker-controlled:
+   immutable receiver identity never clears `external-return` taint, so both a
+   fixed-module list and a caller-selected module report SOL008, with SOL003 a
+   manual-review signal on both.
 5. Caller-supplied targets used only by read-only queries are caller-harm-only
-   and not controlled-call-target findings; a state-changing call remains
-   reportable.
+   only when the read result is ignored or the enclosing external entry is
+   view/pure; a used read result in a non-view function (mapping key,
+   state-changing call argument, or write value) reports SOL008.
 6. Immutable/fixed asset provenance is not user-controlled; mutable
    caller-controlled asset provenance remains reportable.
 
 Workflow
 
-1. Verify clean main, origin/main, current CI, and baseline gates.
-2. Mark PRECISION-002 IN PROGRESS.
-3. Inspect the existing shared compiler facts before choosing a seam.
-4. Work in vertical TDD slices. For each family, add the safe and positive
-   public fixture first. Confirm the misleading safe finding is red, or record
-   that current code already handles it. Then implement the smallest generic
-   change and run focused tests.
-5. Put reusable semantics in existing shared analysis modules. Do not add raw
-   AST walks inside individual rules, target-specific suppressions, or broad
-   name heuristics.
-6. Run the full suite and frozen synthetic/historical evaluations after each
-   logical slice. Stop and repair immediately if any existing positive drops.
-7. Update README.md, CHANGELOG.md, TASKS.md, docs/DEVELOPMENT_PLAN.md,
-   docs/PRECISION_002_PLAN.md, docs/README.md, and this handoff with truthful
-   counts and remaining limitations.
-8. Run a simplification review and inspect the full diff for private material.
-9. Commit one coherent change, push main, verify CI, and leave main clean and
-   equal to origin/main.
+1. Verify the working tree contains the PRECISION-002 uncommitted diff and that
+   `git status` shows only intended files.
+2. Run a simplification review of the diff: confirm the generic distinctions are
+   covered by the `precision-002` corpus, that no rule-local raw-AST walk, name
+   list, configuration toggle, or target suppression was added, and that every
+   safe case has a positive neighbor.
+3. Inspect the full diff for private material (target names, paths, candidate
+   IDs, excerpts, constants, FHE identifiers). None is expected.
+4. Run the full suite and frozen synthetic/historical evaluations. The
+   historical `m7-history-1` raw result was intentionally versioned; verify the
+   gate still passes without weakened thresholds and that no supported case or
+   positive finding regressed.
+5. Update the status docs only if a truthful outcome changed since the last
+   commit of this prompt.
+6. Commit one coherent change, push main, verify CI, leave main clean and equal
+   to origin/main, and mark PRECISION-002 COMPLETE in TASKS.md only when every
+   plan completion gate passes (the private-replay validation is already
+   complete).
 
 Validation gates
 

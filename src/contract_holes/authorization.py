@@ -5,7 +5,7 @@ import re
 from typing import TYPE_CHECKING
 
 from .callgraph import CallEdge
-from .dataflow import FlowFact
+from .dataflow import FlowFact, node_is_unconditional
 from .execution import execution_order
 from .project import Node, NodeKey, SourceSpan
 
@@ -14,17 +14,6 @@ if TYPE_CHECKING:
 
 
 FOLLOW_EDGE_KINDS = frozenset({"internal", "super", "library", "modifier"})
-CONDITIONAL_NODE_TYPES = frozenset(
-    {
-        "Conditional",
-        "DoWhileStatement",
-        "ForStatement",
-        "IfStatement",
-        "TryCatchClause",
-        "TryStatement",
-        "WhileStatement",
-    }
-)
 PRIVILEGED_STATE_NAME = re.compile(
     r"(?:"
     r"owner|admin|implementation|beacon|guardian|operator|pauser|paused|"
@@ -80,7 +69,7 @@ class AuthorizationAnalysis:
             for index, event in enumerate(trace):
                 if event.kind != "write":
                     continue
-                if any(candidate.protective for candidate in trace[:index]):
+                if self._has_protective_authorization(trace, index):
                     continue
                 issue = AuthorizationIssue(entry, event, trace[: index + 1])
                 declaration = event.fact.declaration if event.fact is not None else None
@@ -237,17 +226,33 @@ class AuthorizationAnalysis:
             return False
         return bool(PRIVILEGED_STATE_NAME.search(str(declaration.get("name", ""))))
 
+    @staticmethod
+    def _has_protective_authorization(
+        trace: tuple[AuthorizationTraceEvent, ...], write_index: int
+    ) -> bool:
+        write = trace[write_index]
+        write_fact = write.fact
+        for authorization in trace[:write_index]:
+            if not authorization.protective:
+                continue
+            fact = authorization.fact
+            if (
+                fact is None
+                or "timelock:delay-and-pending"
+                not in fact.metadata.get("mechanisms", [])
+            ):
+                return True
+            if write_fact is None:
+                continue
+            pending_origins = fact.value.origins
+            if _write_uses_pending_value(write_fact, pending_origins):
+                return True
+            if _is_timelock_cleanup(write_fact, fact):
+                return True
+        return False
+
     def _is_unconditional(self, key: NodeKey | None) -> bool:
-        node = self.project.node_for_key(key) if key is not None else None
-        current = self.project.parent(node) if node is not None else None
-        while current is not None:
-            node_type = str(current.get("nodeType", ""))
-            if node_type in CONDITIONAL_NODE_TYPES:
-                return False
-            if node_type in {"FunctionDefinition", "ModifierDefinition"}:
-                break
-            current = self.project.parent(current)
-        return True
+        return node_is_unconditional(self.project, key)
 
     def _modifier_placeholder_start(self, function: Node) -> int | None:
         if function.get("nodeType") != "ModifierDefinition":
@@ -271,6 +276,29 @@ class AuthorizationAnalysis:
             and function.get("kind") != "constructor"
             and isinstance(function.get("body"), dict)
         )
+
+
+def _write_uses_pending_value(
+    fact: FlowFact, pending_origins: frozenset[NodeKey]
+) -> bool:
+    return bool(
+        fact.declaration not in pending_origins
+        and fact.value.origins & pending_origins
+        and not fact.value.user_controlled
+    )
+
+
+def _is_timelock_cleanup(write: FlowFact, authorization: FlowFact) -> bool:
+    if write.declaration is None or write.metadata.get("value_is_zero") is not True:
+        return False
+    guarded = {
+        f"{key.compilation_id}:{key.node_id}" for key in authorization.value.origins
+    }
+    guarded.update(
+        str(value)
+        for value in authorization.metadata.get("deadline_declarations", [])
+    )
+    return f"{write.declaration.compilation_id}:{write.declaration.node_id}" in guarded
 
 
 def _before_limit(span: SourceSpan | None, byte_limit: int) -> bool:

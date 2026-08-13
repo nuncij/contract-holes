@@ -79,17 +79,6 @@
         {
           "column": 37,
           "confidence": "medium",
-          "evidence": "compiler-interprocedural-data-flow",
-          "fingerprint": "59aa2202433e68f6",
-          "issue_kind": null,
-          "line": 13,
-          "path": "src/EnzymeIdle2021.sol",
-          "rule_id": "SOL005",
-          "severity": "high"
-        },
-        {
-          "column": 37,
-          "confidence": "medium",
           "evidence": "compiler-interprocedural-target-taint",
           "fingerprint": "81b557ed13ef9614",
           "issue_kind": null,
@@ -101,12 +90,12 @@
       ],
       "case_id": "ENZYME-2021-IDLE-PRICE",
       "expected_candidates": 0,
-      "investigation_count": 2,
+      "investigation_count": 1,
       "matched_candidates": 0,
       "missed_labels": [],
       "model_status": "out-of-model",
       "project": "Enzyme Finance",
-      "rejected_candidates": 2,
+      "rejected_candidates": 1,
       "split": "calibration",
       "status": "out-of-model-recorded",
       "support_limit": "The market detector models named oracle, AMM, TWAP, and swap flows, not protocol-specific share-supply economics."
@@ -362,11 +351,11 @@
     "Remote references are provenance metadata and are not fetched during evaluation."
   ],
   "metrics": {
-    "candidate_precision": 0.875,
-    "compiler_evidence_rate": 0.75,
+    "candidate_precision": 0.933333,
+    "compiler_evidence_rate": 0.733333,
     "evidence_completeness": 1.0,
-    "investigation_count": 16,
-    "rejected_candidates": 2,
+    "investigation_count": 15,
+    "rejected_candidates": 1,
     "supported_cases_with_evidence": 5,
     "supported_class_recall": 1.0
   },
@@ -379,16 +368,16 @@
     ],
     "statement": "Contract Holes produced useful investigation evidence for at least three independent historical supported cases. Human validation is still required."
   },
-  "result_sha256": "dc0158fd7f53866f2fcf622ce5db023807e0c53eed87b61df4098a619e1afaa9",
+  "result_sha256": "9bf60837d252bac17ba579c91a04a8d33fc5f0c9fcb5c8df59402be0397bdf90",
   "scanner_version": "1.1.1",
   "schema_version": "1.0",
   "solc_version": "0.8.25",
   "split_metrics": {
     "calibration": {
-      "candidate_precision": 0.666667,
+      "candidate_precision": 0.8,
       "cases": 5,
-      "investigation_count": 6,
-      "rejected_candidates": 2,
+      "investigation_count": 5,
+      "rejected_candidates": 1,
       "supported_class_recall": 1.0
     },
     "holdout": {

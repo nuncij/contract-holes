@@ -349,8 +349,10 @@ Project status and future work are tracked explicitly:
   the current private-trial state, work boundary, and completion checklist.
 - [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
   packages, safety constraints, validation gates, and completion criteria.
-- [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — the next
-  precision milestone after the completed compiler-pin repair.
+- [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — the precision
+  milestone after the completed compiler-pin repair; all independent-review
+  blockers are resolved, the private offline replay is complete, and only final
+  review, commit/push, and CI remain.
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
 - [PILOT-008 development plan](docs/PILOT_008_PLAN.md) and
@@ -426,7 +428,32 @@ Solidity `0.8.28`, exposing that bounty profiles do not bind an exact compiler.
 `COMP-004` now binds an optional exact release into profile and manifest schema
 `1.2`, selects it in the isolated Foundry project, and rejects any mismatched or
 mixed observed compiler set. A new private pinned `0.8.30` replay reproduced the
-same two-file, zero-candidate Olas scan semantics. `PRECISION-002` is next.
+same two-file, zero-candidate Olas scan semantics. `PRECISION-002` is in
+progress; only final review, commit/push, and CI remain. Its generic
+`precision-002` compiler corpus provides regression coverage for supported
+outcomes across the six observed false-positive families, with explicit
+unsatisfied/manual-review boundaries: read-only
+view/staticcall interactions no longer form `SOL005` reentrancy paths, while
+state-changing calls, contract creation, and fresh-target initializers remain
+reportable; a strict nonzero-pending-value plus elapsed-delay guard protects a
+following privileged write from `SOL009`; created addresses carry
+non-user-controlled fresh provenance for `SOL008` (which says nothing about
+callback safety for `SOL005`); `external-return` taint is never cleared by an
+immutable receiver (so a governance-configured call list still reports
+`SOL008`); and a used read-only result in a non-view function reports `SOL008`.
+Governance/config-derived and factory-owned address provenance, callback safety
+for creation and fresh targets, broader timelock shapes, and harmless used-read
+analysis remain manual-review boundaries. The frozen `audit-1` evaluation is
+unchanged. The historical `m7-history-1` result was versioned after the
+view-interaction fix removed one out-of-model Enzyme `SOL005` candidate, moving
+candidate precision from 0.875 to 0.933333 with all five supported cases and the
+`go` decision unchanged. The private offline replay used unchanged source and
+dependency identities with cached Solidity `0.8.28` and ten reportable files,
+producing 59 findings/candidates versus 81 before tuning — 22 removed, no new
+findings — which remain investigation leads, not vulnerabilities and not bounty
+submissions. No private source or evidence entered the repository. No target
+network, chain, RPC, proof, report, export, disclosure, submission, or
+bounty-platform write occurred.
 
 The compiler index, inheritance
 resolver, call graph, reusable
@@ -504,8 +531,8 @@ calibration/holdout splits and explicit supported/out-of-model labels:
 holes bounty history tests/fixtures/bounty_history/manifest.json
 ```
 
-The checked result records 16 investigation candidates, two reviewer rejections,
-87.5% candidate precision, 100% supported-label recall, and useful evidence for
+The checked result records 15 investigation candidates, one reviewer rejection,
+93.3% candidate precision, 100% supported-label recall, and useful evidence for
 five independent supported cases. This is a bounded research-assistant claim,
 not exploit confirmation or expected bounty performance; see the
 [historical bounty evaluation](docs/BOUNTY_HISTORY.md).

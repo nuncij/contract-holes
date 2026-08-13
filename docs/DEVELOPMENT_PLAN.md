@@ -3,8 +3,9 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **Run `PRECISION-002`: convert the generic Silo false-positive families
-into paired public regressions and minimal detector fixes.**
+Next: **`PRECISION-002` is in progress; all independent-review blockers are
+resolved, repository-local gates pass, and the private offline replay is
+complete. Only final review, commit/push, and CI remain.**
 
 ## Product goal
 
@@ -35,7 +36,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 221 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 238 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -46,11 +47,11 @@ The scanner is successful when it:
 | `SOL002` unchecked call | Compiler evidence when available | Does not track an assigned success value to its later use |
 | `SOL003` `delegatecall` | Source signal | Does not yet determine whether the target is user-controlled or trusted |
 | `SOL004` `selfdestruct` | Direct evidence | Protocol impact still depends on the call path and deployment assumptions |
-| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence plus configurable callback probe | Opposite `if`/`else` arms remain separate across internal helpers; target deployment, setup, callback reachability, and impact assertions remain project-specific |
+| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence plus configurable callback probe | View/pure and staticcall interactions no longer form paths; state-changing calls, contract creation, and fresh-target initializers remain reportable (no no-callback proof, no blanket fresh/creation suppression); opposite `if`/`else` arms remain separate across internal helpers; target deployment, setup, callback reachability, and impact assertions remain project-specific |
 | `SOL006` weak randomness | Source heuristic | Does not trace the random value to a value-bearing decision |
 | `SOL007` packed hash collision | Compiler evidence plus primitive proof | Does not trace the hash to authorization, signatures, or identifiers |
-| `SOL008` controlled call target | Compiler-backed interprocedural taint | Immutable/fixed receivers retain structured provenance through aliases and internal parameters; the rule does not prove allowlist dominance or persist taint through state across transactions |
-| `SOL009` exposed privileged write | Compiler-backed authorization reachability | Dominating role checks and exact `msg.sender` mapping keys are recognized; a role self-grant remains reportable, while privileged-state names, branch dominance, and custom protocol authorization may require review |
+| `SOL008` controlled call target | Compiler-backed interprocedural taint | Immutable/fixed receivers retain structured provenance through aliases and internal parameters, and created addresses carry non-user-controlled fresh provenance; a read-only view/pure/staticcall sink is suppressed only when its result is ignored or the enclosing external entry is view/pure; `external-return` taint is never cleared by receiver identity, so governance/config-derived and factory-owned target provenance is not proven and stays reportable; the rule does not prove allowlist dominance or persist taint through state across transactions |
+| `SOL009` exposed privileged write | Compiler-backed authorization reachability | Dominating role checks, exact `msg.sender` mapping keys, and a strict timelock guard (separate unconditional nonzero-pending and `block.timestamp >= deadline` guards over distinct declarations, with the pending value feeding the protected write without user-controlled taint or an exact zero-clear of a guarded field) are recognized; no unrelated later write inherits protection, and wrong directions, timestamp `==`/`!=`, OR/optional delay, unrelated zero/nonzero flags, timestamp-only, mixed pending/caller values, compound, and combined boolean guards still report; a role self-grant remains reportable, while privileged-state names, branch dominance, and custom protocol authorization may require review |
 | `SOL010` signature authorization | Compiler-backed recovery-to-action path | Protection and domain recognition are conservative; external library and cross-function digest provenance may require review |
 | `SOL011` proxy and upgrade safety | Compiler-backed initializer, delegatecall-storage, and versioned-layout evidence | Custom proxy standards and unnamed upgrade relationships require project-specific review |
 | `SOL012` ERC-20 interaction safety | Compiler-backed typed-call and amount-origin flow | Custom wrappers, accepted-token policy, and indirect recipients may require review |
@@ -492,7 +493,37 @@ bounty viability. The preserved initial run selected cached Solidity `0.8.28`,
 showing that compiler-enabled profiles do not bind an exact compiler release.
 `COMP-004` now fixes that profile/compiler interface. A new private pinned replay
 selected only Solidity `0.8.30`, preserved the frozen source and dependency
-sets, and again produced zero candidates. `PRECISION-002` is next.
+sets, and again produced zero candidates.
+
+`PRECISION-002` is in progress; only final review, commit/push, and CI remain.
+All independent-review blockers on the first green diff are resolved by
+narrowing or retaining findings. The generic `precision-002` compiler corpus and
+`test_precision_002` cover supported outcomes with adversarial-positive
+neighbors and record explicit unsatisfied/manual-review boundaries:
+view/staticcall interactions no longer form
+`SOL005` paths, while state-changing calls, contract creation, and fresh-target
+initializers remain reportable (no no-callback proof); a strict
+nonzero-pending-value plus elapsed-delay guard protects a following privileged
+write from `SOL009`; created addresses carry non-user-controlled fresh
+provenance for `SOL008` (nothing about `SOL005` callback safety); `external-return`
+taint is never cleared by an immutable receiver (so a governance-configured call
+list still reports `SOL008`); a used read result in a non-view function reports
+`SOL008`; and the immutable underlying asset was already a fixed target.
+Governance/config-derived and factory-owned address provenance, callback safety
+for creation and fresh targets, broader timelock shapes, and harmless used-read
+analysis are unsatisfied manual-review boundaries. Shared `dataflow` facts carry
+callee mutability, fresh-deployment provenance, result-ignored state, and the
+strict timelock authorization fact; `reentrancy` and `target_taint` consume them
+without rule-local AST walks. The frozen `audit-1` evaluation is unchanged. The
+historical `m7-history-1` result was versioned after the view-interaction fix
+removed one out-of-model Enzyme `SOL005` candidate: candidate precision moved
+from 0.875 to 0.933333, all five supported cases retain 1.0 supported-class
+recall and evidence completeness, and the `go` decision is unchanged. Suite:
+238 tests. The private offline replay (unchanged source and dependency
+identities, cached Solidity `0.8.28`, ten reportable files) produced 59
+findings/candidates versus 81 before tuning — 22 removed, no new findings —
+which are investigation leads, not vulnerabilities and not bounty submissions.
+Only final review, commit, push, and project CI remain.
 
 ### Post-M8 — Compiler-only dependency boundary
 

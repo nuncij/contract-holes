@@ -46,11 +46,12 @@ changing detector behavior. `COMP-004` closed that gap with an optional exact
 compiler pin, additive profile and source-manifest schema `1.2`, and fail-closed
 observed-version checking. A new private pinned replay preserved the source and
 dependency sets, selected only Solidity `0.8.30`, scanned two files, and again
-produced zero candidates. The suite is 234 tests; frozen gates are unchanged.
+produced zero candidates. The suite is 238 tests; frozen gates are unchanged.
 
-Next: **PRECISION-002 — convert the generic false-positive families from the
-Silo research corpus into paired regression fixtures and minimal detector
-fixes.**
+Next: **PRECISION-002** is in progress; all independent-review blockers on
+the first green diff are resolved, repository-local gates pass, and the private
+offline replay is complete. Only final review, commit, push, and project CI
+remain.
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -767,7 +768,7 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 - [ ] **PRECISION-002** — Convert the generic false-positive families observed
   on the second independent target into regression fixtures and minimal
   detector fixes. Follow the
-  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **NEXT**.
+  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **IN PROGRESS**.
 
   Acceptance criteria:
 
@@ -777,15 +778,53 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
     state-changing interaction before a write still reports `SOL005`;
   - timelock-style modifiers protect the following privileged write, while
     unprotected writes still report `SOL009`;
-  - freshly deployed clones, governance-configured call lists, and immutable
-    assets are not labelled user-controlled targets, while caller-selected
-    targets still report `SOL008`;
+  - freshly deployed clones and immutable assets are not labelled
+    user-controlled targets, while caller-selected targets and
+    governance/config-derived call lists still report `SOL008`;
   - caller-harm-only read-only query arguments are not controlled-call-target
     findings;
   - existing positive corpus findings remain detected; broad name- or
     project-specific suppressions are not added.
 
   Depends on: `PILOT-008` (complete) and `COMP-004`.
+
+  Repository-local implementation in progress on 2026-08-13 after all
+  independent-review blockers on the first green diff were resolved by
+  narrowing or retaining findings. The `precision-002` corpus and test module
+  cover supported outcomes with adversarial-positive neighbors and record
+  explicit unsatisfied/manual-review boundaries for the rest.
+  Shared `dataflow` facts carry callee mutability, fresh-deployment provenance
+  (a created address is non-user-controlled fresh for `SOL008`, which says
+  nothing about callback safety for `SOL005`), result-ignored state, and the
+  strict timelock authorization fact; `reentrancy` suppresses `SOL005` for
+  view/pure/staticcall interactions, while state-changing calls, contract
+  creation, and fresh-target initializers remain reportable; the timelock fact
+  requires separate unconditional guards proving a nonzero pending value and an
+  elapsed deadline (`block.timestamp >= deadline`) over distinct declarations,
+  with the pending value feeding the protected sensitive write without
+  user-controlled taint. An exact zero-clear of a guarded field is also safe.
+  No unrelated later write inherits protection. `external-return` taint is
+  never cleared by receiver identity. Read-only
+  sinks are suppressed only when their result is ignored or the enclosing
+  external entry is view/pure.
+
+  Unsatisfied and manual-review boundaries by design (not suppressed, no fake
+  coverage): governance/config-derived call lists (`executeGovernance` reports
+  `SOL008`), factory-owned target provenance, callback safety for creation and
+  fresh targets, broader timelock shapes, and harmless used-read analysis. The
+  private offline replay used unchanged source and dependency identities with
+  cached Solidity `0.8.28` and ten reportable files, producing 59
+  findings/candidates versus 81 before tuning (22 removed, no new findings);
+  these remain investigation leads, not vulnerabilities and not bounty
+  submissions.
+
+  Frozen `audit-1` evaluation is unchanged (33/33 positive, 31/31 safe). The
+  historical result was versioned after the view-interaction fix removed one
+  out-of-model Enzyme `SOL005` candidate: candidate precision moved from 0.875
+  to 0.933333 with all five supported cases, 1.0 supported-class recall, 1.0
+  evidence completeness, and the `go` decision unchanged. Suite: 238 tests.
+  Only final review, commit to `main`, and green project CI remain.
+  `PRECISION-002` stays **IN PROGRESS** until those are done.
 
 ## Definition of done for every task
 

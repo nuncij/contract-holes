@@ -50,7 +50,9 @@
 
 - [Development plan](DEVELOPMENT_PLAN.md)
 - [PRECISION-001 development plan](PRECISION_001_PLAN.md)
-- [PRECISION-002 development plan](PRECISION_002_PLAN.md)
+- [PRECISION-002 development plan](PRECISION_002_PLAN.md) — all independent-review
+  blockers resolved; local gates pass and the private offline replay is complete
+  with only final review, commit/push, and CI remaining
 - [Next-session handoff prompt](NEXT_SESSION_PROMPT.md)
 - [Threat model](THREAT_MODEL.md)
 - [Security policy](../SECURITY.md)

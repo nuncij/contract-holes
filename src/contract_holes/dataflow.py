@@ -33,6 +33,34 @@ PURE_BUILTINS = frozenset(
 AUTHORIZATION_NAME = re.compile(
     r"(?:allow|auth|guard|owner|admin|operator|permission|role|whitelist)", re.IGNORECASE
 )
+CONDITIONAL_NODE_TYPES = frozenset(
+    {
+        "Conditional",
+        "DoWhileStatement",
+        "ForStatement",
+        "IfStatement",
+        "TryCatchClause",
+        "TryStatement",
+        "WhileStatement",
+    }
+)
+CREATED_TAINT = "fresh-created"
+
+
+def node_is_unconditional(
+    project: "ProjectIndex", node: NodeKey | Node | None
+) -> bool:
+    if isinstance(node, NodeKey):
+        node = project.node_for_key(node)
+    current = project.parent(node) if node is not None else None
+    while current is not None:
+        node_type = str(current.get("nodeType", ""))
+        if node_type in CONDITIONAL_NODE_TYPES:
+            return False
+        if node_type in {"FunctionDefinition", "ModifierDefinition"}:
+            return True
+        current = project.parent(current)
+    return True
 
 
 @dataclass(frozen=True, slots=True)
@@ -172,6 +200,9 @@ class _FunctionAnalyzer:
         self.edges_by_site = edges_by_site
         self.facts: list[FlowFact] = []
         self.environment: dict[NodeKey, FlowValue] = {}
+        self._timelock_delay_vars: set[NodeKey] = set()
+        self._timelock_pending_vars: set[NodeKey] = set()
+        self._timelock_anchor: tuple[int, Node] | None = None
 
     def analyze(self) -> list[FlowFact]:
         self._initialize_parameters()
@@ -179,6 +210,26 @@ class _FunctionAnalyzer:
         body = self.function.get("body")
         if isinstance(body, dict):
             self.environment = self._statement(body, self.environment)
+        if (
+            self._timelock_pending_vars
+            and self._timelock_delay_vars
+            and self._timelock_pending_vars.isdisjoint(self._timelock_delay_vars)
+        ):
+            assert self._timelock_anchor is not None
+            self._fact(
+                "authorization",
+                self._timelock_anchor[1],
+                value=FlowValue(
+                    origins=frozenset(self._timelock_pending_vars)
+                ),
+                metadata={
+                    "context": "timelock",
+                    "mechanisms": ["timelock:delay-and-pending"],
+                    "deadline_declarations": sorted(
+                        _key_text(key) for key in self._timelock_delay_vars
+                    ),
+                },
+            )
         return self.facts
 
     def _initialize_parameters(self) -> None:
@@ -392,7 +443,21 @@ class _FunctionAnalyzer:
             if expression.get("operator") != "=" and isinstance(left, dict):
                 value = FlowValue.merge(self._value(left), value)
             if isinstance(left, dict):
-                self._write_target(left, value, expression)
+                if (
+                    expression.get("operator") == "="
+                    and left.get("nodeType") in {"IndexAccess", "IndexRangeAccess"}
+                ):
+                    self._value(left)
+                write_metadata = (
+                    {"value_is_zero": True}
+                    if expression.get("operator") == "="
+                    and isinstance(right, dict)
+                    and _is_zero_constant(right)
+                    else None
+                )
+                self._write_target(
+                    left, value, expression, metadata=write_metadata
+                )
             return value
         if node_type == "UnaryOperation":
             sub_expression = expression.get("subExpression")
@@ -540,22 +605,32 @@ class _FunctionAnalyzer:
                 if target_expression is not None
                 else FlowValue(unknown=True)
             )
-            self._fact(
-                "external-target",
-                call,
-                value=target_value,
-                metadata={
-                    "edge_kind": edge.kind,
-                    "confidence": edge.confidence,
-                    "target": edge.target,
-                    "receiver": _call_receiver(self.project, call),
-                    "empty_calldata": _has_empty_calldata(call, edge),
-                },
-            )
             callee = (
                 self.project.node_for_key(edge.callee)
                 if edge.callee is not None
                 else None
+            )
+            callee_mutability = (
+                callee.get("stateMutability") if callee is not None else None
+            )
+            result_ignored = bool(
+                isinstance(parent, dict)
+                and parent.get("nodeType") == "ExpressionStatement"
+            )
+            sink_metadata: dict[str, object] = {
+                "edge_kind": edge.kind,
+                "confidence": edge.confidence,
+                "target": edge.target,
+                "receiver": _call_receiver(self.project, call),
+                "empty_calldata": _has_empty_calldata(call, edge),
+                "callee_mutability": callee_mutability,
+                "result_ignored": result_ignored,
+            }
+            self._fact(
+                "external-target",
+                call,
+                value=target_value,
+                metadata=sink_metadata,
             )
             if callee is None or callee.get("stateMutability") != "pure":
                 self._fact(
@@ -567,10 +642,8 @@ class _FunctionAnalyzer:
                         "confidence": edge.confidence,
                         "target": edge.target,
                         "receiver": _call_receiver(self.project, call),
-                        "result_ignored": bool(
-                            isinstance(parent, dict)
-                            and parent.get("nodeType") == "ExpressionStatement"
-                        ),
+                        "result_ignored": result_ignored,
+                        "callee_mutability": callee_mutability,
                     },
                 )
             transfer_value = _transferred_value(
@@ -583,8 +656,12 @@ class _FunctionAnalyzer:
                     value=transfer_value,
                     metadata={"edge_kind": edge.kind, "target": edge.target},
                 )
+            if edge.kind == "creation":
+                return_value_taints = frozenset({CREATED_TAINT})
+            else:
+                return_value_taints = frozenset({"external-return"})
             return FlowValue(
-                taints=frozenset({"external-return"}),
+                taints=return_value_taints,
                 origins=frozenset({call_key}) if call_key else frozenset(),
                 unknown=True,
             )
@@ -629,6 +706,18 @@ class _FunctionAnalyzer:
         self, condition: Node, value: FlowValue, context: str
     ) -> None:
         mechanisms = _authorization_mechanisms(condition)
+        if context in {"require", "assert"}:
+            delay_vars = elapsed_delay_condition(self.project, condition)
+            pending_vars = pending_value_condition(self.project, condition)
+            if (delay_vars or pending_vars) and node_is_unconditional(
+                self.project, condition
+            ):
+                self._timelock_delay_vars.update(delay_vars)
+                self._timelock_pending_vars.update(pending_vars)
+                span = self.project.source_span(condition)
+                start = span.byte_start if span is not None else -1
+                if self._timelock_anchor is None or start > self._timelock_anchor[0]:
+                    self._timelock_anchor = (start, condition)
         if mechanisms:
             self._fact(
                 "authorization",
@@ -637,7 +726,14 @@ class _FunctionAnalyzer:
                 metadata={"context": context, "mechanisms": sorted(mechanisms)},
             )
 
-    def _write_target(self, target: Node, value: FlowValue, site: Node) -> None:
+    def _write_target(
+        self,
+        target: Node,
+        value: FlowValue,
+        site: Node,
+        *,
+        metadata: dict[str, object] | None = None,
+    ) -> None:
         declarations = _target_declarations(self.project, target)
         if not declarations:
             self._fact(
@@ -650,10 +746,10 @@ class _FunctionAnalyzer:
         for declaration in declarations:
             node = self.project.node_for_key(declaration)
             if node is not None:
-                metadata = {}
+                write_metadata = dict(metadata or {})
                 if _caller_owned_mapping_target(target):
-                    metadata["index_ownership"] = "msg.sender"
-                self._write_declaration(node, value, site, metadata=metadata)
+                    write_metadata["index_ownership"] = "msg.sender"
+                self._write_declaration(node, value, site, metadata=write_metadata)
 
     def _write_declaration(
         self,
@@ -809,6 +905,108 @@ def _sender_primitives(node: Node) -> set[str]:
         if value in {"msg.sender", "tx.origin"}:
             result.add(value)
     return result
+
+
+def elapsed_delay_condition(
+    project: "ProjectIndex", condition: Node
+) -> frozenset[NodeKey]:
+    """State deadlines guarded by timestamp >= deadline or the reversed form."""
+    comparison = _direct_comparison(condition)
+    if comparison is None:
+        return frozenset()
+    left = comparison.get("leftExpression")
+    right = comparison.get("rightExpression")
+    deadline = None
+    if (
+        comparison.get("operator") == ">="
+        and isinstance(left, dict)
+        and _is_block_time_reference(left)
+        and isinstance(right, dict)
+    ):
+        deadline = _mutable_state_declaration(project, right)
+    elif (
+        comparison.get("operator") == "<="
+        and isinstance(right, dict)
+        and _is_block_time_reference(right)
+        and isinstance(left, dict)
+    ):
+        deadline = _mutable_state_declaration(project, left)
+    return frozenset({deadline}) if deadline is not None else frozenset()
+
+
+def pending_value_condition(
+    project: "ProjectIndex", condition: Node
+) -> frozenset[NodeKey]:
+    """State declarations proven nonzero by a direct `state != zero` guard."""
+    comparison = _direct_comparison(condition)
+    if comparison is None or comparison.get("operator") != "!=":
+        return frozenset()
+    left = comparison.get("leftExpression")
+    right = comparison.get("rightExpression")
+    if not isinstance(left, dict) or not isinstance(right, dict):
+        return frozenset()
+    left_state = _mutable_state_declaration(project, left)
+    right_state = _mutable_state_declaration(project, right)
+    if left_state is not None and _is_zero_constant(right):
+        return frozenset({left_state})
+    if right_state is not None and _is_zero_constant(left):
+        return frozenset({right_state})
+    return frozenset()
+
+
+def _is_block_time_reference(node: Node) -> bool:
+    if node.get("nodeType") == "MemberAccess":
+        owner = node.get("expression")
+        return bool(
+            isinstance(owner, dict)
+            and owner.get("nodeType") == "Identifier"
+            and owner.get("name") == "block"
+            and node.get("memberName") == "timestamp"
+        )
+    return node.get("nodeType") == "Identifier" and node.get("name") == "now"
+
+
+def _mutable_state_declaration(
+    project: "ProjectIndex", node: Node
+) -> NodeKey | None:
+    if node.get("nodeType") not in {"Identifier", "IdentifierPath"}:
+        return None
+    resolution = project.resolve_reference_detail(node)
+    declaration = resolution.node if resolution is not None else None
+    if (
+        declaration is None
+        or declaration.get("nodeType") != "VariableDeclaration"
+        or declaration.get("stateVariable") is not True
+        or declaration.get("constant") is True
+    ):
+        return None
+    return resolution.key
+
+
+def _is_zero_constant(node: Node) -> bool:
+    if node.get("nodeType") == "Literal":
+        return node.get("value") in {"0", "0x0"} or node.get("hexValue") in {
+            "0",
+            "0x0",
+        }
+    if node.get("nodeType") == "FunctionCall" and node.get("kind") == "typeConversion":
+        arguments = node.get("arguments", [])
+        return bool(
+            isinstance(arguments, list)
+            and len(arguments) == 1
+            and isinstance(arguments[0], dict)
+            and _is_zero_constant(arguments[0])
+        )
+    return False
+
+
+def _direct_comparison(node: Node) -> Node | None:
+    if (
+        node.get("nodeType") == "BinaryOperation"
+        and node.get("operator") in {">=", ">", "<=", "<", "==", "!="}
+    ):
+        return node
+    return None
 
 
 def _call_options(call: Node) -> tuple[list[str], list[Node]]:

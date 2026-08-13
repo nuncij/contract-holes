@@ -7,6 +7,11 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Documentation
 
+- Updated the `PRECISION-002` plan and tracker after resolving all
+  independent-review blockers, recording the versioned historical result, the
+  completed private offline replay, the unsatisfied governance/config-derived
+  and factory-owned families, and the remaining final review, commit/push, and
+  CI steps.
 - Added a dedicated `PRECISION-001` development plan with test seams, ordered
   red-to-green slices, false-negative guardrails, validation gates, and stop
   conditions.
@@ -45,6 +50,37 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Analysis
 
+- Resolved all independent-review blockers on the `PRECISION-002` diff by
+  narrowing or retaining findings, not by a no-callback proof. Compiler-resolved
+  `view`/`pure` callees and `staticcall` no longer form `SOL005` reentrancy
+  paths; state-changing calls, contract creation, and fresh-target initializers
+  remain reportable. There is no no-callback proof and no blanket fresh or
+  creation suppression.
+- Replaced the loose timelock guard with a strict structural authorization
+  mechanism: separate unconditional direct guards proving a nonzero pending
+  value (`state != zero`) and an elapsed deadline via `block.timestamp >=
+  deadline` (or `deadline <= timestamp`) over distinct state declarations.
+  The pending value must feed the protected sensitive write without
+  user-controlled taint. The mechanism then protects that write from `SOL009`. Exact
+  zero-clears of the guarded pending/deadline fields are also accepted. No
+  other later write inherits protection. Wrong comparison
+  directions, timestamp `==`/`!=`, OR/optional delay, unrelated zero/nonzero
+  flags, timestamp-only, mixed pending/caller values, deadline-derived writes,
+  local pending reads,
+  unrelated later privileged writes, compound expressions, and combined
+  boolean guards still report.
+- Immutable receiver identity never clears `external-return` taint; receiver
+  identity is not provenance for returned targets, so governance/config-derived
+  call lists remain `SOL008` manual-review findings.
+- Created addresses carry non-user-controlled fresh provenance for `SOL008`;
+  this says nothing about callback safety for `SOL005`.
+- Deleted the read-result use tracer. A view/pure/staticcall `SOL008` sink is
+  suppressed only when its result is ignored at the call site or the externally
+  callable enclosing function is view/pure; in a non-view entry any used result
+  (mapping key, state-changing call argument, or write value) reports `SOL008`,
+  and mapping-index calls are evaluated so that use is not missed.
+- Moved the unconditional-node check into the shared `dataflow` module so
+  `authorization.py` reuses it instead of duplicating a private helper.
 - Coalesce deterministic alternative evidence with the same fingerprint before
   report rendering, preserving the first representative trace and the frozen
   fingerprint definition.
@@ -55,6 +91,25 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   `msg.sender` role self-grants reportable.
 
 ### Validation
+
+- Resolved the `PRECISION-002` independent-review blockers by narrowing or
+  retaining findings. Added adversarial-positive fixtures to the
+  `precision-002` compiler corpus and `test_precision_002` (Solidity `0.8.25`):
+  creation and fresh-target initializers, not-yet-elapsed/timestamp-equality/
+  inequality/unrelated-flag/timestamp-only/OR-optional-delay, pending-not-
+  feeding-the-write, mixed-pending/caller, deadline-derived-write,
+  local-pending-read, and unrelated-later-write guards. Added read results used
+  as a mapping key or state-changing call argument. Versioned the
+  `m7-history-1` raw result after
+  the view-interaction fix removed one out-of-model Enzyme `SOL005` candidate:
+  candidate precision moved from 0.875 to 0.933333 with all five supported
+  cases, 1.0 supported-class recall, 1.0 evidence completeness, and the `go`
+  decision unchanged. Frozen `audit-1` evaluation is unchanged (33/33 positive,
+  31/31 safe). Suite: 238 tests. The private offline replay (unchanged source
+  and dependency identities, cached Solidity `0.8.28`, ten reportable files)
+  produced 59 findings/candidates versus 81 before tuning — 22 removed, no new
+  findings — which remain investigation leads. Only final review, commit, push,
+  and project CI remain.
 
 - Implemented `COMP-004` exact-compiler binding in the bounty profile and
   isolated compiler. The public `holes bounty init --compiler-version`,

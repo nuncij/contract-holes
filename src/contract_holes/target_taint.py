@@ -157,6 +157,8 @@ class CallTargetAnalysis:
             self._record_fixed_provenance(
                 entry, sink, fixed_environment, provenance
             )
+            if not self._sink_eligible(sink, entry):
+                continue
             controlled_path = self._controlled_path(
                 sink.value, environment, function, call_prefix
             )
@@ -430,6 +432,26 @@ class CallTargetAnalysis:
             )
         source = min(candidates, key=_step_sort_key)
         return (*call_prefix, source)
+
+    def _sink_eligible(self, sink: FlowFact, entry: NodeKey) -> bool:
+        if not self._is_read_only_sink(sink):
+            return True
+        if sink.metadata.get("result_ignored") is True:
+            return False
+        return not self._entry_is_read_only(entry)
+
+    @staticmethod
+    def _is_read_only_sink(fact: FlowFact) -> bool:
+        if str(fact.metadata.get("edge_kind", "")) == "low-level-staticcall":
+            return True
+        return str(fact.metadata.get("callee_mutability")) in {"view", "pure"}
+
+    def _entry_is_read_only(self, entry: NodeKey) -> bool:
+        function = self.project.node_for_key(entry)
+        return bool(
+            function is not None
+            and function.get("stateMutability") in {"view", "pure"}
+        )
 
     @staticmethod
     def _eligible_target(fact: FlowFact) -> bool:

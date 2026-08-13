@@ -1,6 +1,8 @@
 # PRECISION-002 development plan
 
-Status: **NEXT — `PILOT-008` and `COMP-004` complete**
+Status: **IN PROGRESS — all independent-review blockers are resolved, all
+repository-local gates pass, and the private offline replay is complete. Only
+final review, commit/push, and CI remain (see Result)**
 
 ## Goal
 
@@ -90,6 +92,10 @@ counts are recorded in the development notes or commit message.
 
 ### 2. Add the generic regression corpus
 
+The following are the original acceptance criteria. They are preserved here
+even where the result had to retain a finding instead of claiming an unsafe
+suppression.
+
 Create minimal safe and positive neighbors for each observed family. The
 manifest must name generic behavior and expected rule IDs. It must not contain
 private candidate identities or target-derived source.
@@ -170,12 +176,14 @@ PYTHONPATH=src python3 -m unittest \
   tests.test_precision_001 -q
 PYTHONPATH=src python3 -m unittest discover -s tests -q
 PYTHONPATH=src python3 -m contract_holes evaluate \
-  tests/fixtures/evaluation/manifest.json > /tmp/contract-holes-evaluation.json
+  tests/fixtures/evaluation/manifest.json
 PYTHONPATH=src python3 -m contract_holes bounty history \
-  tests/fixtures/bounty_history/manifest.json \
-  > /tmp/contract-holes-history.json
+  tests/fixtures/bounty_history/manifest.json
 git diff --check
 ```
+
+Keep diagnostic output on stdout. If a captured copy is needed, write it under
+an ignored repository directory and remove it before finishing.
 
 The frozen evaluation must retain every positive and safe label. The historical
 evaluation must retain its supported cases, evidence completeness, and go
@@ -219,3 +227,103 @@ Stop the slice and record the limitation if a proposed fix requires:
 After this task, evaluate the improved scanner only on a target not used to tune
 these fixes. Do not infer bounty viability from the same labels used to tune
 `PRECISION-002`.
+
+## Result
+
+All independent-review blockers on the green implementation were resolved
+in this repository-local slice on 2026-08-13. The generic compiler corpus under
+`tests/fixtures/precision_002/` (Solidity `0.8.25`, compiler-backed
+`ProjectIndex` plus `Scanner.scan_source`) plus `tests/test_precision_002.py`
+now provide generic coverage for supported outcomes plus explicit unsatisfied
+and manual-review boundaries. No private target code, paths, candidate IDs, or
+excerpts entered the repository.
+No target network, chain, RPC, proof, report, export, disclosure, submission,
+target contact, or bounty-platform write occurred.
+
+Detector changes are in shared analysis modules. No rule-local AST walks, name
+lists, configuration toggles, or target suppressions were added:
+
+- `dataflow.py` records callee mutability, fresh-deployment provenance, and
+  result-ignored state on shared sink facts. It taints freshly created addresses
+  with a non-user-controlled `fresh-created` marker. It evaluates the index
+  expression of index-write targets so a read used as a mapping key reaches a
+  sink. It emits a strict `timelock:delay-and-pending` authorization fact only
+  when separate unconditional direct guards prove a nonzero pending value
+  (`state != zero`) and a different state deadline via `block.timestamp >=
+  deadline` or `deadline <= block.timestamp`, with the pending value feeding the
+  protected sensitive write without user-controlled taint. Exact zero-clears of
+  the guarded pending and deadline declarations are also accepted. No other
+  write inherits protection.
+- `reentrancy.py` no longer classifies compiler-resolved view/pure callees or
+  `staticcall` interactions as `SOL005` events. State-changing calls, contract
+  creation, and fresh-target initializers remain reportable. There is no
+  no-callback proof and no blanket fresh or creation suppression.
+- `target_taint.py` deletes the read-result use tracer. A view/pure/staticcall
+  `SOL008` sink is suppressed only when its result is ignored at the call site
+  or the externally callable enclosing function is view/pure. In a non-view
+  entry any used result (mapping key, state-changing call argument, or write
+  value) reports `SOL008`, and mapping-index calls are evaluated so that use is
+  not missed.
+- `dataflow.py` never clears `external-return` taint for calls whose receiver is
+  an immutable/constant declaration. Receiver identity is not provenance for
+  the returned targets.
+- The unconditional-node check moved to the shared `dataflow` module so
+  `authorization.py` reuses it instead of duplicating a private helper.
+
+Safe/positive outcomes per family:
+
+| Family | Clean | Positive neighbor retained |
+| --- | --- | --- |
+| View-interaction ordering | view-then-write, write-then-interact | state-changing interaction before write reports `SOL005` |
+| Timelock authorization | separate unconditional nonzero-pending and elapsed-delay guards, pending value feeding the protected write without user-controlled taint, then exact zero cleanup of those guarded fields | wrong directions, timestamp `==`/`!=`, OR/optional delay, unrelated zero/nonzero flags, timestamp-only, mixed pending/caller values, deadline-derived writes, local pending reads, unrelated later privileged writes, compound, and combined boolean guards report `SOL009` |
+| Deployment sequence | created address is non-user-controlled fresh provenance for `SOL008` | a freshly deployed clone and a caller-supplied existing target report `SOL005` |
+| Governance call lists | none (unsatisfied) | both a fixed-module list and a caller-selected module report `SOL008`. `SOL003` stays a manual-review signal on both |
+| Read-only target taint | caller-supplied read-only query with an ignored result or in a view entry | a used read result in a non-view entry reports `SOL008` (mapping key, call argument, write value) |
+| Fixed asset provenance | immutable underlying asset (already green before this task) | caller-supplied token target reports `SOL008` |
+
+Unsatisfied families and explicit boundaries (not suppressed, no fake
+coverage):
+
+- Governance/config-derived call lists: a list returned by a fixed-module view
+  call is not proven non-attacker-controlled. `external-return` taint is never
+  cleared by receiver identity, so `executeGovernance` reports `SOL008`.
+  A provenance proof that the returned array is governance-owned was not
+  implemented. The slice is incomplete by design.
+- Factory-owned targets generally: no provenance proof exists for addresses
+  derived from a factory's own state. Only the direct immutable-receiver case
+  is handled, and it predates this task.
+- Callback safety for creation and fresh targets is not proved: contract
+  creation and fresh-target initializers report `SOL005` whenever callback
+  capability or target control remains unknown. There is no no-callback proof
+  and no blanket fresh or creation suppression.
+- Timelock recognition is deliberately strict: wrong comparison directions,
+  timestamp `==`/`!=`, OR/optional delay, unrelated zero/nonzero flags,
+  timestamp-only guards, compound expressions, combined boolean guards, a
+  named-constant zero, and a pending comparison against the same state deadline
+  are not recognized and still report `SOL009`.
+- Multiple independent timelock sections in one callable are collapsed to one
+  conservative fact and can leave an otherwise safe write reportable.
+- Read-result use is conservative by construction: in a non-view function any
+  used read result reports `SOL008`. There is no harmless-use or
+  cross-transaction analysis. The previous claim that unsafe missed uses stay
+  conservative was removed because the tracer itself was deleted.
+- The private offline replay is complete: unchanged exact source and dependency
+  identities, exact cached Solidity `0.8.28`, ten reportable files. It produced
+  59 findings/candidates versus 81 before tuning: 22 removed, no new findings.
+  Current rule distribution: SOL003=1, SOL005=13, SOL008=41, SOL009=3, SOL011=1.
+  removed distribution: SOL005=13, SOL008=9. The remaining 59 findings are
+  investigation leads, not vulnerabilities and not bounty submissions.
+
+Frozen gates: the `audit-1` evaluation retains 33/33 positive and 31/31 safe
+labels with 1.0 precision/recall. The historical `m7-history-1` result changed
+deterministically: the view-interaction fix removed one out-of-model `SOL005`
+candidate from the Enzyme reduction (a `totalSupply()` view read before a
+write), improving candidate precision from 0.875 to 0.933333 with all five
+supported cases, 1.0 supported-class recall, 1.0 evidence completeness, and the
+`go` decision unchanged. `evaluation/bounty-history-1.0.json` was regenerated
+through the public CLI. No fixture, label, threshold, or split changed.
+
+Suite: 238 tests pass with `git diff --check`. The remaining completion-gate
+items — final review, the single coherent commit, push to `main`, and green
+project CI — are outside this documentation slice, so `PRECISION-002` stays
+**IN PROGRESS** until they complete.

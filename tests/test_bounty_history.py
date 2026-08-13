@@ -48,7 +48,7 @@ class BountyHistoryTests(unittest.TestCase):
         self.assertEqual(result["status"], "passed")
         self.assertEqual(result["product_claim"]["decision"], "go")
         self.assertEqual(result["metrics"]["supported_cases_with_evidence"], 5)
-        self.assertEqual(result["metrics"]["rejected_candidates"], 2)
+        self.assertEqual(result["metrics"]["rejected_candidates"], 1)
         self.assertNotIn(str(ROOT), json.dumps(result))
 
     def test_fixture_tampering_and_label_rewriting_are_rejected(self) -> None:

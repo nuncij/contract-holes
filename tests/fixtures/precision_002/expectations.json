@@ -1,0 +1,64 @@
+{
+  "schema_version": "1.0",
+  "sol005_clean": [
+    "PrecisionCases.viewThenWrite",
+    "PrecisionCases.writeThenInteract",
+    "PrecisionCases.queryPriceThenWrite"
+  ],
+  "sol005_positive": [
+    "PrecisionCases.registerCallbackClone",
+    "PrecisionCases.registerClone",
+    "PrecisionCases.registerExisting",
+    "PrecisionCases.stateChangingThenWrite"
+  ],
+  "sol008_clean": [
+    "PrecisionCases.viewThenWrite",
+    "PrecisionCases.registerClone",
+    "PrecisionCases.queryPrice",
+    "PrecisionCases.deposit"
+  ],
+  "sol008_positive": [
+    "PrecisionCases.depositCallerAsset",
+    "PrecisionCases.executeCallerSelected",
+    "PrecisionCases.executeGovernance",
+    "PrecisionCases.queryPriceThenWrite",
+    "PrecisionCases.queryThenFeedExternalCall",
+    "PrecisionCases.queryThenUseAsMappingKey",
+    "PrecisionCases.registerExisting",
+    "PrecisionCases.stateChangingThenWrite",
+    "PrecisionCases.writeThenInteract"
+  ],
+  "sol009_clean": [
+    "PrecisionCases.proposeOwner",
+    "PrecisionCases.acceptOwner"
+  ],
+  "sol009_positive": [
+    "PrecisionCases.notYetElapsedWrite",
+    "PrecisionCases.optionalElapsedWrite",
+    "PrecisionCases.timelockActionDoesNotAuthorizeLaterInput",
+    "PrecisionCases.timelockDeadlineDoesNotAuthorizeWrite",
+    "PrecisionCases.timelockDoesNotAuthorizeInput",
+    "PrecisionCases.timelockLocalReadDoesNotAuthorizeInput",
+    "PrecisionCases.timelockMixedValueDoesNotAuthorizeInput",
+    "PrecisionCases.timestampEqualityWrite",
+    "PrecisionCases.timestampInequalityWrite",
+    "PrecisionCases.timestampOnlyWrite",
+    "PrecisionCases.unprotectedWrite",
+    "PrecisionCases.unrelatedNonzeroFlagWithElapsed",
+    "PrecisionCases.unrelatedStateComparisonWithElapsed"
+  ],
+  "sol003_lines": [
+    169,
+    177
+  ],
+  "evidence": {
+    "SOL005": "compiler-interprocedural-data-flow",
+    "SOL008": "compiler-interprocedural-target-taint",
+    "SOL009": "compiler-authorization-reachability"
+  },
+  "evidence_lines": {
+    "SOL005": 66,
+    "SOL008": 204,
+    "SOL009": 94
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "corpus_version": "precision-002",
+  "compiler": "0.8.25",
+  "cases": [
+    {"name": "view-interaction-ordering", "rule_ids": ["SOL005", "SOL008"], "behavior": "read-only view interactions and calls after the writes do not form SOL005 reentrancy paths; a real state-changing interaction before a write still reports SOL005"},
+    {"name": "timelock-authorization", "rule_ids": ["SOL009"], "behavior": "only separate dominating guards for pending-state != zero and a different state deadline with block.timestamp >= deadline (or deadline <= timestamp), where the guarded pending value feeds the protected write without user-controlled taint or a guarded field is exactly zero-cleared, suppress SOL009; caller-input, mixed pending/caller, and deadline-derived writes, local pending reads, unrelated later privileged writes, wrong timestamp directions, optional OR conditions, unrelated zero/nonzero state guards, and timestamp-only guards still report"},
+    {"name": "deployment-sequence", "rule_ids": ["SOL005", "SOL008"], "behavior": "freshly deployed addresses are not caller-controlled SOL008 targets, but their constructors and initializers remain callback-capable SOL005 interactions until a complete compiler proof exists; caller-supplied existing targets still report both applicable rules"},
+    {"name": "governance-call-lists", "rule_ids": ["SOL003", "SOL008"], "behavior": "returns from a fixed-module call list carry external-return taint (receiver identity is not provenance proof), so a governance-configured delegatecall list reports SOL008; a caller-selected module also reports SOL008; SOL003 remains a manual-review signal on both"},
+    {"name": "read-only-target-taint", "rule_ids": ["SOL008"], "behavior": "a caller-supplied read-only view/staticcall sink is caller-harm-only only when its result is ignored or the externally callable enclosing function is view/pure; in a non-view function any used read result (mapping key, state-changing call argument, or write value) reports SOL008"},
+    {"name": "fixed-asset-provenance", "rule_ids": ["SOL008"], "behavior": "the immutable underlying asset is not a user-controlled call target; a caller-supplied token target remains reportable"}
+  ]
+}

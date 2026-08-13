@@ -58,16 +58,20 @@ The `m7-history-1` result is:
 | --- | ---: | ---: |
 | Cases / projects | 10 / 10 | at least 10 / 5 |
 | Supported cases with useful evidence | 5 | at least 3 |
-| Candidate precision | 0.875 | at least 0.8 |
+| Candidate precision | 0.933333 | at least 0.8 |
 | Supported-class recall | 1.0 | at least 0.8 |
 | Evidence completeness | 1.0 | at least 0.9 |
-| Investigation candidates | 16 | reported, not optimized away |
-| Rejected candidates | 2 | reported, not hidden |
+| Investigation candidates | 15 | reported, not optimized away |
+| Rejected candidates | 1 | reported, not hidden |
 | Holdout precision / recall | 1.0 / 1.0 | reported separately |
 
-The two rejected candidates are generic reentrancy/target-taint observations on
-the Enzyme reduction. They are deliberately retained in raw output rather than
-relabelled as the disclosed price-integration root cause.
+The single rejected candidate is a generic reentrancy observation on the Enzyme
+reduction. It is deliberately retained in raw output rather than relabelled as
+the disclosed price-integration root cause. A second out-of-model `SOL005`
+candidate was removed on 2026-08-13 when `PRECISION-002` stopped treating view
+interactions as reentrancy paths (`totalSupply()` is a read-only `view` call);
+the versioned raw result was regenerated through the public CLI and no fixture,
+label, threshold, or split changed.
 
 The gate decision is `go` only for this wording: Contract Holes produced useful
 investigation evidence for at least three independent historical cases in

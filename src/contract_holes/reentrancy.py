@@ -283,7 +283,10 @@ class ReentrancyAnalysis:
     @staticmethod
     def _fact_event_kind(fact: FlowFact) -> str | None:
         if fact.kind == "external-interaction":
-            if fact.metadata.get("edge_kind") == "low-level-staticcall":
+            edge_kind = fact.metadata.get("edge_kind")
+            if edge_kind == "low-level-staticcall":
+                return None
+            if fact.metadata.get("callee_mutability") in {"view", "pure"}:
                 return None
             return "interaction"
         if fact.kind == "write" and fact.metadata.get("scope") == "state":
