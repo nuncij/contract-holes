@@ -286,6 +286,22 @@ class ReentrancyRule(Rule):
             mutation_line = (
                 issue.state_write.span.line if issue.state_write.span is not None else None
             )
+            metadata: dict[str, object] = {
+                "evidence": "compiler-interprocedural-data-flow",
+                "entry_function": analysis.function_name(issue.entry),
+                "interaction_function": interaction_name,
+                "state_write_function": write_name,
+                "state_variable": state_variable,
+                "interaction_line": interaction_line,
+                "mutation_line": mutation_line,
+                "trace": [analysis.event_dict(event) for event in issue.trace],
+            }
+            if issue.interaction.fact is not None:
+                provenance = source.project_index.target_taint.provenance_for(
+                    issue.entry, issue.interaction.fact
+                )
+                if provenance is not None:
+                    metadata["target_provenance"] = provenance
             finding = self.finding(
                 source,
                 anchor,
@@ -293,16 +309,7 @@ class ReentrancyRule(Rule):
                     f"External interaction in {interaction_name} occurs before "
                     f"state variable {state_variable!r} is updated in {write_name}."
                 ),
-                metadata={
-                    "evidence": "compiler-interprocedural-data-flow",
-                    "entry_function": analysis.function_name(issue.entry),
-                    "interaction_function": interaction_name,
-                    "state_write_function": write_name,
-                    "state_variable": state_variable,
-                    "interaction_line": interaction_line,
-                    "mutation_line": mutation_line,
-                    "trace": [analysis.event_dict(event) for event in issue.trace],
-                },
+                metadata=metadata,
             )
             if finding:
                 yield finding

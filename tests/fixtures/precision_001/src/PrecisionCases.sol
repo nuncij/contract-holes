@@ -4,6 +4,12 @@ interface ICallback {
     function ping() external;
 }
 
+library PureLibrary {
+    function increment(uint256 value) public pure returns (uint256) {
+        return value + 1;
+    }
+}
+
 type UserValue is uint256;
 
 contract PrecisionCases {
@@ -11,6 +17,7 @@ contract PrecisionCases {
     address public immutable fixedTarget;
     address public owner;
     mapping(address => bool) public admins;
+    mapping(address => uint256) public preferences;
 
     constructor(address target) {
         fixedTarget = target;
@@ -19,7 +26,7 @@ contract PrecisionCases {
 
     function callSemantics(uint256 raw) external pure returns (uint256) {
         UserValue value = UserValue.wrap(raw);
-        return _pure(value) + _internal(value);
+        return PureLibrary.increment(_pure(value) + _internal(value));
     }
 
     function _pure(UserValue value) internal pure returns (uint256) {
@@ -38,6 +45,14 @@ contract PrecisionCases {
         }
     }
 
+    function infeasibleBranchViaHelper(bool chooseCallback, address target) external {
+        if (chooseCallback) {
+            _ping(target);
+        } else {
+            balance = 2;
+        }
+    }
+
     function feasibleBranch(bool chooseCallback, address target) external {
         if (chooseCallback) {
             ICallback(target).ping();
@@ -45,9 +60,27 @@ contract PrecisionCases {
         }
     }
 
+    function postConditionalWrite(bool chooseCallback, address target) external {
+        if (chooseCallback) {
+            _ping(target);
+        }
+        balance = 3;
+    }
+
     function fixedTargetStillNeedsReview() external {
         ICallback(fixedTarget).ping();
         balance = 1;
+    }
+
+    function fixedTargetAliasStillNeedsReview() external {
+        address target = fixedTarget;
+        ICallback(target).ping();
+        balance = 4;
+    }
+
+    function fixedTargetHelperStillNeedsReview() external {
+        _ping(fixedTarget);
+        balance = 5;
     }
 
     function fixedTargetCall() external {
@@ -59,15 +92,23 @@ contract PrecisionCases {
     }
 
     function roleProtectedWrite(address nextOwner) external {
-        require(msg.sender == owner);
+        require(admins[msg.sender]);
         owner = nextOwner;
     }
 
-    function callerOwnedWrite() external {
+    function callerOwnedWrite(uint256 value) external {
+        preferences[msg.sender] = value;
+    }
+
+    function selfGrantRole() external {
         admins[msg.sender] = true;
     }
 
     function arbitraryAccountWrite(address account) external {
         admins[account] = true;
+    }
+
+    function _ping(address target) internal {
+        ICallback(target).ping();
     }
 }

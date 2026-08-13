@@ -34,6 +34,11 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 - Coalesce deterministic alternative evidence with the same fingerprint before
   report rendering, preserving the first representative trace and the frozen
   fingerprint definition.
+- Keep compiler-resolved pure calls out of reentrancy interaction facts while
+  retaining their external-target evidence.
+- Carry `if`/`else` branch context through internal calls, preserve immutable
+  target provenance through aliases and helper parameters, and keep
+  `msg.sender` role self-grants reportable.
 
 ### Validation
 
@@ -65,6 +70,10 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   branch-feasibility, 12 target-provenance, 3 authorization-context, and 1
   reentrancy-trust-boundary. The canonical private workspace and target
   checkout were unchanged.
+- Completed the `PRECISION-001` follow-up review. Exact path, line, and evidence
+  assertions now cover retained `SOL005`, `SOL008`, and `SOL009` positives. All
+  216 tests and both frozen evaluation gates pass. A separate locked-down
+  offline rescan reproduced the same 47 candidates and deterministic digests.
 
 ## 1.1.1 — 2026-08-10
 

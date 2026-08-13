@@ -1,18 +1,39 @@
 {
-  "sol005_clean": ["PrecisionCases.infeasibleBranch"],
+  "schema_version": "1.0",
+  "sol005_clean": [
+    "PrecisionCases.infeasibleBranch",
+    "PrecisionCases.infeasibleBranchViaHelper"
+  ],
   "sol005_positive": [
     "PrecisionCases.feasibleBranch",
-    "PrecisionCases.fixedTargetStillNeedsReview"
+    "PrecisionCases.fixedTargetAliasStillNeedsReview",
+    "PrecisionCases.fixedTargetHelperStillNeedsReview",
+    "PrecisionCases.fixedTargetStillNeedsReview",
+    "PrecisionCases.postConditionalWrite"
   ],
   "sol008_positive": [
     "PrecisionCases.callerSelectedTarget",
     "PrecisionCases.feasibleBranch",
-    "PrecisionCases.infeasibleBranch"
+    "PrecisionCases.infeasibleBranch",
+    "PrecisionCases.infeasibleBranchViaHelper",
+    "PrecisionCases.postConditionalWrite"
   ],
   "sol009_clean": [
     "PrecisionCases.roleProtectedWrite",
     "PrecisionCases.callerOwnedWrite"
   ],
-  "sol009_positive": ["PrecisionCases.arbitraryAccountWrite"],
-  "call_semantics_clean": true
+  "sol009_positive": [
+    "PrecisionCases.arbitraryAccountWrite",
+    "PrecisionCases.selfGrantRole"
+  ],
+  "evidence": {
+    "SOL005": "compiler-interprocedural-data-flow",
+    "SOL008": "compiler-interprocedural-target-taint",
+    "SOL009": "compiler-authorization-reachability"
+  },
+  "evidence_lines": {
+    "SOL005": 58,
+    "SOL008": 91,
+    "SOL009": 104
+  }
 }

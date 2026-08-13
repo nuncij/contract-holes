@@ -198,6 +198,13 @@ canonical private workspace and target checkout were unchanged. These are
 reviewer-derived labels from one target, not independent ground truth; an
 independent second target is required before drawing broader precision claims.
 
+A completion review later on 2026-08-13 repaired four generic boundaries in the
+first implementation. They cover pure public-library calls, internal-call branch
+propagation, role self-grants, and immutable-target provenance. The provenance
+now follows aliases and helper parameters. A separate private offline rescan
+reproduced the same 47-candidate result and deterministic digests. The repair
+makes no additional target-specific precision claim.
+
 ## Decision
 
 M8 passes its release gate. The authorized target and rules were pinned before

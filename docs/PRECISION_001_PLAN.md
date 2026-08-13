@@ -239,6 +239,15 @@ evaluation remains at 0.875 candidate precision and 1.0 supported-class recall.
 The labels are reviewer-derived from one target and are not independent ground
 truth. The next task is an independently authorized second real-world target.
 
+A completion review on 2026-08-13 found gaps in the first fixture. It did not
+cover a pure public-library call or an interaction reached through an internal
+helper branch. It also lacked a post-conditional positive and a role self-grant.
+Fixed-target provenance did not cover aliases and internal parameters. The
+repair adds these cases and exact path, line, and evidence assertions. All 216
+tests and both frozen evaluations pass. A separate private offline rescan
+reproduced the same 47 candidates and both deterministic digests. The repair
+makes no further precision claim for the pinned target.
+
 ## Stop conditions
 
 Stop the slice and record the limitation if a proposed fix requires:

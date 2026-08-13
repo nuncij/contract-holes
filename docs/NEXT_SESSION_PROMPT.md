@@ -26,6 +26,10 @@ Project state
   The fresh private rescan produced 47 candidates: 23 call-semantics, 8
   branch-feasibility, 12 target-provenance, 3 authorization-context, and 1
   reentrancy-trust-boundary.
+- A completion review repaired pure public-library call handling,
+  interprocedural branch context, role self-grant detection, fixed-target
+  provenance, and public evidence assertions. A separate offline rescan
+  reproduced the same 47 candidates and deterministic digests.
 - The final trust-boundary analysis found no reachable untrusted callback. The
   generic proof workflow was unsupported for that question, so no proof ran.
 - No report, export, disclosure, submission, chain action, or target contact
@@ -61,8 +65,8 @@ Local evidence
   8bcf4e1b910588932998161b3f4df5f4cd8dc02a6efacd4dc3c670e1f301c66e
 - Expected PRECISION-001 candidate-ledger digest:
   92654835b8aa11f95b83bc070547a823a32a0bd3a8ed113ab5c328501c6a437e
-- Expected Contract Holes commit:
-  c4c7b99
+- Private PRECISION-001 repair rescan workspace:
+  ../bounty-workspaces/openzeppelin-confidential-v0.4.0-precision-001-repair
 - Expected solc version:
   0.8.27+commit.40a35a09.Linux.g++
 - Expected solc SHA-256:
@@ -80,8 +84,9 @@ work. Never commit private candidate details or target source.
 
 Execution
 
-Follow docs/PRECISION_001_PLAN.md as the authoritative development sequence and
-completion gate. Work one red-to-green slice at a time. Keep the target checkout
-and canonical private workspaces unchanged. When the plan is complete, update
-this prompt to the next actual task before committing.
+Follow the `PILOT-007` acceptance criteria in TASKS.md. Select and document an
+independent candidate target first. Pin its current program rules, exact source
+revision, scope, impacts, restrictions, and work authorization before acquiring
+or scanning it. Keep the existing target checkout and canonical private
+workspaces unchanged.
 ```

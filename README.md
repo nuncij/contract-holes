@@ -370,8 +370,14 @@ observed precision groups, and a fresh private rescan of the pinned trial
 produced 47 remaining candidates across those groups: 23 call-semantics, 8
 branch-feasibility, 12 target-provenance, 3 authorization-context, and 1
 reentrancy-trust-boundary. The canonical private workspace and target checkout
-were unchanged. `PILOT-007` is next: select and evaluate an independent second
-real-world target under new explicit authorization.
+were unchanged. A follow-up completion review then hardened the generic cases:
+pure public-library calls no longer create reentrancy interaction facts. Branch
+compatibility crosses internal helper calls. Role self-grants remain reportable,
+and fixed-target evidence follows aliases and helper parameters. A separate
+offline rescan reproduced the same 47-candidate result. These correctness
+repairs do not claim a target-specific reduction. `PILOT-007` is next: select
+and evaluate an independent second real-world target under new explicit
+authorization.
 
 The compiler index, inheritance
 resolver, call graph, reusable

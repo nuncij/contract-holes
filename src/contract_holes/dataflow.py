@@ -552,21 +552,27 @@ class _FunctionAnalyzer:
                     "empty_calldata": _has_empty_calldata(call, edge),
                 },
             )
-            self._fact(
-                "external-interaction",
-                call,
-                value=FlowValue.merge(*argument_values, *option_values),
-                metadata={
-                    "edge_kind": edge.kind,
-                    "confidence": edge.confidence,
-                    "target": edge.target,
-                    "receiver": _call_receiver(self.project, call),
-                    "result_ignored": bool(
-                        isinstance(parent, dict)
-                        and parent.get("nodeType") == "ExpressionStatement"
-                    ),
-                },
+            callee = (
+                self.project.node_for_key(edge.callee)
+                if edge.callee is not None
+                else None
             )
+            if callee is None or callee.get("stateMutability") != "pure":
+                self._fact(
+                    "external-interaction",
+                    call,
+                    value=FlowValue.merge(*argument_values, *option_values),
+                    metadata={
+                        "edge_kind": edge.kind,
+                        "confidence": edge.confidence,
+                        "target": edge.target,
+                        "receiver": _call_receiver(self.project, call),
+                        "result_ignored": bool(
+                            isinstance(parent, dict)
+                            and parent.get("nodeType") == "ExpressionStatement"
+                        ),
+                    },
+                )
             transfer_value = _transferred_value(
                 edge, option_names, option_values, argument_values
             )

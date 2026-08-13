@@ -35,7 +35,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 212 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 216 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -46,11 +46,11 @@ The scanner is successful when it:
 | `SOL002` unchecked call | Compiler evidence when available | Does not track an assigned success value to its later use |
 | `SOL003` `delegatecall` | Source signal | Does not yet determine whether the target is user-controlled or trusted |
 | `SOL004` `selfdestruct` | Direct evidence | Protocol impact still depends on the call path and deployment assumptions |
-| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence plus configurable callback probe | Opposite `if`/`else` arms are kept separate; target deployment, setup, callback reachability, and impact assertions remain project-specific |
+| `SOL005` reentrancy ordering | Compiler-backed interprocedural evidence plus configurable callback probe | Opposite `if`/`else` arms remain separate across internal helpers; target deployment, setup, callback reachability, and impact assertions remain project-specific |
 | `SOL006` weak randomness | Source heuristic | Does not trace the random value to a value-bearing decision |
 | `SOL007` packed hash collision | Compiler evidence plus primitive proof | Does not trace the hash to authorization, signatures, or identifiers |
-| `SOL008` controlled call target | Compiler-backed interprocedural taint | Immutable/fixed receivers retain provenance; the rule does not prove allowlist dominance or persist taint through state across transactions |
-| `SOL009` exposed privileged write | Compiler-backed authorization reachability | Dominating role checks and `msg.sender` mapping keys are recognized; privileged-state names, branch dominance, and custom protocol authorization may require review |
+| `SOL008` controlled call target | Compiler-backed interprocedural taint | Immutable/fixed receivers retain structured provenance through aliases and internal parameters; the rule does not prove allowlist dominance or persist taint through state across transactions |
+| `SOL009` exposed privileged write | Compiler-backed authorization reachability | Dominating role checks and exact `msg.sender` mapping keys are recognized; a role self-grant remains reportable, while privileged-state names, branch dominance, and custom protocol authorization may require review |
 | `SOL010` signature authorization | Compiler-backed recovery-to-action path | Protection and domain recognition are conservative; external library and cross-function digest provenance may require review |
 | `SOL011` proxy and upgrade safety | Compiler-backed initializer, delegatecall-storage, and versioned-layout evidence | Custom proxy standards and unnamed upgrade relationships require project-specific review |
 | `SOL012` ERC-20 interaction safety | Compiler-backed typed-call and amount-origin flow | Custom wrappers, accepted-token policy, and indirect recipients may require review |
@@ -437,6 +437,15 @@ evaluation gates remain unchanged and passing. These reviewer labels are not
 independent ground truth; the next step is an independently authorized second
 real-world target. Private target evidence will not become a repository
 fixture.
+
+A completion review on 2026-08-13 found four gaps in the first implementation.
+The repair adds a pure public-library call and carries branch context through
+internal helpers. It adds post-conditional positives and role self-grant
+coverage. Structured immutable-target provenance now follows aliases and
+internal parameters. Tests assert the exact public path, line, and evidence
+metadata. All 216 tests and both frozen evaluations pass. A new private offline
+workspace reproduced the same 47-candidate scan and both prior digests. The
+repair does not claim a lower workload for this target.
 
 The next validation step is `PILOT-007`: select and evaluate an independent
 second real-world target only after its program rules, source identity, scope,

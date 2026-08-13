@@ -67,6 +67,9 @@ class CallTargetAnalysis:
                 self.input_facts.setdefault(fact.declaration, fact)
 
         issues: dict[tuple[NodeKey, NodeKey | None], CallTargetIssue] = {}
+        provenance: dict[
+            tuple[NodeKey, NodeKey | None], frozenset[NodeKey] | None
+        ] = {}
         for entry, function in sorted(project.functions_by_id.items()):
             if not _is_external_entry(function):
                 continue
@@ -75,13 +78,32 @@ class CallTargetAnalysis:
                 entry=entry,
                 function=entry,
                 environment=environment,
+                fixed_environment={},
                 call_prefix=(),
                 stack=frozenset(),
                 issues=issues,
+                provenance=provenance,
             )
         self.issues: tuple[CallTargetIssue, ...] = tuple(
             sorted(issues.values(), key=_issue_sort_key)
         )
+        self.fixed_provenance = provenance
+
+    def provenance_for(
+        self, entry: NodeKey, sink: FlowFact
+    ) -> dict[str, object] | None:
+        declarations = self.fixed_provenance.get((entry, sink.node))
+        if not declarations:
+            return None
+        return {
+            "kind": "immutable-state",
+            "declarations": sorted(
+                str(node.get("name"))
+                for key in declarations
+                if (node := self.project.node_for_key(key)) is not None
+            ),
+            "user_controlled": False,
+        }
 
     def function_name(self, key: NodeKey) -> str:
         node = self.project.node_for_key(key)
@@ -120,14 +142,21 @@ class CallTargetAnalysis:
         entry: NodeKey,
         function: NodeKey,
         environment: dict[NodeKey, tuple[TargetTraceStep, ...]],
+        fixed_environment: dict[NodeKey, frozenset[NodeKey]],
         call_prefix: tuple[TargetTraceStep, ...],
         stack: frozenset[NodeKey],
         issues: dict[tuple[NodeKey, NodeKey | None], CallTargetIssue],
+        provenance: dict[
+            tuple[NodeKey, NodeKey | None], frozenset[NodeKey] | None
+        ],
     ) -> None:
         if function in stack:
             return
         next_stack = stack | {function}
         for sink in self.targets_by_function.get(function, ()):
+            self._record_fixed_provenance(
+                entry, sink, fixed_environment, provenance
+            )
             controlled_path = self._controlled_path(
                 sink.value, environment, function, call_prefix
             )
@@ -194,13 +223,18 @@ class CallTargetAnalysis:
             callee_environment = self._callee_environment(
                 edge, environment, function, call_prefix
             )
+            callee_fixed_environment = self._callee_fixed_environment(
+                edge, fixed_environment
+            )
             self._walk(
                 entry=entry,
                 function=edge.callee,
                 environment=callee_environment,
+                fixed_environment=callee_fixed_environment,
                 call_prefix=(*call_prefix, call_step),
                 stack=next_stack,
                 issues=issues,
+                provenance=provenance,
             )
 
     def _entry_environment(
@@ -285,6 +319,69 @@ class CallTargetAnalysis:
             )
         return result
 
+    def _callee_fixed_environment(
+        self,
+        edge: CallEdge,
+        environment: dict[NodeKey, frozenset[NodeKey]],
+    ) -> dict[NodeKey, frozenset[NodeKey]]:
+        if edge.callee is None or edge.call_site is None:
+            return {}
+        call = self.project.node_for_key(edge.call_site)
+        callee = self.project.node_for_key(edge.callee)
+        if call is None or callee is None:
+            return {}
+        arguments = call.get("arguments", [])
+        if not isinstance(arguments, list):
+            return {}
+        result: dict[NodeKey, frozenset[NodeKey]] = {}
+        for argument, parameter in zip(arguments, _parameters(callee)):
+            if not isinstance(argument, dict):
+                continue
+            value = self.project.data_flow.value_for_argument(argument)
+            parameter_key = self.project.key_for_node(parameter)
+            if value is None or parameter_key is None:
+                continue
+            declarations = self._fixed_declarations(value, environment)
+            if declarations:
+                result[parameter_key] = declarations
+        return result
+
+    def _record_fixed_provenance(
+        self,
+        entry: NodeKey,
+        sink: FlowFact,
+        environment: dict[NodeKey, frozenset[NodeKey]],
+        observations: dict[
+            tuple[NodeKey, NodeKey | None], frozenset[NodeKey] | None
+        ],
+    ) -> None:
+        declarations = self._fixed_declarations(sink.value, environment)
+        key = (entry, sink.node)
+        if key not in observations:
+            observations[key] = declarations or None
+        elif not declarations:
+            observations[key] = None
+        elif observations[key] is not None:
+            observations[key] |= declarations
+
+    def _fixed_declarations(
+        self,
+        value: FlowValue,
+        environment: dict[NodeKey, frozenset[NodeKey]],
+    ) -> frozenset[NodeKey]:
+        if value.user_controlled or not value.origins:
+            return frozenset()
+        result: set[NodeKey] = set()
+        for origin in value.origins:
+            if origin in environment:
+                result.update(environment[origin])
+                continue
+            declaration = self.project.node_for_key(origin)
+            if not _is_fixed_target_declaration(declaration):
+                return frozenset()
+            result.add(origin)
+        return frozenset(result)
+
     def _controlled_path(
         self,
         value: FlowValue,
@@ -357,6 +454,15 @@ def _is_external_entry(function: Node) -> bool:
         and function.get("visibility") in {"external", "public"}
         and function.get("kind") != "constructor"
         and isinstance(function.get("body"), dict)
+    )
+
+
+def _is_fixed_target_declaration(node: Node | None) -> bool:
+    return bool(
+        node is not None
+        and node.get("nodeType") == "VariableDeclaration"
+        and node.get("stateVariable") is True
+        and (node.get("mutability") == "immutable" or node.get("constant") is True)
     )
 
 

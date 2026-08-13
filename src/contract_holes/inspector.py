@@ -409,13 +409,20 @@ class ProjectInspector:
             if item.get("path") is not None:
                 item["path"] = self._path(Path(str(item["path"])))
             trace.append(item)
-        return {
+        result = {
             "entry_function": self._qualified_name(issue.entry),
             "interaction_function": self._qualified_name(issue.interaction.function),
             "state_write_function": self._qualified_name(issue.state_write.function),
             "state_variable": analysis.state_variable_name(issue.state_write),
             "trace": trace,
         }
+        if issue.interaction.fact is not None:
+            provenance = self.project.target_taint.provenance_for(
+                issue.entry, issue.interaction.fact
+            )
+            if provenance is not None:
+                result["target_provenance"] = provenance
+        return result
 
     def _target_issue_dict(self, issue) -> dict[str, object]:
         analysis = self.project.target_taint

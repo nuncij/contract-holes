@@ -126,7 +126,11 @@ class ReentrancyAnalysis:
         return result
 
     def _unfold(
-        self, function: NodeKey, stack: frozenset[NodeKey], inherited_guard: bool
+        self,
+        function: NodeKey,
+        stack: frozenset[NodeKey],
+        inherited_guard: bool,
+        inherited_branch_context: tuple[tuple[NodeKey, str], ...] = (),
     ) -> list[TraceEvent]:
         if function in stack:
             return []
@@ -142,7 +146,10 @@ class ReentrancyAnalysis:
                         fact.span,
                         fact=fact,
                         guarded=guarded,
-                        branch_context=self._branch_context(fact.node),
+                        branch_context=(
+                            *inherited_branch_context,
+                            *self._branch_context(fact.node),
+                        ),
                     )
                 )
         for edge in self.project.call_graph.edges_from(function):
@@ -159,7 +166,10 @@ class ReentrancyAnalysis:
                     edge.span,
                     edge=edge,
                     guarded=guarded,
-                    branch_context=self._branch_context(edge.call_site),
+                    branch_context=(
+                        *inherited_branch_context,
+                        *self._branch_context(edge.call_site),
+                    ),
                 )
             )
         function_node = self.project.node_for_key(function)
@@ -175,7 +185,14 @@ class ReentrancyAnalysis:
         for event in local_events:
             result.append(event)
             if event.edge is not None and event.edge.callee not in next_stack:
-                result.extend(self._unfold(event.edge.callee, next_stack, guarded))
+                result.extend(
+                    self._unfold(
+                        event.edge.callee,
+                        next_stack,
+                        guarded,
+                        event.branch_context,
+                    )
+                )
         return result
 
     def _issues_for_trace(
@@ -226,7 +243,12 @@ class ReentrancyAnalysis:
             if parent is None:
                 break
             if parent.get("nodeType") == "IfStatement":
-                arm = _if_arm(parent, current, self.project)
+                if current is parent.get("trueBody"):
+                    arm = "true"
+                elif current is parent.get("falseBody"):
+                    arm = "false"
+                else:
+                    arm = None
                 if arm is not None:
                     parent_key = self.project.key_for_node(parent)
                     if parent_key is not None:
@@ -347,23 +369,6 @@ def _walk_ast(node: Node):
             for child in value:
                 if isinstance(child, dict) and "nodeType" in child:
                     yield from _walk_ast(child)
-
-
-def _if_arm(
-    statement: Node, descendant: Node, project: "ProjectIndex"
-) -> str | None:
-    current = descendant
-    while current is not None:
-        parent = project.parent(current)
-        if parent is statement:
-            if current is statement.get("trueBody"):
-                return "true"
-            if current is statement.get("falseBody"):
-                return "false"
-            return None
-        current = parent
-    return None
-
 
 def _event_sort_key(
     event: TraceEvent, execution_order: dict[NodeKey, int]

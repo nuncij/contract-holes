@@ -586,6 +586,16 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   target-provenance, 3 authorization-context, and 1 reentrancy-trust-boundary.
   The canonical private workspace and target checkout were unchanged.
 
+  A completion review on 2026-08-13 found and repaired four generic gaps:
+  public-library pure calls no longer emit reentrancy interaction facts,
+  branch context survives internal helper calls, role self-grants are not
+  suppressed merely because the key is `msg.sender`, and immutable target
+  provenance survives aliases and internal parameters. Exact path, line, and
+  evidence assertions now cover retained `SOL005`, `SOL008`, and `SOL009`
+  positives. A separate private offline rescan reproduced the same 47
+  candidates and deterministic digests, so no target-specific reduction is
+  claimed from the repair.
+
 - [ ] **PILOT-007** — Select and evaluate an independent second real-world target
   with the improved scanner — P1 — **NEXT, NEW AUTHORIZATION REQUIRED**.
 
