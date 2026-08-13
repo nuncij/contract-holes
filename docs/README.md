@@ -50,9 +50,11 @@
 
 - [Development plan](DEVELOPMENT_PLAN.md)
 - [PRECISION-001 development plan](PRECISION_001_PLAN.md)
-- [PRECISION-002 development plan](PRECISION_002_PLAN.md) — all independent-review
-  blockers resolved; local gates pass and the private offline replay is complete
-  with only final review, commit/push, and CI remaining
+- [PRECISION-002 development plan](PRECISION_002_PLAN.md) — complete at commit
+  `2574b6e`. GitHub CI run `31720097982` passed
+- [PILOT-009 development plan](PILOT_009_PLAN.md) — queued validation of commit
+  `2574b6e` on a genuinely untouched target that is not OpenZeppelin, Silo, or
+  Olas
 - [Next-session handoff prompt](NEXT_SESSION_PROMPT.md)
 - [Threat model](THREAT_MODEL.md)
 - [Security policy](../SECURITY.md)

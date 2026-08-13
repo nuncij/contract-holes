@@ -48,10 +48,14 @@ observed-version checking. A new private pinned replay preserved the source and
 dependency sets, selected only Solidity `0.8.30`, scanned two files, and again
 produced zero candidates. The suite is 238 tests; frozen gates are unchanged.
 
-Next: **PRECISION-002** is in progress; all independent-review blockers on
-the first green diff are resolved, repository-local gates pass, and the private
-offline replay is complete. Only final review, commit, push, and project CI
-remain.
+`PRECISION-002` completed on 2026-08-13: commit `2574b6e` was pushed to
+`main`, and GitHub CI run `31720097982` passed both Quality and Reproducible
+package.
+
+Next: **PILOT-009** is queued. It must validate the `PRECISION-002` detector
+commit `2574b6e` on a genuinely untouched target that is not OpenZeppelin,
+Silo, or Olas. See [the PILOT-009 plan](docs/PILOT_009_PLAN.md) and
+[the next-session prompt](docs/NEXT_SESSION_PROMPT.md).
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -765,10 +769,10 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   reportable and two compiler-only files, selected only Solidity `0.8.30`, and
   reproduced zero findings and candidates offline.
 
-- [ ] **PRECISION-002** — Convert the generic false-positive families observed
+- [x] **PRECISION-002** — Convert the generic false-positive families observed
   on the second independent target into regression fixtures and minimal
   detector fixes. Follow the
-  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **IN PROGRESS**.
+  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **COMPLETE**.
 
   Acceptance criteria:
 
@@ -818,13 +822,40 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   these remain investigation leads, not vulnerabilities and not bounty
   submissions.
 
-  Frozen `audit-1` evaluation is unchanged (33/33 positive, 31/31 safe). The
-  historical result was versioned after the view-interaction fix removed one
+  Frozen `audit-1` evaluation is unchanged (33/33 positive, 31/31 safe at 1.0).
+  The historical result was versioned after the view-interaction fix removed one
   out-of-model Enzyme `SOL005` candidate: candidate precision moved from 0.875
   to 0.933333 with all five supported cases, 1.0 supported-class recall, 1.0
   evidence completeness, and the `go` decision unchanged. Suite: 238 tests.
-  Only final review, commit to `main`, and green project CI remain.
-  `PRECISION-002` stays **IN PROGRESS** until those are done.
+
+  Completed on 2026-08-13. Commit `2574b6e` was pushed to `main`; GitHub CI run
+  `31720097982` passed both Quality and Reproducible package. The final fresh
+  private offline replay was an exact match: unchanged source and dependency
+  identities, Solidity `0.8.28`, ten reportable files, 59 findings/candidates
+  (SOL003=1, SOL005=13, SOL008=41, SOL009=3, SOL011=1), 22 removed and none
+  added. These are investigation leads, not vulnerabilities and not bounty
+  submissions. `PRECISION-002` is **COMPLETE**.
+
+- [ ] **PILOT-009** — Validate detector commit `2574b6e` on a genuinely
+  untouched target that is not OpenZeppelin, Silo, or Olas. Follow the
+  [dedicated development plan](docs/PILOT_009_PLAN.md) — P1 — **QUEUED**.
+
+  Acceptance criteria:
+
+  - official records establish the exact deployed-source mapping before source
+    download, and the exact compiler closure is frozen before scanning.
+  - an immutable pre-scan freeze pins the target revision, compiler closure,
+    and scope before any scan.
+  - the standing yolo direction authorizes public research, one-time exact
+    source/dependency downloads, and private offline analysis.
+  - no RPC, chain/fork/transaction, proof, report, export, disclosure,
+    submission, bounty-platform write, or target contact occurs.
+  - the scan is private and offline, review is independent of tuning labels,
+    and replay is deterministic.
+  - a public aggregate evaluation is written without private target evidence.
+  - stop conditions are defined in the plan.
+
+  Depends on: `PRECISION-002`.
 
 ## Definition of done for every task
 

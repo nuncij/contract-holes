@@ -3,9 +3,9 @@
 Last updated: 2026-08-13
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **`PRECISION-002` is in progress; all independent-review blockers are
-resolved, repository-local gates pass, and the private offline replay is
-complete. Only final review, commit/push, and CI remain.**
+Next: **`PILOT-009` is queued. It will validate detector commit `2574b6e` on a
+genuinely untouched target that is not OpenZeppelin, Silo, or Olas. See the
+[PILOT-009 plan](PILOT_009_PLAN.md).**
 
 ## Product goal
 
@@ -495,9 +495,10 @@ showing that compiler-enabled profiles do not bind an exact compiler release.
 selected only Solidity `0.8.30`, preserved the frozen source and dependency
 sets, and again produced zero candidates.
 
-`PRECISION-002` is in progress; only final review, commit/push, and CI remain.
-All independent-review blockers on the first green diff are resolved by
-narrowing or retaining findings. The generic `precision-002` compiler corpus and
+`PRECISION-002` completed on 2026-08-13. Commit `2574b6e` reached `main`.
+GitHub CI run `31720097982` passed both Quality and Reproducible
+package. All independent-review blockers on the first green diff are resolved
+by narrowing or retaining findings. The generic `precision-002` compiler corpus and
 `test_precision_002` cover supported outcomes with adversarial-positive
 neighbors and record explicit unsatisfied/manual-review boundaries:
 view/staticcall interactions no longer form
@@ -519,11 +520,12 @@ historical `m7-history-1` result was versioned after the view-interaction fix
 removed one out-of-model Enzyme `SOL005` candidate: candidate precision moved
 from 0.875 to 0.933333, all five supported cases retain 1.0 supported-class
 recall and evidence completeness, and the `go` decision is unchanged. Suite:
-238 tests. The private offline replay (unchanged source and dependency
-identities, cached Solidity `0.8.28`, ten reportable files) produced 59
-findings/candidates versus 81 before tuning — 22 removed, no new findings —
-which are investigation leads, not vulnerabilities and not bounty submissions.
-Only final review, commit, push, and project CI remain.
+238 tests. The final fresh private offline replay was an exact match: unchanged
+source and dependency identities, Solidity `0.8.28`, ten reportable files, 59
+findings/candidates versus 81 before tuning (SOL003=1, SOL005=13, SOL008=41,
+SOL009=3, SOL011=1), 22 removed and none added — investigation leads, not
+vulnerabilities and not bounty submissions. `PILOT-009` is queued to validate
+commit `2574b6e` on a genuinely untouched target.
 
 ### Post-M8 — Compiler-only dependency boundary
 

@@ -7,11 +7,21 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Documentation
 
+- Completed `PRECISION-002`: commit `2574b6e` was pushed to `main` and GitHub
+  CI run `31720097982` passed both Quality and Reproducible package. The final
+  fresh private offline replay was an exact match (Solidity `0.8.28`, ten
+  reportable files, 59 findings/candidates, SOL003=1 SOL005=13 SOL008=41
+  SOL009=3 SOL011=1, 22 removed and none added). The frozen audit result and the
+  versioned historical result (candidate precision 0.933333, supported recall
+  and evidence 1.0) are recorded.
 - Updated the `PRECISION-002` plan and tracker after resolving all
   independent-review blockers, recording the versioned historical result, the
   completed private offline replay, the unsatisfied governance/config-derived
-  and factory-owned families, and the remaining final review, commit/push, and
-  CI steps.
+  and factory-owned families, and the completion of the review, commit, push,
+  and CI steps.
+- Added the queued `PILOT-009` plan and rewrote the next-session prompt to
+  start `PILOT-009`: validate detector commit `2574b6e` on a genuinely
+  untouched target that is not OpenZeppelin, Silo, or Olas.
 - Added a dedicated `PRECISION-001` development plan with test seams, ordered
   red-to-green slices, false-negative guardrails, validation gates, and stop
   conditions.
@@ -105,11 +115,13 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   candidate precision moved from 0.875 to 0.933333 with all five supported
   cases, 1.0 supported-class recall, 1.0 evidence completeness, and the `go`
   decision unchanged. Frozen `audit-1` evaluation is unchanged (33/33 positive,
-  31/31 safe). Suite: 238 tests. The private offline replay (unchanged source
-  and dependency identities, cached Solidity `0.8.28`, ten reportable files)
-  produced 59 findings/candidates versus 81 before tuning — 22 removed, no new
-  findings — which remain investigation leads. Only final review, commit, push,
-  and project CI remain.
+  31/31 safe at 1.0). Suite: 238 tests. The final fresh private offline replay
+  was an exact match: unchanged source and dependency identities, Solidity
+  `0.8.28`, ten reportable files, 59 findings/candidates versus 81 before tuning
+  (SOL003=1, SOL005=13, SOL008=41, SOL009=3, SOL011=1), 22 removed and none
+  added — investigation leads, not vulnerabilities and not bounty submissions.
+  Commit `2574b6e` reached `main`. GitHub CI run `31720097982` passed
+  both Quality and Reproducible package. `PRECISION-002` is **COMPLETE**.
 
 - Implemented `COMP-004` exact-compiler binding in the bounty profile and
   isolated compiler. The public `holes bounty init --compiler-version`,

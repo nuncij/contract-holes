@@ -8,14 +8,14 @@ Continue development of Contract Holes in this repository.
 
 Objective
 
-Finish PRECISION-002 with the develop -> test -> docs -> Git workflow. All
-independent-review blockers on the first green diff are resolved and the private
-offline replay is complete; the work is left as a reviewable uncommitted diff.
-Review that diff, run every validation gate, and finish the remaining
-completion-gate steps: commit one coherent change, push main, and verify project
-CI. Preserve every existing positive, frozen corpus identity, label, threshold,
-split, and public evidence contract. Do not copy private target code or evidence
-into the repository.
+Start PILOT-009 with the develop -> test -> docs -> Git workflow. PRECISION-002
+is COMPLETE: detector commit 2574b6e is pushed to main and GitHub CI run
+31720097982 passed both Quality and Reproducible package. Validate that commit
+on a genuinely untouched real-world target that is not OpenZeppelin, Silo, or
+Olas. Follow docs/PILOT_009_PLAN.md as the authoritative scope. Preserve every
+existing positive, frozen corpus identity, label, threshold, split, and public
+evidence contract. Do not copy private target code or evidence into the
+repository.
 
 Read first
 
@@ -23,9 +23,10 @@ Read first
 - CONTRIBUTING.md
 - TASKS.md
 - docs/DEVELOPMENT_PLAN.md
-- docs/PRECISION_002_PLAN.md (authoritative scope)
+- docs/PILOT_009_PLAN.md (authoritative scope)
+- docs/PRECISION_002_PLAN.md
 - docs/COMP_004_PLAN.md
-- docs/research/PILOT_008_EVALUATION.md
+- docs/research/PILOT_008_EVALUATION.md (prior trial)
 - docs/EVALUATION.md
 - this handoff
 
@@ -34,109 +35,78 @@ Treat current command output as authoritative for mutable state.
 Project state
 
 - Release: 1.1.1.
-- M0 through M8, PRECISION-001, REPAIR-007, PILOT-008, and COMP-004 are
-  complete.
-- PRECISION-002 is IN PROGRESS. All independent-review blockers are
-  resolved in the uncommitted diff by narrowing or retaining findings: `SOL005`
-  no longer forms paths for compiler-resolved view/pure and staticcall
-  interactions, while state-changing calls, contract creation, and fresh-target
-  initializers remain reportable (there is no no-callback proof and no blanket
-  fresh or creation suppression); `external-return` taint is never cleared by an
-  immutable receiver; timelock recognition is strict (separate unconditional
-  nonzero-pending and `block.timestamp >= deadline` guards over distinct
-  declarations, with the pending value feeding the protected write without
-  user-controlled taint or an exact
-  zero-clear of a guarded field; no unrelated later write inherits it); and the
-  read-result use tracer was deleted in favor of a narrow ignore-or-view-entry
-  suppression. Unsatisfied manual-review boundaries by design: governance/
-  config-derived call lists (`executeGovernance` reports `SOL008`), factory-owned
-  target provenance, callback safety for creation and fresh targets, broader
-  timelock shapes, and harmless used-read analysis. The private offline replay
-  is complete: unchanged source and dependency identities, cached Solidity
-  0.8.28, ten reportable files, 59 findings/candidates versus 81 before tuning
-  (22 removed, no new findings), which are investigation leads, not
-  vulnerabilities and not bounty submissions.
-- Suite: 238 tests after PRECISION-002 local slices.
-- Frozen synthetic evaluation: 33/33 positive labels and 31/31 safe labels.
+- PRECISION-002 is COMPLETE on commit 2574b6e, pushed to main; GitHub CI run
+  31720097982 passed Quality and Reproducible package.
+- Suite: 238 tests.
+- Frozen synthetic evaluation: 33/33 positive labels and 31/31 safe labels at
+  1.0.
 - Historical candidate precision: 0.933333; supported-class recall: 1.0;
-  evidence completeness: 1.0; decision: go. The `m7-history-1` raw result was
-  versioned in `evaluation/bounty-history-1.0.json` because the
-  view-interaction fix removed one out-of-model Enzyme `SOL005` candidate; no
-  label, fixture, threshold, or split changed.
-- COMP-004 added optional `--compiler-version X.Y.Z`, additive normalized
-  profile/source-manifest schema 1.2, exact isolated Foundry selection, and
-  fail-closed observed-version checking. Frozen unpinned 1.0/1.1 profile
-  digests are unchanged.
-- A new private offline Olas replay selected only Solidity 0.8.30, matched the
-  frozen source and compiler-dependency sets, scanned two reportable files, and
-  again produced zero findings and zero candidates.
+  evidence completeness: 1.0; decision: go.
+- Final fresh private offline replay exact-match with Solidity 0.8.28: ten
+  reportable files, 59 findings/candidates (SOL003=1 SOL005=13 SOL008=41
+  SOL009=3 SOL011=1), 22 removed and none added. These are investigation leads,
+  not vulnerabilities and not bounty submissions.
+- PILOT-009 is QUEUED; it validates detector commit 2574b6e on a genuinely
+  untouched target that is not OpenZeppelin, Silo, or Olas.
+
+Authorization boundary (standing, do not re-ask)
+
+Public research and one-time exact-source/dependency downloads plus private
+offline analysis are authorized under the operator's standing yolo direction.
+Do not ask for repeat approvals within this boundary; ask only if the boundary
+itself must change. No RPC, chain/fork/transaction, proof, report, export,
+disclosure, submission, bounty-platform write, or target contact is authorized.
+Do not download source until the selection record establishes an exact mapping.
+Do not scan until the pre-scan freeze is complete.
 
 Private evidence boundary
 
-Private Silo records may be inspected locally only to understand the already
-documented generic families. Do not send private source, paths, candidate IDs,
-source excerpts, traces, or records to an external model or service. Do not put
-them in fixtures, tests, commits, documentation, or logs intended for sharing.
-
-No RPC, fork, chain action, transaction, proof, report, export, disclosure,
-submission, platform write, or target contact is authorized. No target-specific
-detector rule, project name, contract name, function name, constant, or path is
-allowed.
+Keep target source and all candidate evidence private. Do not send private
+source, paths, candidate IDs, source excerpts, traces, or records to OpenCode,
+delegated agents, or another secondary model or service. The primary session
+can inspect them only through approved local tools. Cheaper agents can handle
+public research and public documentation. Do not put private evidence in
+fixtures, tests, commits, documentation, or logs intended for sharing. No
+target-specific detector rule, project name, contract name, function name,
+constant, or path is allowed.
 
 Required behavior
 
-Keep the compiler corpus under tests/fixtures/precision_002 and test through
-ProjectIndex plus Scanner.scan_source as specified by the plan. Each safe case
-must have a nearby positive neighbor that keeps the original rule reportable.
-
-Cover these generic distinctions:
-
-1. Read-only view/static interactions do not create a SOL005 reentrancy path; a
-   real state-changing external interaction before a write still does.
-2. Only separate unconditional direct guards — a nonzero pending-state
-   comparison plus a different state deadline with block.timestamp >= deadline
-   (or deadline <= timestamp) — where the pending value feeds the protected
-   sensitive write without user-controlled taint, protect the following
-   privileged write from SOL009. Wrong directions, timestamp `==`/`!=`,
-   OR/optional delay, unrelated zero/nonzero flags, timestamp-only, mixed
-   pending/caller values, deadline-derived writes, local pending reads,
-   unrelated later privileged writes, compound expressions, and combined
-   boolean guards still report.
-3. Contract creation and fresh-target initializers remain `SOL005`-reportable;
-   only compiler-resolved view/pure and staticcall interactions are suppressed.
-   A created address is non-user-controlled fresh provenance for `SOL008`, but
-   that says nothing about callback safety for `SOL005`.
-4. Governance-configured call lists are not proven non-attacker-controlled:
-   immutable receiver identity never clears `external-return` taint, so both a
-   fixed-module list and a caller-selected module report SOL008, with SOL003 a
-   manual-review signal on both.
-5. Caller-supplied targets used only by read-only queries are caller-harm-only
-   only when the read result is ignored or the enclosing external entry is
-   view/pure; a used read result in a non-view function (mapping key,
-   state-changing call argument, or write value) reports SOL008.
-6. Immutable/fixed asset provenance is not user-controlled; mutable
-   caller-controlled asset provenance remains reportable.
+Select and map a target per the plan: research at least three current programs
+from official sources, establish the exact deployed-source mapping from
+official records before source download, and record the verdict in
+docs/research/PILOT_009_TARGET_SELECTION.md. Reject a target that cannot be
+mapped exactly to a pinned immutable revision. Download only that pinned source,
+then record the exact compiler closure and one supported Solidity release with
+--compiler-version. Freeze the target revision, compiler closure, compiler
+version, and scope before the first scan. Run one private offline
+compiler-enabled scan, keep the
+first result frozen, run a deterministic replay in a second private workspace,
+and compare digests, compiler version, file count, and candidate
+count/rule distribution. Review candidates without prior tuning labels and
+record their states with holes bounty review. Write
+docs/research/PILOT_009_EVALUATION.md with aggregate information only.
 
 Workflow
 
-1. Verify the working tree contains the PRECISION-002 uncommitted diff and that
-   `git status` shows only intended files.
-2. Run a simplification review of the diff: confirm the generic distinctions are
-   covered by the `precision-002` corpus, that no rule-local raw-AST walk, name
-   list, configuration toggle, or target suppression was added, and that every
-   safe case has a positive neighbor.
-3. Inspect the full diff for private material (target names, paths, candidate
-   IDs, excerpts, constants, FHE identifiers). None is expected.
-4. Run the full suite and frozen synthetic/historical evaluations. The
-   historical `m7-history-1` raw result was intentionally versioned; verify the
-   gate still passes without weakened thresholds and that no supported case or
-   positive finding regressed.
-5. Update the status docs only if a truthful outcome changed since the last
-   commit of this prompt.
-6. Commit one coherent change, push main, verify CI, leave main clean and equal
-   to origin/main, and mark PRECISION-002 COMPLETE in TASKS.md only when every
-   plan completion gate passes (the private-replay validation is already
-   complete).
+1. Verify a clean main worktree that matches origin/main. Confirm no scanner
+   code or test changed after detector commit 2574b6e.
+2. Run the full suite, the frozen audit evaluation, and the historical bounty
+   evaluation; record the results.
+3. Select and map a target; record the deployed-source mapping verdict.
+4. Download the pinned source, record the exact compiler closure, and create the
+   immutable pre-scan freeze. Commit and push the public selection/status record
+   and verify CI before the first scan.
+5. Create a new private workspace, add exact scope and compiler-only dependency
+   paths, and run holes bounty validate.
+6. Run the private offline scan and the deterministic replay.
+7. Review candidates without prior tuning labels and record their states.
+8. Write the aggregate evaluation.
+9. Update README.md, CHANGELOG.md, TASKS.md, docs/DEVELOPMENT_PLAN.md,
+   docs/NEXT_SESSION_PROMPT.md, and the docs index. Inspect the staged diff for
+   private material. Run the validation gates, a simplification review, commit,
+   push main, and verify project CI. Mark PILOT-009 COMPLETE in TASKS.md only
+   when every plan completion gate passes.
 
 Validation gates
 
@@ -147,7 +117,10 @@ PYTHONPATH=src python3 -m contract_holes bounty history \
   tests/fixtures/bounty_history/manifest.json
 git diff --check
 
-Stop only if an existing positive or frozen identity changes unexpectedly, a
-generic distinction cannot be established without target-specific knowledge,
-or work would cross the prohibited external-action boundary.
+Stop only if the deployed-source mapping cannot be evidenced from official
+records, a target revision/scope/dependency/compiler/rule changes after the
+freeze, a plausible candidate would need a proof, report, disclosure, or
+submission, safe progress requires RPC, a fork, chain activity, target contact,
+or an unapproved download, private evidence may have entered the repository or
+another public channel, or the authorization boundary itself must change.
 ```

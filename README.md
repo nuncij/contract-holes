@@ -345,14 +345,18 @@ Project status and future work are tracked explicitly:
   rule maturity, milestones, and release gates.
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
-- [Next-session handoff](docs/NEXT_SESSION_PROMPT.md) — a copy-ready prompt with
-  the current private-trial state, work boundary, and completion checklist.
+- [Next-session handoff](docs/NEXT_SESSION_PROMPT.md) — a copy-ready prompt that
+  starts `PILOT-009`, with the current private-trial state, work boundary, and
+  completion checklist.
 - [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
   packages, safety constraints, validation gates, and completion criteria.
 - [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — the precision
-  milestone after the completed compiler-pin repair; all independent-review
-  blockers are resolved, the private offline replay is complete, and only final
-  review, commit/push, and CI remain.
+  milestone after the completed compiler-pin repair; COMPLETE. Commit `2574b6e`
+  is pushed to `main`, and GitHub CI run `31720097982` passed both Quality and
+  Reproducible package.
+- [PILOT-009 development plan](docs/PILOT_009_PLAN.md) — queued validation of
+  detector commit `2574b6e` on a genuinely untouched target that is not
+  OpenZeppelin, Silo, or Olas.
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
 - [PILOT-008 development plan](docs/PILOT_008_PLAN.md) and
@@ -428,8 +432,9 @@ Solidity `0.8.28`, exposing that bounty profiles do not bind an exact compiler.
 `COMP-004` now binds an optional exact release into profile and manifest schema
 `1.2`, selects it in the isolated Foundry project, and rejects any mismatched or
 mixed observed compiler set. A new private pinned `0.8.30` replay reproduced the
-same two-file, zero-candidate Olas scan semantics. `PRECISION-002` is in
-progress; only final review, commit/push, and CI remain. Its generic
+same two-file, zero-candidate Olas scan semantics. `PRECISION-002` is complete
+at commit `2574b6e` on `main`. GitHub CI run `31720097982` passed both Quality
+and Reproducible package. Its generic
 `precision-002` compiler corpus provides regression coverage for supported
 outcomes across the six observed false-positive families, with explicit
 unsatisfied/manual-review boundaries: read-only
@@ -444,16 +449,21 @@ immutable receiver (so a governance-configured call list still reports
 Governance/config-derived and factory-owned address provenance, callback safety
 for creation and fresh targets, broader timelock shapes, and harmless used-read
 analysis remain manual-review boundaries. The frozen `audit-1` evaluation is
-unchanged. The historical `m7-history-1` result was versioned after the
-view-interaction fix removed one out-of-model Enzyme `SOL005` candidate, moving
-candidate precision from 0.875 to 0.933333 with all five supported cases and the
-`go` decision unchanged. The private offline replay used unchanged source and
-dependency identities with cached Solidity `0.8.28` and ten reportable files,
-producing 59 findings/candidates versus 81 before tuning — 22 removed, no new
-findings — which remain investigation leads, not vulnerabilities and not bounty
+unchanged (33 positive, 31 safe at 1.0). The historical `m7-history-1` result
+was versioned after the view-interaction fix removed one out-of-model Enzyme
+`SOL005` candidate, moving candidate precision from 0.875 to 0.933333 with all
+five supported cases, 1.0 supported-class recall, 1.0 evidence completeness,
+and the `go` decision unchanged. The final fresh private offline replay was an
+exact match: unchanged source and dependency identities, Solidity `0.8.28`,
+ten reportable files, and 59 findings/candidates versus 81 before tuning.
+The rule counts are SOL003=1, SOL005=13, SOL008=41, SOL009=3, and SOL011=1.
+The scan removed 22 findings and added none. The remaining findings are
+investigation leads, not vulnerabilities and not bounty
 submissions. No private source or evidence entered the repository. No target
 network, chain, RPC, proof, report, export, disclosure, submission, or
-bounty-platform write occurred.
+bounty-platform write occurred. `PILOT-009` is queued to validate commit
+`2574b6e` on a genuinely untouched target that is not OpenZeppelin, Silo, or
+Olas.
 
 The compiler index, inheritance
 resolver, call graph, reusable

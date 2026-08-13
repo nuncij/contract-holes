@@ -1,8 +1,7 @@
 # PRECISION-002 development plan
 
-Status: **IN PROGRESS — all independent-review blockers are resolved, all
-repository-local gates pass, and the private offline replay is complete. Only
-final review, commit/push, and CI remain (see Result)**
+Status: **COMPLETE — commit `2574b6e` is on `main`. GitHub CI run `31720097982`
+passed both Quality and Reproducible package (see Result)**
 
 ## Goal
 
@@ -323,7 +322,13 @@ supported cases, 1.0 supported-class recall, 1.0 evidence completeness, and the
 `go` decision unchanged. `evaluation/bounty-history-1.0.json` was regenerated
 through the public CLI. No fixture, label, threshold, or split changed.
 
-Suite: 238 tests pass with `git diff --check`. The remaining completion-gate
-items — final review, the single coherent commit, push to `main`, and green
-project CI — are outside this documentation slice, so `PRECISION-002` stays
-**IN PROGRESS** until they complete.
+Suite: 238 tests pass with `git diff --check`. The task completed on
+2026-08-13. Commit `2574b6e` reached `main`. GitHub CI run `31720097982` passed
+both Quality and Reproducible package. The final fresh
+private offline replay was an exact match: unchanged source and dependency
+identities, Solidity `0.8.28`, ten reportable files, 59 findings/candidates
+(SOL003=1, SOL005=13, SOL008=41, SOL009=3, SOL011=1), 22 removed and none
+added. These are investigation leads, not vulnerabilities and not bounty
+submissions. `PRECISION-002` is **COMPLETE**. The next task is `PILOT-009`:
+validate detector commit `2574b6e` on a genuinely untouched target that is not
+OpenZeppelin, Silo, or Olas (see [PILOT_009_PLAN.md](PILOT_009_PLAN.md)).
