@@ -1,6 +1,6 @@
 # PILOT-007 development plan
 
-Status: **COMPLETE**
+Status: **REPAIR REQUIRED**
 
 ## Goal
 
@@ -238,6 +238,78 @@ change, push `main`, and verify project CI.
 
 Completion criterion: public tests and evaluations pass, documentation matches
 the result, Git is clean, `main` matches `origin/main`, and CI is green.
+
+## Completion-review repair
+
+The 2026-08-13 completion review found that the operational scan and replay are
+deterministic, but the trial does not yet satisfy this plan. Repair the record
+before starting `PRECISION-002`.
+
+### 1. Reconstruct the untouched baseline
+
+Use a temporary Git worktree at selection commit
+`08050a14437abaf47ff45b90a1392a9fbc460a93`, before the target-exposed scanner
+repairs. Run the same approved source profile offline in two new private
+workspaces. Preserve the canonical and replay workspaces unchanged.
+
+Record either matching baseline scan digests or the same reproducible failure
+from both attempts. Describe this as a retrospective reconstruction, not as the
+original first scan. Keep the existing 81-candidate result as a post-repair
+operational replay.
+
+Completion criterion: the released-plus-`PRECISION-001` behavior is frozen and
+the public evaluation distinguishes it from the post-repair result.
+
+### 2. Prove the source-to-scope mapping
+
+Use official program and verified-source records to determine whether each of
+the ten selected files at commit
+`570a668a98a88a6a2b92697e7b9a3b1c6299dce7` exactly corresponds to an in-scope
+deployed asset. Filename equality is insufficient. Keep comparisons read-only;
+do not use RPC, a fork, or a chain transaction.
+
+If the mapping cannot be proved, reclassify Silo as a non-bounty research
+corpus and mark this independent bounty trial unsatisfied. Plan a later trial
+against a new target; do not substitute another target inside this repair.
+
+Completion criterion: every reportable source has an exact public mapping, or
+the documents clearly state that `PILOT-007` did not meet its target-selection
+gate.
+
+### 3. Repair acquisition and private review records
+
+Create a new minimal checkout from local objects with only the submodules that
+intersect the 124-file compiler closure. Do not delete or rewrite the existing
+checkout. Freeze the full new checkout, including Git metadata, and reproduce
+the source manifest offline.
+
+Complete the private review brief for all 81 candidates with the required
+hypothesis, impact, assumptions, known/duplicate status, reason, and remaining
+uncertainty. Preserve the operator-confirmed states unless source review
+requires a different state; surface any plausible candidate to the operator.
+
+Completion criterion: acquisition matches the approved compiler closure, and
+every private decision has the evidence required by step 6.
+
+### 4. Add missing regressions and deterministic test isolation
+
+Add public-seam regression coverage for signature-domain recursion and for
+error, event, and struct member call classification. Replace the fixed
+`/tmp/holes-deep-ast-regression` directory with a per-test temporary directory.
+Do not tune a detector against the Silo candidates in this repair.
+
+Completion criterion: each repaired bug has a regression, tests cannot consume
+stale files, and every frozen positive remains detected.
+
+### 5. Correct status and evaluation claims
+
+Update the evaluation and project status documents. State that three defects
+were target-discovered, identify the baseline reconstruction separately from
+the post-repair 81-candidate result, and use the current test count. Keep public
+records aggregate and redacted.
+
+Completion criterion: no document calls the Silo result an untouched frozen
+trial or claims regression coverage that is absent.
 
 ## Task completion gate
 

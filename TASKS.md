@@ -6,7 +6,7 @@ marked **IN PROGRESS**.
 
 Current release: `1.1.1`
 
-Current milestone: **M8 — Private Real-World Validation — COMPLETE**
+Current milestone: **Post-M8 — PILOT-007 completion repair**
 
 Current position: M0 through M8 are complete. The private GitHub repository has
 passing production CI, verified signed `v1.1.0` and `v1.1.1` releases,
@@ -25,19 +25,16 @@ offline mechanical enumeration showed no untrusted actor can reach a callback
 in the reported interaction window, and the existing proof workflow could not
 test that question without inventing setup facts.
 
-A second independent trial (`PILOT-007`) completed on 2026-08-13 against Silo
-Finance v2/v3 pinned to tag `4.26.0`. Two private workspaces reproduced
-identical digests over ten reportable files and 124 pinned compiler-only
-dependencies with Solidity `0.8.28`. The scan produced 81 candidates; the
-operator confirmed all 81 rejections, with zero investigating or confirmed. The
-trial surfaced and fixed three generic scanner defects (iterative AST
-traversal, cycle-safe signature domain analysis, and error/event members
-excluded from the call graph). No proof, report, export, disclosure,
-submission, chain action, or target contact occurred.
+The Silo operational scan and replay are deterministic, but a 2026-08-13
+completion review reopened `PILOT-007`. The preserved scans were made after
+target-exposed scanner repairs, the selected Git tag is not yet mapped exactly
+to the in-scope deployed assets, dependency retrieval exceeded the compiler
+closure, two repairs lack regressions, and the private review brief is
+incomplete. The existing 81-candidate result remains useful post-repair
+evidence, not an untouched independent baseline.
 
-Next: **PRECISION-002 — Convert the generic false-positive families observed
-on the second independent target into regression fixtures and minimal detector
-fixes.**
+Next: **PILOT-007 repair — reconstruct the untouched baseline, resolve the
+source-to-scope gate, and close the completion-review findings.**
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -607,9 +604,9 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   candidates and deterministic digests, so no target-specific reduction is
   claimed from the repair.
 
-- [x] **PILOT-007** — Select and evaluate an independent second real-world target
+- [ ] **PILOT-007** — Select and evaluate an independent second real-world target
   with the improved scanner. Follow the
-  [dedicated development plan](docs/PILOT_007_PLAN.md) — P1 — **COMPLETE**.
+  [dedicated development plan](docs/PILOT_007_PLAN.md) — P1 — **REPAIR NEXT**.
 
   Acceptance criteria:
 
@@ -628,8 +625,8 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
 
   Depends on: `PRECISION-001`.
 
-  Completed on 2026-08-13. Silo Finance v2/v3 was selected as an independent
-  target and pinned to tag `4.26.0` (`570a668a98a88a6a2b92697e7b9a3b1c6299dce7`)
+  An operational result was recorded on 2026-08-13. The initial selection used
+  Silo Finance v2/v3 at tag `4.26.0` (`570a668a98a88a6a2b92697e7b9a3b1c6299dce7`)
   after one consolidated operator authorization. Two private workspaces
   reproduced identical digests over ten reportable files and 124 pinned
   compiler-only dependencies with Solidity `0.8.28`. The scan produced 81
@@ -641,10 +638,16 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   contact occurred. See
   [the evaluation](docs/research/PILOT_007_EVALUATION.md).
 
+  Completion review reopened the task. The repair must reconstruct the
+  pre-repair scanner behavior, prove the deployed source mapping or mark the
+  selection invalid, reproduce the approved minimal dependency closure,
+  complete every private review record, and add the missing regressions. The
+  existing canonical and replay workspaces remain unchanged.
+
 - [ ] **PRECISION-002** — Convert the generic false-positive families observed
   on the second independent target into regression fixtures and minimal
   detector fixes. Follow the
-  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **NEXT**.
+  [dedicated development plan](docs/PRECISION_002_PLAN.md) — P1 — **BLOCKED BY PILOT-007 REPAIR**.
 
   Acceptance criteria:
 

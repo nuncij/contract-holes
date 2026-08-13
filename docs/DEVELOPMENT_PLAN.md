@@ -2,10 +2,9 @@
 
 Last updated: 2026-08-13
 Current release: `1.1.1`
-Current milestone: **M8 — Private Real-World Validation — COMPLETE**
-Next: **Convert the generic false-positive families observed on the second
-independent target into regression fixtures and minimal detector fixes
-(`PRECISION-002`).**
+Current milestone: **Post-M8 — PILOT-007 completion repair**
+Next: **Repair the independent-trial record and validation boundary before
+starting `PRECISION-002`.**
 
 ## Product goal
 
@@ -36,7 +35,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 216 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 219 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -448,14 +447,14 @@ metadata. All 216 tests and both frozen evaluations pass. A new private offline
 workspace reproduced the same 47-candidate scan and both prior digests. The
 repair does not claim a lower workload for this target.
 
-The next validation step was `PILOT-007`: an independent second real-world
-target selected and evaluated only after its program rules, source identity,
-scope, and authorization were explicitly pinned. It remained local, private,
-isolated, and offline; no target contact, proof, report, export, disclosure,
-submission, chain action, or platform interaction occurred.
+The next validation step was `PILOT-007`, which intended to test an independent
+second real-world target. The run remained local, private, isolated, and
+offline. No target contact, proof, report, export, disclosure, submission,
+chain action, or platform interaction occurred.
 
-`PILOT-007` completed on 2026-08-13 against Silo Finance v2/v3 pinned to tag
-`4.26.0`. Two private workspaces reproduced identical digests over ten
+`PILOT-007` recorded an operational result on 2026-08-13 against Silo Finance
+v2/v3 at tag `4.26.0`. Two private workspaces reproduced identical digests over
+ten
 reportable files and 124 pinned compiler-only dependencies with Solidity
 `0.8.28`. The scan produced 81 candidates; the operator confirmed all 81
 rejections after source review, with zero investigating or confirmed. The trial
@@ -463,8 +462,16 @@ surfaced and fixed three generic scanner defects: recursive AST walkers now
 traverse iteratively, signature domain analysis is cycle-safe across mutually
 recursive call arguments, and custom error/event members are excluded from the
 call graph. All 219 tests and both frozen evaluations pass unchanged. The
-observed generic false-positive families are captured as the next product task,
-`PRECISION-002`.
+observed generic false-positive families are captured in `PRECISION-002`.
+
+A completion review reopened `PILOT-007`. Both preserved scans were created
+after target-exposed scanner repairs, and the selected Git tag is not yet
+mapped exactly to the deployed assets named by the bounty scope. The repair
+also needs a minimal dependency checkout, complete private review fields, two
+missing regressions, and deterministic temporary test isolation. The existing
+81-candidate result is post-repair operational evidence. `PRECISION-002`
+remains blocked until the repair documents an untouched baseline result or
+blocker and resolves the source-to-scope gate.
 
 ### Post-M8 — Compiler-only dependency boundary
 

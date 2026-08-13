@@ -1,10 +1,12 @@
 # PILOT-007 Target Selection
 
 Reviewed: 2026-08-13
+Status: **COMPLETION REVIEW OPEN** — the selected Git tag has not yet been
+mapped exactly to the deployed assets in the program scope.
 
 ## Decision
 
-Use **Silo Finance v2/v3** for the second independent M8+ trial. Pin the trial to
+The initial selection used **Silo Finance v2/v3** for the second M8+ trial and pinned it to
 the Silo V3 monorepository tag `4.26.0`, which resolves to commit
 [`570a668a98a88a6a2b92697e7b9a3b1c6299dce7`](https://github.com/silo-finance/silo-contracts-v3/tree/570a668a98a88a6a2b92697e7b9a3b1c6299dce7).
 

@@ -237,8 +237,8 @@ workspace and target checkout were unchanged. The synthetic evaluation remains
 33 positive and 31 safe labels with 1.0 precision and recall; the historical
 evaluation remains at 0.875 candidate precision and 1.0 supported-class recall.
 The labels are reviewer-derived from one target and are not independent ground
-truth. The next task was an independently authorized second real-world target,
-completed as `PILOT-007` on 2026-08-13.
+truth. The next task was a separately authorized real-world target, recorded as
+`PILOT-007` on 2026-08-13. A later completion review reopened that task.
 
 A completion review on 2026-08-13 found gaps in the first fixture. It did not
 cover a pure public-library call or an interaction reached through an internal

@@ -35,7 +35,7 @@
 - [M8 OpenZeppelin trial evaluation](research/M8_OPENZEPPELIN_TRIAL.md)
 - [PILOT-007 independent target selection](research/PILOT_007_TARGET_SELECTION.md)
 - [PILOT-007 evaluation](research/PILOT_007_EVALUATION.md)
-- [PILOT-007 development plan](PILOT_007_PLAN.md)
+- [PILOT-007 development and completion-repair plan](PILOT_007_PLAN.md)
 
 ## Project governance
 

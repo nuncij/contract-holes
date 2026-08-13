@@ -1,12 +1,13 @@
 # PRECISION-002 development plan
 
-Status: **NEXT**
+Status: **BLOCKED BY PILOT-007 REPAIR**
 
 ## Goal
 
-Reduce the generic false-positive families observed during the second
-independent compiler-enabled real-world trial (PILOT-007). Preserve every
-existing positive finding and historical supported case.
+Reduce the generic false-positive families observed during the Silo
+compiler-enabled operational validation. Start only after the `PILOT-007`
+completion repair decides whether that run satisfies the independent-trial
+gate. Preserve every existing positive finding and historical supported case.
 
 This task improves triage quality. It does not prove audit completeness,
 unknown-bug recall, bounty eligibility, or commercial viability.

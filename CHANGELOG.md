@@ -44,6 +44,12 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Validation
 
+- Reopened `PILOT-007` after completion review. The deterministic Silo scans
+  remain post-repair operational evidence, while the untouched baseline,
+  exact deployed source mapping, minimal dependency acquisition, complete
+  private review brief, and missing regressions require repair before
+  `PRECISION-002` starts.
+
 - Completed the first authorized external source-only trial against the exact
   bounty-pinned OpenZeppelin Confidential Contracts `v0.4.0` release. The
   private deterministic workflow scanned 22 files, produced zero candidates,
@@ -76,12 +82,12 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   assertions now cover retained `SOL005`, `SOL008`, and `SOL009` positives. All
   216 tests and both frozen evaluation gates pass. A separate locked-down
   offline rescan reproduced the same 47 candidates and deterministic digests.
-- Completed the independent `PILOT-007` trial against Silo Finance v2/v3 pinned
+- Recorded a post-repair `PILOT-007` operational result against Silo Finance v2/v3 pinned
   to tag `4.26.0`. Two private workspaces reproduced identical digests over ten
   reportable files and 124 pinned compiler-only dependencies with Solidity
   `0.8.28`. The scan produced 81 candidates; the operator confirmed all 81
   rejections after source review, with zero investigating or confirmed.
-- Fixed three generic scanner defects surfaced by the second independent trial:
+- Fixed three generic scanner defects surfaced by the post-repair Silo run:
   analysis AST walkers now traverse iteratively instead of overflowing Python's
   recursion limit on large contracts; signature domain analysis is cycle-safe
   across mutually recursive call arguments; and custom error and event members

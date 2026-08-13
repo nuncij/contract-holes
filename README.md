@@ -339,10 +339,10 @@ Project status and future work are tracked explicitly:
   the current private-trial state, work boundary, and completion checklist.
 - [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
   packages, safety constraints, validation gates, and completion criteria.
-- [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — next precision
-  work from the independent second-trial families.
+- [PRECISION-002 development plan](docs/PRECISION_002_PLAN.md) — precision work
+  queued behind the independent-trial repair.
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
-  selection, one approval boundary, private replay, review, and evaluation.
+  selection, private replay, completion-review repair, and evaluation.
 - [Bounty workspace](docs/BOUNTY_PROFILE.md) — authorization, immutable target
   identity, scope, and private-workspace schema.
 - [Bounty triage](docs/BOUNTY_TRIAGE.md) — stable candidates, explainable review
@@ -381,16 +381,19 @@ and fixed-target evidence follows aliases and helper parameters. A separate
 offline rescan reproduced the same 47-candidate result. These correctness
 repairs do not claim a target-specific reduction.
 
-`PILOT-007` completed on 2026-08-13 against Silo Finance v2/v3 pinned to tag
-`4.26.0`. Two private workspaces reproduced identical digests over ten
+`PILOT-007` recorded a post-repair operational result on 2026-08-13 against
+Silo Finance v2/v3 at tag `4.26.0`. Two private workspaces reproduced identical
+digests over ten
 reportable files and 124 pinned compiler-only dependencies with Solidity
 `0.8.28`. The scan produced 81 candidates; the operator confirmed all 81
 rejections, with zero investigating or confirmed. The trial surfaced and fixed
 three generic scanner defects (iterative AST traversal, cycle-safe signature
 domain analysis, and error/event members excluded from the call graph). No
 proof, report, export, disclosure, submission, chain action, or target contact
-occurred. `PRECISION-002` is next: convert the observed generic false-positive
-families into regression fixtures and minimal detector fixes.
+occurred. A completion review reopened the task because the untouched baseline
+was not preserved, the Git tag is not yet mapped exactly to the deployed bounty
+assets, and supporting test and private-review records are incomplete.
+`PRECISION-002` remains queued until this repair is complete.
 
 The compiler index, inheritance
 resolver, call graph, reusable

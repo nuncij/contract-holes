@@ -4,10 +4,13 @@ Trial date: 2026-08-13
 Target: Silo Finance v2/v3 (`silo-finance/silo-contracts-v3` tag `4.26.0`)
 Pinned commit: `570a668a98a88a6a2b92697e7b9a3b1c6299dce7`
 Operator authorization: single consolidated approval on 2026-08-13
+Status: **COMPLETION REVIEW OPEN** — this document currently describes the
+post-repair operational result, not the untouched baseline required by the
+trial plan.
 
 ## Outcome
 
-The second independent real-world trial processed a previously unseen lending
+The post-repair operational run processed a previously unseen lending
 and vaults protocol through the private offline compiler workflow. The scan
 materialized 81 candidates; human review rejected all 81 after source
 verification. No candidate is investigating or confirmed. This is an
@@ -42,8 +45,8 @@ frozen source-only evidence from the first trial were unchanged.
 
 ## Workflow friction and fixes
 
-The first scan exposed two generic scanner defects, both fixed as routine local
-development with regression tests before the canonical result was accepted:
+The target exposed three generic scanner defects. The implementation changed
+before the preserved operational result was accepted:
 
 1. Recursive AST walkers overflowed Python's recursion limit on large,
    deeply nested real-world contracts. All analysis walkers now traverse
@@ -58,8 +61,10 @@ development with regression tests before the canonical result was accepted:
 
 All 219 tests pass and the frozen synthetic and historical evaluation gates are
 unchanged (`1.0` precision/recall on the synthetic corpus; `0.875` candidate
-precision and `1.0` supported-class recall on the historical corpus). No
-detector behavior was tuned against this target.
+precision and `1.0` supported-class recall on the historical corpus). The
+call-graph change altered detector behavior after target feedback. Regression
+coverage for the signature and call-graph repairs remains part of the open
+completion repair.
 
 ## Results
 
