@@ -48,7 +48,7 @@ Current public state
   compiler-only files, schema 1.2, Solidity 0.8.27) reproduced byte-identical
   profile, source-manifest, scan, and candidate-ledger identities. All 25
   candidates received a private review decision.
-- Suite: 247 tests.
+- Suite: 248 tests.
 - Frozen audit: 33 positive and 31 safe labels at 1.0.
 - Historical result: 0.933333 candidate precision, 1.0 supported recall, 1.0
   evidence completeness, result hash
@@ -71,7 +71,7 @@ private target work.
 Verification duties
 
 1. Confirm the worktree is clean and main == origin/main before starting.
-2. Rerun the 247+ test suite, frozen audit evaluation, historical evaluation,
+2. Rerun the 248+ test suite, frozen audit evaluation, historical evaluation,
    and git diff check. Inspect all changed code and tests.
 3. If new work starts, confirm it does not load target configuration, execute
    forge remappings, enable library discovery, expand an approved source

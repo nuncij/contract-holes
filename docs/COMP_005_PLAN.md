@@ -164,10 +164,12 @@ closed, and no profile or source-manifest schema or legacy digest changes when
 no mapping is derived. No target-specific string appears in production code or
 public fixtures.
 
-Nine new tests cover the uncovered direct-library compile, explicit
+Ten new tests cover the uncovered direct-library compile, explicit
 precedence and non-duplication, fail-closed undeclared imports, deterministic
-mapping order, and unchanged legacy identities; the suite is now 247 tests with
-the frozen audit and historical gates unchanged. Repair commit `04781a9` was
+mapping order, an active derived mapping that still cannot widen the approved
+closure to an undeclared sibling file, and unchanged legacy identities; the
+suite is now 248 tests with the frozen audit and historical gates unchanged.
+Repair commit `04781a9` was
 pushed to `main`; GitHub CI run `31787480206` passed both Quality and
 Reproducible package before private replay.
 

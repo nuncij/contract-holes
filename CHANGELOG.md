@@ -16,7 +16,9 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   entries remain authoritative, undeclared imports still fail closed, and no
   profile/source-manifest schema or legacy digest changes when no mapping is
   derived. This closes the `COMP-005` gap observed in the frozen PILOT-009
-  EulerSwap closure. Suite: 247 tests.
+  EulerSwap closure. Added a fail-closed regression proving an active derived
+  mapping cannot widen the approved closure to an undeclared sibling file in the
+  same library. Suite: 248 tests.
 
 ### Documentation
 
@@ -29,7 +31,14 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   decision and none was confirmed. The source manifest still matches the frozen
   pre-scan manifest, so the source and dependency sets are unchanged. The
   evaluation, plans, task tracker, and next-session handoff are updated; no
-  task is currently queued.
+  task is currently queued. The observed-backlog verdict is recorded: all 25
+  rejected candidates (23 `SOL008`, 1 `SOL005`, 1 `SOL003`) fall inside the
+  manual-review and unsatisfied boundaries `PRECISION-002` already documents
+  (factory-owned target provenance, callback safety for creation and fresh
+  targets, immutable deployment trust boundaries, governance/config-derived and
+  role-controlled call targets, and caller-harm-only or self-directed targets
+  without harmless-use analysis), so the untouched target confirmed the
+  documented boundaries and no follow-up precision task is opened.
 - Added the queued `COMP-005` plan for the generic direct-library remapping
   repair exposed by PILOT-009. Rewrote the next-session handoff as a coordinator
   prompt: OpenCode with `opencode-go/deepseek-v4-flash` implements the task, and

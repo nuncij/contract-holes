@@ -11,7 +11,7 @@ from contract_holes.bounty_scope import (
     scan_bounty_workspace,
     validate_profile_source,
 )
-from contract_holes.compiler import CompilationResult, CompiledSource
+from contract_holes.compiler import CompilationResult, CompiledSource, CompilerError
 
 
 REPORTABLE_IMPORTING_DEPENDENCY = """// SPDX-License-Identifier: MIT
@@ -23,6 +23,13 @@ contract Vault is Dependency {}
 DEPENDENCY_SOURCE = """// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 abstract contract Dependency {}
+"""
+
+UNDECLARED_SIBLING_IMPORTING_DEPENDENCY = """// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.20;
+import "example-lib/src/Dependency.sol";
+import "example-lib/src/Undeclared.sol";
+contract Vault is Dependency {}
 """
 
 
@@ -101,6 +108,19 @@ class CapturingDelegate:
             compiler_versions=("0.8.25",),
             diagnostics=(),
         )
+
+
+class FailingCompileDelegate(CapturingDelegate):
+    def __init__(self):
+        super().__init__()
+        self.staged_undeclared_sibling = False
+
+    def compile(self, files, *, project_root=None, offline=False):
+        super().compile(files, project_root=project_root, offline=offline)
+        self.staged_undeclared_sibling = (
+            project_root / "lib/example-lib/src/Undeclared.sol"
+        ).exists()
+        raise CompilerError("Foundry compilation failed: source not found")
 
 
 class Comp005RemappingTests(unittest.TestCase):
@@ -218,6 +238,33 @@ class Comp005RemappingTests(unittest.TestCase):
             compiler.compile([reportable], offline=True)
 
             self.assertEqual(delegate.remappings, "")
+
+    def test_undeclared_sibling_in_active_derived_library_fails_closed(self) -> None:
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            create_target(
+                root, "src/Vault.sol", UNDECLARED_SIBLING_IMPORTING_DEPENDENCY
+            )
+            create_target(
+                root, "lib/example-lib/src/Dependency.sol", DEPENDENCY_SOURCE
+            )
+            create_target(
+                root, "lib/example-lib/src/Undeclared.sol", DEPENDENCY_SOURCE
+            )
+            profile = make_profile(
+                root,
+                compiler_dependencies=("lib/example-lib/src/Dependency.sol",),
+            )
+            identity = validate_profile_source(profile)
+            reportable = root / "target" / "src/Vault.sol"
+
+            delegate = FailingCompileDelegate()
+            compiler = ScopedForgeCompiler(profile, identity, delegate=delegate)
+            with self.assertRaises(CompilerError):
+                compiler.compile([reportable], offline=True)
+
+            self.assertIn("example-lib/=lib/example-lib/", delegate.remappings)
+            self.assertFalse(delegate.staged_undeclared_sibling)
 
     def test_multiple_derived_mappings_are_lexically_ordered_and_deterministic(
         self,

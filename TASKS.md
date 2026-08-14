@@ -71,12 +71,22 @@ identities; all 25 candidates received a private review decision. See
 `COMP-005` completed on 2026-08-14 with the same result. The isolated bounty
 compiler now derives only the direct-library remappings required by approved
 imports, keeping `libs = []`, explicit remappings authoritative, undeclared
-imports fail-closed, and legacy identities unchanged. The suite is 247 tests
+imports fail-closed, and legacy identities unchanged. The suite is 248 tests
 with the frozen audit and historical gates unchanged. Repair commit `04781a9`
 reached `main` and GitHub CI run `31787480206` passed both Quality and
 Reproducible package.
 
-No task is currently queued. See
+No task is currently queued, and the observed-backlog verdict is recorded: the
+25 rejected `PILOT-009` candidates (23 `SOL008`, 1 `SOL005`, 1 `SOL003`) all
+fall inside boundaries `PRECISION-002` already documents as intentional
+manual-review or unsatisfied — factory-owned target provenance for
+registry-bonded and factory-deployed pools, callback safety for creation and
+fresh targets plus immutable deployment trust boundaries,
+governance/config-derived and role-controlled call targets, and
+caller-harm-only or self-directed targets without harmless-use analysis. This
+genuinely untouched target therefore confirmed the documented boundaries rather
+than revealing a new false-positive family, so no follow-up precision task is
+opened. See
 [the COMP-005 plan](docs/COMP_005_PLAN.md) and
 [the next-session starter prompt](docs/NEXT_SESSION_PROMPT.md).
 
@@ -925,9 +935,10 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   whose resolved unit is already declared below that exact direct library
   directory, and appends the derived mappings in stable lexical order to the
   temporary staging `remappings.txt` while keeping `libs = []` and explicit
-  validated remappings authoritative. Nine new tests cover direct-library
+  validated remappings authoritative. Ten new tests cover direct-library
   compilation, explicit precedence, fail-closed undeclared imports,
-  deterministic ordering, and unchanged legacy identities. Suite: 247 tests;
+  deterministic ordering, an active derived mapping that still cannot widen the
+  approved closure, and unchanged legacy identities. Suite: 248 tests;
   frozen audit and historical gates are unchanged. Repair commit `04781a9` was
   pushed to `main`; CI run `31787480206` passed. Two new private offline scans
   of the unchanged frozen EulerSwap closure (five reportable plus 56

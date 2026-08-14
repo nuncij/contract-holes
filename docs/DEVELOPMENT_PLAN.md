@@ -7,7 +7,16 @@ Next: **No task is currently queued.** `COMP-005` completed on 2026-08-14:
 the isolated bounty compiler derives only the direct-library remappings
 required by approved imports while keeping `libs = []` and legacy identities
 unchanged, and the frozen EulerSwap closure replayed twice with matching
-identities. `PILOT-009` is complete. See the
+identities. `PILOT-009` is complete. The observed-backlog verdict is recorded:
+the 25 rejected `PILOT-009` candidates (23 `SOL008`, 1 `SOL005`, 1 `SOL003`)
+all fall inside `PRECISION-002`'s documented intentional manual-review or
+unsatisfied boundaries — factory-owned target provenance for registry-bonded
+and factory-deployed pools, callback safety for creation and fresh targets plus
+immutable deployment trust boundaries, governance/config-derived and
+role-controlled call targets, and caller-harm-only or self-directed targets
+without harmless-use analysis. This genuinely untouched target confirmed those
+documented boundaries rather than revealing a new false-positive family, so no
+follow-up precision task is opened. See the
 [COMP-005 plan](COMP_005_PLAN.md), [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md),
 and [next-session starter prompt](NEXT_SESSION_PROMPT.md).**
 
@@ -40,7 +49,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 247 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 248 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity
@@ -561,7 +570,9 @@ Derived mappings are appended in stable lexical order to the temporary staging
 `remappings.txt` entries remain authoritative, relative imports are untouched,
 and undeclared imports still fail closed. No target configuration is loaded and
 no profile or source-manifest schema or legacy digest changes when no mapping
-is needed. Suite: 247 tests; frozen audit and historical gates unchanged.
+is needed. A fail-closed regression proves an active derived mapping cannot
+widen the approved closure to an undeclared sibling file. Suite: 248 tests;
+frozen audit and historical gates unchanged.
 Repair commit `04781a9` reached `main`; GitHub CI run `31787480206` passed.
 
 ## Engineering rules
