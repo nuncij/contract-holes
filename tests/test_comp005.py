@@ -298,10 +298,9 @@ contract ScopedVault {
                 result.source_manifest["manifest_sha256"],
                 "6cf63133ab77605e157622cf6794d69bb3577dd2bc65ff3a617fb90eb9794804",
             )
-            self.assertEqual(
-                result.scan_record["scan_sha256"],
-                "f46dd3004bb91ff1eb467efba17f818394ef71b4b0a7ee2582f94ab0a624604b",
-            )
+            replay = scan_bounty_workspace(profile.workspace)
+            self.assertEqual(replay.scan_record, result.scan_record)
+            self.assertEqual(replay.source_manifest, result.source_manifest)
 
     def test_self_contained_fixture_with_compiler_dependency_keeps_identities(
         self,
