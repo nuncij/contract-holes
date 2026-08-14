@@ -45,6 +45,8 @@
   scan result and compiler-pin follow-up
 - [COMP-004 development plan](COMP_004_PLAN.md) — exact compiler version in
   bounty profiles (complete, including the private pinned Olas replay)
+- [COMP-005 development plan](COMP_005_PLAN.md) — queued deterministic
+  direct-library remapping repair and frozen PILOT-009 replay
 
 ## Project governance
 
@@ -61,7 +63,9 @@
 - [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md) — unsatisfied trial
   outcome: exact closure frozen, fixed detector cannot reproduce the target's
   automatic submodule remapping
-- [Next-session handoff prompt](NEXT_SESSION_PROMPT.md)
+- [Next-session starter prompt](NEXT_SESSION_PROMPT.md) — coordinator handoff
+  for OpenCode with `opencode-go/deepseek-v4-flash`, followed by independent
+  verification
 - [Threat model](THREAT_MODEL.md)
 - [Security policy](../SECURITY.md)
 - [Contributing](../CONTRIBUTING.md)

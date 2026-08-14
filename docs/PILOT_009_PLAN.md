@@ -9,7 +9,8 @@ frozen user-read-only. Both private workspaces then failed deterministically at
 the compile stage: the fixed detector commit `2574b6e` cannot reproduce
 Foundry's automatic submodule remapping, so the frozen closure cannot be
 compiled and no scan or candidate identity exists. EulerSwap is retained as a
-research corpus; a detector repair and a private re-scan are required.**
+research corpus; [COMP-005](COMP_005_PLAN.md) is the queued generic repair and
+private re-scan task.**
 
 ## Goal
 

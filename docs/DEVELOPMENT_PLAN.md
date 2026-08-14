@@ -1,21 +1,15 @@
 # Contract Holes Development Plan
 
-Last updated: 2026-08-13
+Last updated: 2026-08-14
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **`PILOT-009` is UNSATISFIED.** The public selection gate passed for the
-EulerSwap v2 Ethereum subset at commit
-`81cf6dc988468fd56f690e6bc0e338a5be02d034`; Euler's pinned first-party
-verification record maps five deployed components to that commit. The exact
-pinned source and recursive submodule closure were acquired, enumerated (five
-reportable and 56 compiler-only files), and frozen user-read-only, but the
-fixed detector commit `2574b6e` cannot compile the frozen closure: its isolated
-compiler does not reproduce Foundry's automatic submodule remapping. Both
-private workspaces failed deterministically before any scan. EulerSwap is
-retained as a research corpus. See the
-[PILOT-009 plan](PILOT_009_PLAN.md), the
-[evaluation](research/PILOT_009_EVALUATION.md), and the
-[target-selection record](research/PILOT_009_TARGET_SELECTION.md).**
+Next: **`COMP-005` is queued.** It will add a narrow deterministic direct-lib
+remapping repair to the isolated bounty compiler, keep `libs = []` and legacy
+identities unchanged, publish the generic repair with green CI, and replay the
+unchanged frozen EulerSwap closure twice. `PILOT-009` remains UNSATISFIED until
+those scans reproduce and every candidate is reviewed. See the
+[COMP-005 plan](COMP_005_PLAN.md), [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md),
+and [next-session starter prompt](NEXT_SESSION_PROMPT.md).**
 
 ## Product goal
 

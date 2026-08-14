@@ -1,142 +1,97 @@
-# OpenCode development handoff
+# Next-session starter prompt
 
-Run this handoff with OpenCode model `opencode-go/deepseek-v4-flash`. This is
-the only assigned development model. The primary Codex session writes the plan
-and verifies the result; OpenCode performs the development workflow.
+Copy the text below into a new Codex session opened at the Contract Holes
+repository root.
 
 ```text
-Continue Contract Holes development in the current repository. PILOT-009 is
-UNSATISFIED. Add the generic compiler-boundary repair (reproduce Foundry
-automatic submodule remapping in the isolated bounty compiler) and re-run the
-frozen EulerSwap v2 closure privately. Use docs/PILOT_009_PLAN.md as the
-authoritative scope, its completion gate, and its stop conditions.
+Continue Contract Holes from the current repository state.
 
-Role
+Workflow rule
 
-You are the implementation agent. Work autonomously through develop -> test ->
-docs -> Git. Do not ask for routine approvals. The primary session will review
-your finished work and evidence. Do not delegate to another model or agent.
+Act as the coordinator and verifier. Do not implement production code yourself.
+Use OpenCode for implementation with exactly this model:
+opencode-go/deepseek-v4-flash
+
+Start the development agent with:
+
+/home/nux/.opencode/bin/opencode run --auto \
+  -m opencode-go/deepseek-v4-flash \
+  "Read docs/COMP_005_PLAN.md and execute it completely with the develop -> test -> docs -> Git workflow. Work autonomously until PASS, UNSATISFIED, or a documented stop condition. Do not delegate to another model."
+
+After the agent finishes, independently review its diff, tests, documentation,
+Git state, private-evidence boundary, and CI. If a repair is needed, write a
+precise follow-up contract and send it to OpenCode with the same model; then
+verify again. Do not silently implement the repair yourself.
 
 Read first
 
-- AGENTS.md, if present
 - CONTRIBUTING.md
 - TASKS.md
 - docs/DEVELOPMENT_PLAN.md
-- docs/PILOT_009_PLAN.md
+- docs/COMP_005_PLAN.md (authoritative next task)
+- docs/PILOT_009_PLAN.md (original trial gate)
 - docs/research/PILOT_009_TARGET_SELECTION.md
 - docs/research/PILOT_009_EVALUATION.md
-- docs/PRECISION_002_PLAN.md
 - docs/COMP_004_PLAN.md
 - docs/EVALUATION.md
-- this handoff
 
-Current state
+Current public state
 
-- Release 1.1.1 is complete.
-- PRECISION-002 is complete at detector commit 2574b6e. GitHub CI run
-  31720097982 passed both jobs.
-- The suite has 238 tests. The frozen audit result is 33 positive and 31 safe
-  labels at 1.0. The historical result has 0.933333 candidate precision, 1.0
-  supported-class recall, and 1.0 evidence completeness.
-- PILOT-009 is UNSATISFIED. The public selection gate passed for the EulerSwap
-  v2 Ethereum subset at commit 81cf6dc988468fd56f690e6bc0e338a5be02d034.
-  Euler's pinned first-party verification manifest (euler-interfaces commit
-  d938bc264d6e1cee68a559798044d43ade8ac95e) maps five deployed components to
-  that commit. The exact pinned source and recursive submodule closure were
-  acquired, enumerated (5 reportable and 56 compiler-only Solidity files), and
-  frozen clean and user-read-only with Git metadata.
-- Both private workspaces reproduced byte-identical schema-1.2 source manifests
-  and failed deterministically at the compile stage before any scan: the fixed
-  detector commit 2574b6e cannot reproduce Foundry's automatic submodule
-  remapping (its isolated compiler writes libs = [] and loads only the target
-  remappings.txt). The unresolved import is v4-periphery/src/utils/BaseHook.sol
-  from src/UniswapHook.sol, in the closure of reportable src/EulerSwap.sol; the
-  target itself resolves it through libs = ["lib"] in foundry.toml. A
-  standalone offline trial compile of the identical 61-file closure with the
-  automatic remapping succeeds with Solidity 0.8.27.
-- No scan record or candidate identity exists. EulerSwap is retained as a
-  research corpus. The frozen target checkout is at
-  targets/euler-swap-v2-81cf6dc9 and the freeze record is at
-  bounty-workspaces/euler-swap-v2-0.8.27-freeze (outside this repository).
+- Release: 1.1.1.
+- The last implementation/outcome commit before the doc-only COMP-005 handoff
+  is afc702fa7980b5c90f658fce08a29ce7402cf079. Treat current Git output as
+  authoritative and require clean main == origin/main before development.
+- Public selection freeze: commit 649b923; CI 31723534741 passed.
+- PILOT-009 unsatisfied record: commit afc702f; CI 31725057831 passed.
+- Suite: 238 tests.
+- Frozen audit: 33 positive and 31 safe labels at 1.0.
+- Historical result: 0.933333 candidate precision, 1.0 supported recall, 1.0
+  evidence completeness, result hash
+  9bf60837d252bac17ba579c91a04a8d33fc5f0c9fcb5c8df59402be0397bdf90,
+  decision go.
+- PILOT-009 selected EulerSwap v2 at immutable commit
+  81cf6dc988468fd56f690e6bc0e338a5be02d034. The exact frozen closure is five
+  reportable plus 56 compiler-only Solidity files at exact compiler 0.8.27.
+- Two preserved private workspaces reproduced the same schema-1.2 manifest and
+  the same pre-scan compile blocker. No scan or candidate identity exists.
+- The blocker is generic: isolated bounty staging uses libs = [] and only the
+  tracked remappings.txt, so it cannot resolve a direct Foundry lib package
+  prefix that the complete declared closure already contains.
+- COMP-005 is the single NEXT task. It adds a narrow deterministic direct-lib
+  remapping repair, publishes it with green CI, and replays the unchanged frozen
+  EulerSwap closure twice before any completion claim.
 
-Boundary
+Authority and privacy
 
-Public research, the one-time exact pinned source/dependency downloads, and
-private local offline analysis are authorized. Keep the target checkout,
-profiles, manifests, scans, candidates, reviews, paths, excerpts, and hashes
-outside this repository. Use private directories (0700) and files (0600).
+The standing yolo direction covers public research, the already completed exact
+downloads, and private local offline analysis. Do not ask for routine approvals.
+No new target download, RPC, fork, chain action, transaction, deployment, proof,
+report, export, disclosure, submission, bounty-platform write, or target contact
+is authorized.
 
-Stay local and source-only after acquisition. No RPC, fork, public or test
-chain, transaction, deployment, target build/test/deploy script, proof,
-exploit, report export, disclosure, submission, bounty-platform write, or
-target contact. Do not change detector rules, thresholds, corpus labels, or
-evaluation baselines for target-specific reasons; a generic compiler-boundary
-repair must keep every frozen corpus identity and public evidence contract
-unchanged. Do not put candidate-specific facts in public docs, commits,
-terminal summaries, or CI.
+OpenCode may operate the existing local private workspace. Keep target source,
+manifests, scans, candidates, reviews, paths, excerpts, and hashes outside the
+repository and out of public summaries. Do not use another model or subagent for
+private target work.
 
-Sequence
+Verification duties
 
-1. Verify main against origin/main. Confirm src, tests, evaluation, and
-   pyproject.toml have not changed after detector commit 2574b6e. Run the full
-   unit suite, frozen audit evaluation, and historical bounty evaluation.
+1. Confirm the agent used a generic test-first repair and did not load target
+   configuration, execute forge remappings, enable library discovery, or expand
+   the approved source closure.
+2. Confirm explicit validated remappings retain precedence, synthesized mappings
+   are deterministic, and undeclared imports still fail closed.
+3. Confirm no profile/source-manifest schema or legacy identity changed when no
+   derived mapping is needed.
+4. Rerun the 238+ test suite, frozen audit evaluation, historical evaluation,
+   and git diff check. Inspect all changed code and tests.
+5. Verify the generic repair commit was pushed and CI passed before private
+   replay.
+6. Verify two new private offline replays used the unchanged 5+56 closure and
+   produced matching identities. Review only aggregate public results; keep
+   candidate evidence private.
+7. Verify the final docs, clean worktree, main == origin/main, and green final CI.
 
-2. Design the generic compiler-boundary repair at the existing isolated
-   compiler seam: reproduce Foundry's automatic submodule remappings (the
-   prefixes the target's libs/ directories imply) in the temporary staging
-   project, or accept a profile-declared additive remapping extension, so a
-   closure that relies on automatic remapping compiles offline. Keep legacy
-   digests and behavior unchanged for targets whose remappings.txt is
-   self-contained. Add generic fixtures and tests for a target that relies on
-   automatic remapping (a root import that resolves only via a libs/ prefix).
-
-3. Run the full suite and both frozen evaluations. Verify the frozen audit,
-   historical, and prior corpus identities are unchanged and that legacy
-   unpinned profiles/digests are byte-identical.
-
-4. Re-run the frozen EulerSwap closure privately with the repaired detector in
-   two new workspaces (schema 1.2, Solidity 0.8.27, the same 5 reportable and
-   56 compiler-only files). Compare source-manifest, profile, scan, and
-   candidate digests, compiler version, reportable file count, finding count,
-   candidate count, and rule distribution. A mismatch leaves the repair
-   incomplete.
-
-5. Review every candidate privately against the pinned source, live program
-   impact rules, known issues, and prior audits. Record hypothesis, evidence
-   boundary, impact, reachability assumptions, duplicate status, state, reason,
-   uncertainty, and review effort. Do not tune the scanner from these labels.
-   Treat candidates as investigation leads, not vulnerabilities.
-
-6. Write docs/research/PILOT_009_EVALUATION.md using aggregate public data only:
-   public target identity and selection method, mapping verdict, compiler mode,
-   reportable file count, total candidates and per-rule counts, aggregate review
-   states, review effort, comparison with prior trials, limitations including
-   unknown recall, restrictions observed, and the recommended next task. Omit
-   private paths, hashes, candidate IDs, source excerpts, traces, and any
-   candidate-specific explanation.
-
-7. Update README.md, CHANGELOG.md, TASKS.md, docs/DEVELOPMENT_PLAN.md,
-   docs/PILOT_009_PLAN.md, docs/README.md, and this handoff to the final truthful
-   state. Mark PILOT-009 COMPLETE only if every completion gate in its plan
-   passes. Run all validation gates, inspect the staged diff for private data,
-   commit, push main, and wait for green GitHub CI. If GPG commit signing needs
-   interaction, use an unsigned commit; release tag signing is separate.
-
-Validation gates
-
-PYTHONPATH=src python3 -m unittest discover -s tests -q
-PYTHONPATH=src python3 -m contract_holes evaluate \
-  tests/fixtures/evaluation/manifest.json
-PYTHONPATH=src python3 -m contract_holes bounty history \
-  tests/fixtures/bounty_history/manifest.json
-git diff --check
-
-Finished output
-
-Return a concise aggregate summary: PASS/UNSATISFIED, public commit IDs, CI run
-IDs and results, test/evaluation totals, private workspace locations and
-permissions without candidate-specific details, replay-match verdict, aggregate
-candidate/review counts, docs changed, and any remaining blocker. Leave the
-repository clean with main matching origin/main.
+Use unsigned commits if GPG requires interaction. Stop only at a condition in
+docs/COMP_005_PLAN.md or when the authorization boundary must change.
 ```

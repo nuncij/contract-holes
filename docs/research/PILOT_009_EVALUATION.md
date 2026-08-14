@@ -111,12 +111,12 @@ parallel to the compiler-pin gap that `COMP-004` closed after `PILOT-008`.
 
 ## Recommended next task
 
-Add automatic submodule remapping (or a profile-declared remapping extension)
-to the isolated bounty compiler so closures that rely on Foundry's `libs`
-auto-remapping compile offline, then re-run a private scan of this same frozen
-EulerSwap closure. The closure, profile, and freeze are already complete. If the
-repair is rejected, select a different untouched target whose tracked
-`remappings.txt` is self-contained.
+Execute [COMP-005](../COMP_005_PLAN.md): derive only the missing direct-library
+remappings required by approved imports, keep `libs = []` and explicit
+remappings authoritative, publish the generic repair, and then run two private
+scans of this same frozen EulerSwap closure. The closure, profile, and freeze are
+already complete. If the narrow repair is rejected, select a different untouched
+target whose tracked `remappings.txt` is self-contained.
 
 ## Limitations
 

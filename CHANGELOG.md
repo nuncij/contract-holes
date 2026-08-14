@@ -7,6 +7,11 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Documentation
 
+- Added the queued `COMP-005` plan for the generic direct-library remapping
+  repair exposed by PILOT-009. Rewrote the next-session handoff as a coordinator
+  prompt: OpenCode with `opencode-go/deepseek-v4-flash` implements the task, and
+  the primary session independently verifies code, tests, private replay,
+  documentation, Git, and CI.
 - Completed `PRECISION-002`: commit `2574b6e` was pushed to `main` and GitHub
   CI run `31720097982` passed both Quality and Reproducible package. The final
   fresh private offline replay was an exact match (Solidity `0.8.28`, ten

@@ -52,7 +52,7 @@ produced zero candidates. The suite is 238 tests; frozen gates are unchanged.
 `main`, and GitHub CI run `31720097982` passed both Quality and Reproducible
 package.
 
-Next: **PILOT-009** is UNSATISFIED. The public selection gate passed for the
+`PILOT-009` is UNSATISFIED. The public selection gate passed for the
 EulerSwap v2 Ethereum subset at commit
 `81cf6dc988468fd56f690e6bc0e338a5be02d034`, and the exact pinned source with
 its recursive submodule closure was acquired, enumerated (five reportable and
@@ -68,6 +68,13 @@ closure, is required before the next trial. See
 [the PILOT-009 plan](docs/PILOT_009_PLAN.md),
 [the evaluation](docs/research/PILOT_009_EVALUATION.md), and
 [the target-selection record](docs/research/PILOT_009_TARGET_SELECTION.md).
+
+Next: **COMP-005** is queued. It will add the smallest deterministic
+direct-library remapping repair at the isolated bounty compiler boundary, keep
+legacy identities unchanged, publish the generic repair with green CI, and then
+replay the unchanged frozen EulerSwap closure twice. See
+[the COMP-005 plan](docs/COMP_005_PLAN.md) and
+[the next-session starter prompt](docs/NEXT_SESSION_PROMPT.md).
 
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
 P1 (important), and P2 (useful follow-up).
@@ -893,6 +900,28 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   - stop conditions are defined in the plan.
 
   Depends on: `PRECISION-002`.
+
+- [ ] **COMP-005** — Derive only required direct `lib/<name>/` package
+  remappings from the approved content-bound closure, while keeping `libs = []`,
+  explicit validated remappings authoritative, undeclared imports fail-closed,
+  and legacy identities unchanged. Publish the generic repair before replaying
+  the frozen PILOT-009 EulerSwap closure in two new private offline workspaces.
+  Follow the [dedicated plan](docs/COMP_005_PLAN.md) — P1 — **NEXT**.
+
+  Acceptance criteria:
+
+  - generic red-to-green coverage proves a declared direct-library import
+    compiles without loading target configuration or discovering undeclared
+    files;
+  - explicit remapping precedence, stable ordering, fail-closed scope, and
+    legacy digest compatibility are tested;
+  - all public gates and repair CI pass before private replay;
+  - two new private scans use the unchanged five-reportable/56-dependency
+    closure and reproduce all scan and candidate identities;
+  - every candidate is reviewed privately and public docs remain aggregate;
+  - final docs, Git state, and CI pass the plan's completion gate.
+
+  Depends on: `COMP-004`, `PRECISION-002`, and the frozen `PILOT-009` corpus.
 
 ## Definition of done for every task
 
