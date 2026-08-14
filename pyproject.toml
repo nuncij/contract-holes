@@ -10,7 +10,7 @@ readme = "README.md"
 requires-python = ">=3.10,<3.15"
 license = "MIT"
 license-files = ["LICENSE"]
-authors = [{ name = "scanner-gpt contributors" }]
+authors = [{ name = "Contract Holes contributors" }]
 dependencies = []
 keywords = ["solidity", "smart-contracts", "security", "static-analysis"]
 classifiers = [
