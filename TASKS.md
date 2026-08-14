@@ -69,10 +69,11 @@ closure, is required before the next trial. See
 [the evaluation](docs/research/PILOT_009_EVALUATION.md), and
 [the target-selection record](docs/research/PILOT_009_TARGET_SELECTION.md).
 
-Next: **COMP-005** is queued. It will add the smallest deterministic
-direct-library remapping repair at the isolated bounty compiler boundary, keep
-legacy identities unchanged, publish the generic repair with green CI, and then
-replay the unchanged frozen EulerSwap closure twice. See
+Next: **COMP-005** is in progress. The generic deterministic direct-library
+remapping repair is implemented and published at the isolated bounty compiler
+boundary, keeping legacy identities unchanged and explicit remappings
+authoritative. The remaining work replays the unchanged frozen EulerSwap
+closure twice and reviews every candidate. See
 [the COMP-005 plan](docs/COMP_005_PLAN.md) and
 [the next-session starter prompt](docs/NEXT_SESSION_PROMPT.md).
 
@@ -906,7 +907,19 @@ submission, disclosure, transaction, or remote exploit execution is automatic.
   explicit validated remappings authoritative, undeclared imports fail-closed,
   and legacy identities unchanged. Publish the generic repair before replaying
   the frozen PILOT-009 EulerSwap closure in two new private offline workspaces.
-  Follow the [dedicated plan](docs/COMP_005_PLAN.md) — P1 — **NEXT**.
+  Follow the [dedicated plan](docs/COMP_005_PLAN.md) — P1 — **IN PROGRESS**.
+
+  Status: the generic repair is implemented and published. A new helper at the
+  isolated bounty compiler boundary derives `<name>/=lib/<name>/` only for an
+  uncovered package import whose resolved unit is already declared below that
+  exact direct library directory, and appends the derived mappings in stable
+  lexical order to the temporary staging `remappings.txt` while keeping
+  `libs = []` and explicit validated remappings authoritative. Nine new tests
+  cover direct-library compilation, explicit precedence, fail-closed undeclared
+  imports, deterministic ordering, and unchanged legacy identities. Suite:
+  247 tests; frozen audit and historical gates are unchanged. The private
+  EulerSwap replay of the unchanged five-reportable/56-dependency closure is
+  pending.
 
   Acceptance criteria:
 

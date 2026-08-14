@@ -45,8 +45,9 @@
   scan result and compiler-pin follow-up
 - [COMP-004 development plan](COMP_004_PLAN.md) — exact compiler version in
   bounty profiles (complete, including the private pinned Olas replay)
-- [COMP-005 development plan](COMP_005_PLAN.md) — queued deterministic
-  direct-library remapping repair and frozen PILOT-009 replay
+- [COMP-005 development plan](COMP_005_PLAN.md) — deterministic direct-library
+  remapping repair at the isolated compiler boundary (repair published; frozen
+  PILOT-009 replay in progress)
 
 ## Project governance
 

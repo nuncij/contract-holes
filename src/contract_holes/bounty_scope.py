@@ -369,9 +369,12 @@ class ScopedForgeCompiler:
                 + "ffi = false\n",
                 encoding="utf-8",
             )
-            if self.identity.remappings:
+            staging_remappings = self.identity.remappings + _derive_direct_library_remappings(
+                self.identity
+            )
+            if staging_remappings:
                 (staged_root / "remappings.txt").write_text(
-                    "\n".join(self.identity.remappings) + "\n",
+                    "\n".join(staging_remappings) + "\n",
                     encoding="utf-8",
                 )
             result = self.delegate.compile(
@@ -648,6 +651,54 @@ def _verify_entry(entry: SourceEntry) -> None:
         raise CompilerError(f"could not re-read approved source {entry.relative_path}: {exc}") from exc
     if len(data) != entry.bytes or hashlib.sha256(data).hexdigest() != entry.sha256:
         raise CompilerError(f"approved source changed during scan: {entry.relative_path}")
+
+
+def _derive_direct_library_remappings(identity: SourceIdentity) -> tuple[str, ...]:
+    """Derive direct-library remappings required by approved imports.
+
+    An uncovered package import such as ``name/rest`` derives ``name/=lib/name/``
+    only when the imported unit resolves to an already declared staged path
+    below that exact direct library directory. Relative imports and imports
+    already covered by an explicit validated remapping are left unchanged.
+    Mappings are returned in stable lexical order.
+    """
+    declared_relative = {
+        entry.relative_path
+        for entry in identity.files + identity.compiler_dependency_files
+    }
+    explicit_prefixes = tuple(
+        line.rsplit("=", 1)[0] for line in identity.remappings
+    )
+    derived: set[str] = set()
+    for entry in identity.files + identity.compiler_dependency_files:
+        try:
+            text = entry.path.read_text(encoding="utf-8")
+        except (OSError, UnicodeError) as exc:
+            raise CompilerError(
+                f"could not inspect imports in {entry.relative_path}: {exc}"
+            ) from exc
+        without_comments = _remove_solidity_comments(text)
+        for match in _IMPORT_PATTERN.finditer(without_comments):
+            import_value = match.group("path")
+            candidate = PurePosixPath(import_value)
+            if (
+                not import_value
+                or "\\" in import_value
+                or candidate.is_absolute()
+                or "://" in import_value
+                or import_value.startswith(".")
+            ):
+                continue
+            if any(import_value.startswith(prefix) for prefix in explicit_prefixes):
+                continue
+            parts = candidate.parts
+            if len(parts) < 2:
+                continue
+            name = parts[0]
+            staged = "lib/" + "/".join(parts)
+            if staged in declared_relative:
+                derived.add(f"{name}/=lib/{name}/")
+    return tuple(sorted(derived))
 
 
 def _validate_import_paths(

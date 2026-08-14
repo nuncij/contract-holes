@@ -1,9 +1,11 @@
 # COMP-005 development plan
 
-Status: **QUEUED — NEXT.** Repair the isolated bounty compiler's observed
-automatic library-remapping gap, then replay the frozen PILOT-009 EulerSwap
-closure. PILOT-009 remains **UNSATISFIED** until both repaired scans reproduce
-and every candidate is reviewed.
+Status: **IN PROGRESS.** The generic deterministic direct-library remapping
+repair is implemented and published at the isolated bounty compiler boundary.
+The observed PILOT-009 EulerSwap closure now derives the single missing
+`v4-periphery/` prefix from its declared imports. `PILOT-009` remains
+**UNSATISFIED** until the frozen closure is replayed twice and every candidate
+is reviewed.
 
 ## Goal
 

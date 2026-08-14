@@ -3,10 +3,12 @@
 Last updated: 2026-08-14
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **`COMP-005` is queued.** It will add a narrow deterministic direct-lib
-remapping repair to the isolated bounty compiler, keep `libs = []` and legacy
-identities unchanged, publish the generic repair with green CI, and replay the
-unchanged frozen EulerSwap closure twice. `PILOT-009` remains UNSATISFIED until
+Next: **`COMP-005` is in progress.** The generic deterministic direct-library
+remapping repair is implemented and published: the isolated bounty compiler now
+derives `<name>/=lib/<name>/` for uncovered approved imports whose resolved
+units are already declared, while keeping `libs = []` and legacy identities
+unchanged. The remaining work replays the unchanged frozen EulerSwap closure
+twice and reviews every candidate. `PILOT-009` remains UNSATISFIED until
 those scans reproduce and every candidate is reviewed. See the
 [COMP-005 plan](COMP_005_PLAN.md), [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md),
 and [next-session starter prompt](NEXT_SESSION_PROMPT.md).**
@@ -40,7 +42,7 @@ The scanner is successful when it:
 | Output | Terminal text, finding JSON, SARIF 2.1.0, filtered inspection JSON, and evidence-bound AI triage JSON |
 | Workflow | `.holes.toml`, baselines, `holes rules`, verified-source provenance, severity/CI policy, suppressions, inspection, benchmarks, and proofs |
 | Project model | Shared AST, inheritance, calls, value-flow facts, execution order, reentrancy, target-taint, authorization, signature, proxy-upgrade, token-flow, and market-integrity traces |
-| Verification | 238 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
+| Verification | 247 Python tests; frozen JSON/SARIF and bounty schemas, 64 audit labels, ten historical cases, an authorized end-to-end pilot, CI/catalog/config/baselines/limits/address/AI boundaries, offline benchmarks, inspection, and isolated Forge execution tested |
 | Runtime dependencies | None; Foundry is optional and required only for compiler-aware analysis |
 
 ### Rule maturity

@@ -5,6 +5,19 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ## Unreleased
 
+### Fixed
+
+- Isolated bounty compiler now derives the direct-library remappings that the
+  approved closure actually requires. When a reportable or compiler-only file
+  imports an uncovered package path such as `v4-periphery/src/...`, and the
+  exact unit is already declared below `lib/<name>/`, the compiler appends
+  `<name>/=lib/<name>/` in stable lexical order to the temporary staging
+  `remappings.txt`. `libs = []` stays empty, explicit validated `remappings.txt`
+  entries remain authoritative, undeclared imports still fail closed, and no
+  profile/source-manifest schema or legacy digest changes when no mapping is
+  derived. This closes the `COMP-005` gap observed in the frozen PILOT-009
+  EulerSwap closure. Suite: 247 tests.
+
 ### Documentation
 
 - Added the queued `COMP-005` plan for the generic direct-library remapping

@@ -346,7 +346,7 @@ Project status and future work are tracked explicitly:
 - [Task tracker](TASKS.md) — task IDs, priorities, dependencies, acceptance criteria,
   completed work, and the single next task.
 - [Next-session handoff](docs/NEXT_SESSION_PROMPT.md) — a copy-ready coordinator
-  prompt that starts the `COMP-005` OpenCode repair with DeepSeek V4 Flash and
+  prompt that runs the `COMP-005` OpenCode repair with DeepSeek V4 Flash and
   then requires independent verification.
 - [PRECISION-001 development plan](docs/PRECISION_001_PLAN.md) — test-first work
   packages, safety constraints, validation gates, and completion criteria.
@@ -361,9 +361,9 @@ Project status and future work are tracked explicitly:
   unsatisfied. See the
   [target-selection record](docs/research/PILOT_009_TARGET_SELECTION.md) and
   the [evaluation](docs/research/PILOT_009_EVALUATION.md).
-- [COMP-005 development plan](docs/COMP_005_PLAN.md) — the queued generic
-  direct-library remapping repair and private replay of the unchanged frozen
-  EulerSwap closure.
+- [COMP-005 development plan](docs/COMP_005_PLAN.md) — the generic
+  direct-library remapping repair (published) and private replay of the
+  unchanged frozen EulerSwap closure (in progress).
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
 - [PILOT-008 development plan](docs/PILOT_008_PLAN.md) and
