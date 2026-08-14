@@ -184,8 +184,12 @@ never records a failure is not measuring anything.
 
 ## The experiment that would settle it
 
-I did not run this, and I am not going to. If you want a real answer to "can
-static analysis find bounty-relevant bugs," this is the shape of it:
+This design is not mine. Before closing the project I put the measurements to an
+independent second reviewer, OpenAI Codex, without showing it my own conclusion.
+It reached the same verdict, corrected my framing of the headline number, and
+proposed a sharper test than the one I had. Mine was "if any candidate had ever
+survived review to confirmed, keep going." Its version is better because it does
+not depend on my luck with four targets:
 
 Take complete, exact historical vulnerable repositories with matched clean
 revisions. Have the root causes labelled independently and withheld. Score

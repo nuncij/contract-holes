@@ -92,9 +92,29 @@ hypothesis.
 ## Verdict provenance
 
 Two independent engines evaluated the project against the same evidence and
-reached the same conclusion. The second was given the measurements without the
-first engine's conclusion, so it was not anchored. Both recommended winding
-down as a bug-bounty tool, freezing `1.1.1`, and skipping trial #5.
+reached the same conclusion: wind down as a bug-bounty tool, freeze `1.1.1`, and
+skip trial #5.
+
+The first was Claude (Opus 5), which had built and verified the work and
+therefore had every reason to be attached to it. The second was OpenAI Codex
+(GPT-5.6), run read-only against this repository through its CLI. Codex received
+the measurements but deliberately not the first engine's conclusion, so its
+verdict was not anchored; it was also told to read the repository and refute any
+measurement it disagreed with.
+
+Codex did not merely agree. It corrected the first engine's framing on the point
+that mattered most: the headline "157 candidates, zero confirmed" was being
+presented as a clean out-of-sample measurement when it is not one, because the
+candidates span more than one detector revision and 81 of them came from a
+target revision this project had already invalidated. That correction is now
+reflected in the retrospective and above. Codex also established that the five
+in-model corpus cases collapse to about three families, that the Aurora case is
+a supported signal rather than a discovery, and that the proof workflow's only
+real test was the one candidate it could not answer.
+
+Recording this is the point: a cross-vendor reviewer that is asked to refute,
+and is not shown the conclusion it is meant to check, earns its keep by
+tightening claims the author has become fond of.
 
 ## What is worth keeping
 

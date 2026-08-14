@@ -22,7 +22,9 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
   while the frozen historical corpus labels the families that current bounty
   programs pay for — share pricing, verification logic, share accounting,
   flash-loan governance, and health-check invariants — as out-of-model. Two
-  independent engines evaluated the same evidence and both recommended stopping.
+  independent engines evaluated the same evidence and both recommended stopping:
+  Claude (Opus 5), which built the work, and OpenAI Codex (GPT-5.6), run
+  read-only and given the measurements without the first conclusion.
   Added [the closeout record](docs/PROJECT_CLOSEOUT.md) with the decision, the
   measured evidence, the reusable components, and the two reopening conditions;
   marked `README.md`, `TASKS.md`, `docs/DEVELOPMENT_PLAN.md`, and
