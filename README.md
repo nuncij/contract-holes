@@ -7,8 +7,12 @@
 > bounty programs pay for — accounting, pricing, verification logic, governance
 > economics — are labelled out-of-model by this project's own historical corpus.
 > The code works and every gate passes; it is simply not worth another target.
-> Read [the closeout record](docs/PROJECT_CLOSEOUT.md) before reusing or
-> reopening anything here.
+>
+> **Start with [the retrospective](docs/RETROSPECTIVE.md)** — the negative
+> result, why static analysis reaches proxy-init and reentrancy but not
+> accounting, pricing, verification logic, or governance economics, and the
+> research discipline that is worth reusing. The decision record itself is in
+> [the closeout](docs/PROJECT_CLOSEOUT.md).
 
 `holes` is a fast, evidence-first Solidity security scanner. It is intentionally
 small enough to understand and extend: the first release has no runtime

@@ -1,8 +1,10 @@
 # Documentation
 
-> **This project is closed as of 2026-08-14.** See
-> [the closeout record](PROJECT_CLOSEOUT.md) for the decision and its evidence.
-> The documents below remain accurate for the final `1.1.1` release.
+> **This project is closed as of 2026-08-14.** Start with
+> [the retrospective](RETROSPECTIVE.md) for what the four real-world trials
+> showed and what is worth reusing; see [the closeout](PROJECT_CLOSEOUT.md) for
+> the decision and its evidence. The documents below remain accurate for the
+> final `1.1.1` release.
 
 ## Start here
 
@@ -67,9 +69,12 @@
 - [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md) — completed trial:
   repaired compiler replays the frozen closure twice with matching identities
   and all candidates are reviewed privately
-- [Project closeout](PROJECT_CLOSEOUT.md) — **read first.** The 2026-08-14
-  decision to stop development, the measured evidence behind it, which
-  components are reusable, and the two reopening conditions
+- [Retrospective](RETROSPECTIVE.md) — **read first.** The negative result across
+  four bounty targets, why the ceiling is structural, and the freeze-and-replay
+  research discipline worth reusing
+- [Project closeout](PROJECT_CLOSEOUT.md) — the 2026-08-14 decision to stop
+  development, the measured evidence behind it, which components are reusable,
+  and the two reopening conditions
 - [Next-session starter prompt](NEXT_SESSION_PROMPT.md) — closed; no queued work
   and no handoff remains
 - [Threat model](THREAT_MODEL.md)

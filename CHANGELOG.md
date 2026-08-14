@@ -7,6 +7,13 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Closed
 
+- Published the repository publicly under its existing MIT license after a
+  full-history audit (no target source, private digest, candidate identifier,
+  finding, or credential in any commit) and a program-rules check (the programs
+  restrict disclosure of vulnerabilities, of which there are none). Added
+  [the retrospective](docs/RETROSPECTIVE.md): the negative result across four
+  bounty targets, the in-model/out-of-model split that explains it, and the
+  freeze-and-replay research discipline worth reusing.
 - **The project is closed as of 2026-08-14** at the signed `1.1.1` release. Four
   authorized real-world bounty trials scanned 39 reportable files, produced 157
   candidates, and confirmed none; no report, export, disclosure, submission,

@@ -135,6 +135,32 @@ design. Two options, in order:
    the scope and evidence harness above. This is a different project that
    imports this one; it is not a continuation of the rule set.
 
+## Publication
+
+The repository was made public on 2026-08-14 under its existing MIT license,
+after two checks.
+
+**History audit.** Every commit was scanned, not only the final tree: no target
+source, no private manifest or scan digest, no candidate identifier, no finding,
+and no credential or key-shaped material appears anywhere in history. All 43
+Solidity fixtures are locally authored MIT reductions, so no third-party source
+is redistributed. The only residue is relative *directory names* of local private
+workspaces in a few doc commits, and one local toolchain path. Names only, no
+contents, and no more than the public selection records already state.
+
+**Program rules.** The bounty programs prohibit public disclosure of
+vulnerabilities without the protocol team's consent. No vulnerability was found,
+no report was ever filed, and no privileged triage information was ever received,
+so nothing disclosable exists. Nothing in the programs' rules restricts stating
+that publicly available source was reviewed or publishing a result that reports
+no findings. All target facts published here come from public sources: program
+scope pages, first-party verification records, published addresses, and public
+Git revisions.
+
+This publication is a negative result plus a research method. It is not a
+security assessment of any named protocol, and a rejected candidate is not
+evidence that a protocol is safe.
+
 ## Standing boundaries
 
 These remain in force for the archived repository:
