@@ -3,13 +3,11 @@
 Last updated: 2026-08-14
 Current release: `1.1.1`
 Current milestone: **Post-M8 — independent validation rework**
-Next: **`COMP-005` is in progress.** The generic deterministic direct-library
-remapping repair is implemented and published: the isolated bounty compiler now
-derives `<name>/=lib/<name>/` for uncovered approved imports whose resolved
-units are already declared, while keeping `libs = []` and legacy identities
-unchanged. The remaining work replays the unchanged frozen EulerSwap closure
-twice and reviews every candidate. `PILOT-009` remains UNSATISFIED until
-those scans reproduce and every candidate is reviewed. See the
+Next: **No task is currently queued.** `COMP-005` completed on 2026-08-14:
+the isolated bounty compiler derives only the direct-library remappings
+required by approved imports while keeping `libs = []` and legacy identities
+unchanged, and the frozen EulerSwap closure replayed twice with matching
+identities. `PILOT-009` is complete. See the
 [COMP-005 plan](COMP_005_PLAN.md), [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md),
 and [next-session starter prompt](NEXT_SESSION_PROMPT.md).**
 
@@ -530,14 +528,17 @@ recall and evidence completeness, and the `go` decision is unchanged. Suite:
 source and dependency identities, Solidity `0.8.28`, ten reportable files, 59
 findings/candidates versus 81 before tuning (SOL003=1, SOL005=13, SOL008=41,
 SOL009=3, SOL011=1), 22 removed and none added — investigation leads, not
-vulnerabilities and not bounty submissions. `PILOT-009` was started to validate
-commit `2574b6e` on the selected EulerSwap v2 Ethereum subset, a genuinely
-untouched target that is not OpenZeppelin, Silo, or Olas, but is UNSATISFIED:
-the fixed detector cannot compile the frozen EulerSwap closure (Foundry's
+vulnerabilities and not bounty submissions. `PILOT-009` started against the
+selected EulerSwap v2 Ethereum subset, a genuinely
+untouched target that is not OpenZeppelin, Silo, or Olas. The original fixed
+detector could not compile the frozen EulerSwap closure (Foundry's
 automatic submodule remapping is not reproduced by the isolated compiler), so
-no scan or candidate identity exists. EulerSwap is retained as a research
-corpus; a repair to reproduce automatic submodule remapping and a re-trial are
-required.
+no scan or candidate identity existed. `COMP-005` closed that gap and
+`PILOT-009` completed on 2026-08-14: two new private offline scans of the
+unchanged frozen closure (five reportable plus 56 compiler-only files, schema
+`1.2`, Solidity `0.8.27`) reproduced byte-identical profile, source-manifest,
+scan, and candidate-ledger identities, and all 25 candidates received a private
+review decision (SOL003=1, SOL005=1, SOL008=23, all rejected).
 
 ### Post-M8 — Compiler-only dependency boundary
 
@@ -548,6 +549,20 @@ tampering. Only reportable files are requested for scanning, and findings outsid
 that set fail closed. Profiles and source manifests using this feature emit their
 additive `1.1` normalized record schemas; existing workspaces retain `1.0` digest
 material and behavior.
+
+### Post-M8 — Direct-library remapping repair
+
+`COMP-005` is complete. The isolated bounty compiler derives only the
+direct-library remappings its approved imports require: for an uncovered
+package import `<name>/<rest>`, it emits `<name>/=lib/<name>/` only when the
+imported unit is already declared below that exact direct library directory.
+Derived mappings are appended in stable lexical order to the temporary staging
+`remappings.txt` while `libs = []` stays empty, explicit validated
+`remappings.txt` entries remain authoritative, relative imports are untouched,
+and undeclared imports still fail closed. No target configuration is loaded and
+no profile or source-manifest schema or legacy digest changes when no mapping
+is needed. Suite: 247 tests; frozen audit and historical gates unchanged.
+Repair commit `04781a9` reached `main`; GitHub CI run `31787480206` passed.
 
 ## Engineering rules
 

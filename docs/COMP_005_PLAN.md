@@ -1,11 +1,13 @@
 # COMP-005 development plan
 
-Status: **IN PROGRESS.** The generic deterministic direct-library remapping
-repair is implemented and published at the isolated bounty compiler boundary.
-The observed PILOT-009 EulerSwap closure now derives the single missing
-`v4-periphery/` prefix from its declared imports. `PILOT-009` remains
-**UNSATISFIED** until the frozen closure is replayed twice and every candidate
-is reviewed.
+Status: **COMPLETE — 2026-08-14.** The generic deterministic direct-library
+remapping repair is implemented, published, and validated by a green CI run.
+Two new private offline scans of the unchanged frozen PILOT-009 EulerSwap
+closure (five reportable plus 56 compiler-only files, Solidity `0.8.27`, schema
+`1.2`) reproduced byte-identical profile, source-manifest, scan, and
+candidate-ledger identities, and every candidate received a private review
+decision. `PILOT-009` is complete. See
+[the evaluation](research/PILOT_009_EVALUATION.md).
 
 ## Goal
 
@@ -148,3 +150,32 @@ Stop and leave the task incomplete if the repair requires target configuration
 execution, undeclared source discovery, a schema-breaking change, target-tuned
 detector behavior, a changed frozen closure, non-deterministic replay, private
 evidence in the repository, or any action outside the standing authorization.
+
+## Completion record
+
+The generic repair added one focused helper at the isolated bounty compiler
+boundary. The staging compiler now derives `<name>/=lib/<name>/` for an
+uncovered package import only when the imported unit resolves to an already
+declared staged path below that exact direct library directory, and appends the
+derived mappings in stable lexical order to the temporary `remappings.txt`.
+`libs = []` stays empty, explicit validated remappings retain precedence and are
+not duplicated, relative imports are untouched, undeclared imports still fail
+closed, and no profile or source-manifest schema or legacy digest changes when
+no mapping is derived. No target-specific string appears in production code or
+public fixtures.
+
+Nine new tests cover the uncovered direct-library compile, explicit
+precedence and non-duplication, fail-closed undeclared imports, deterministic
+mapping order, and unchanged legacy identities; the suite is now 247 tests with
+the frozen audit and historical gates unchanged. Repair commit `04781a9` was
+pushed to `main`; GitHub CI run `31787480206` passed both Quality and
+Reproducible package before private replay.
+
+Two new private offline workspaces then replayed the unchanged frozen EulerSwap
+closure (five reportable plus 56 compiler-only files, schema `1.2`, Solidity
+`0.8.27`). Both scans completed and produced byte-identical profile,
+source-manifest, scan, and candidate-ledger identities; the source manifest
+matches the frozen pre-scan manifest. The scan produced 25 candidates across
+three rules; every candidate received a private operator-confirmed rejection
+after source review. No proof, report, export, disclosure, submission, chain
+action, or target contact occurred. `PILOT-009` is now complete.

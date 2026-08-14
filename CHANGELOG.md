@@ -20,6 +20,16 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ### Documentation
 
+- Completed `COMP-005` and `PILOT-009`. Repair commit `04781a9` was pushed to
+  `main` and GitHub CI run `31787480206` passed both Quality and Reproducible
+  package. Two new private offline scans of the unchanged frozen EulerSwap v2
+  closure (five reportable plus 56 compiler-only files, schema `1.2`, Solidity
+  `0.8.27`) reproduced byte-identical profile, source-manifest, scan, and
+  candidate-ledger identities; all 25 candidates received a private review
+  decision and none was confirmed. The source manifest still matches the frozen
+  pre-scan manifest, so the source and dependency sets are unchanged. The
+  evaluation, plans, task tracker, and next-session handoff are updated; no
+  task is currently queued.
 - Added the queued `COMP-005` plan for the generic direct-library remapping
   repair exposed by PILOT-009. Rewrote the next-session handoff as a coordinator
   prompt: OpenCode with `opencode-go/deepseek-v4-flash` implements the task, and

@@ -354,16 +354,17 @@ Project status and future work are tracked explicitly:
   milestone after the completed compiler-pin repair; COMPLETE. Commit `2574b6e`
   is pushed to `main`, and GitHub CI run `31720097982` passed both Quality and
   Reproducible package.
-- [PILOT-009 development plan](docs/PILOT_009_PLAN.md) — unsatisfied validation
+- [PILOT-009 development plan](docs/PILOT_009_PLAN.md) — completed validation
   of detector commit `2574b6e` on the EulerSwap v2 Ethereum subset (a
   genuinely untouched target that is not OpenZeppelin, Silo, or Olas): the
-  fixed detector could not compile the frozen closure, so the trial is
-  unsatisfied. See the
+  generic `COMP-005` direct-library remapping repair closed the fixed-detector
+  compile blocker, and two private replays reproduced the frozen closure with
+  matching identities. See the
   [target-selection record](docs/research/PILOT_009_TARGET_SELECTION.md) and
   the [evaluation](docs/research/PILOT_009_EVALUATION.md).
 - [COMP-005 development plan](docs/COMP_005_PLAN.md) — the generic
-  direct-library remapping repair (published) and private replay of the
-  unchanged frozen EulerSwap closure (in progress).
+  direct-library remapping repair (complete) and the completed private replay
+  of the unchanged frozen EulerSwap closure.
 - [PILOT-007 development plan](docs/PILOT_007_PLAN.md) — independent target
   selection, private replay, completion-review repair, and evaluation.
 - [PILOT-008 development plan](docs/PILOT_008_PLAN.md) and

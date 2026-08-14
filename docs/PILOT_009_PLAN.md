@@ -1,16 +1,13 @@
 # PILOT-009 development plan
 
-Status: **UNSATISFIED. The public selection gate passed for the EulerSwap v2
-Ethereum subset at commit `81cf6dc988468fd56f690e6bc0e338a5be02d034`.
-Euler's pinned first-party verification record maps five deployed components to
-that commit, and the exact pinned source with its recursive submodule closure
-was acquired, enumerated (five reportable and 56 compiler-only files), and
-frozen user-read-only. Both private workspaces then failed deterministically at
-the compile stage: the fixed detector commit `2574b6e` cannot reproduce
-Foundry's automatic submodule remapping, so the frozen closure cannot be
-compiled and no scan or candidate identity exists. EulerSwap is retained as a
-research corpus; [COMP-005](COMP_005_PLAN.md) is the queued generic repair and
-private re-scan task.**
+Status: **COMPLETE — 2026-08-14.** The `COMP-005` generic repair closed the
+fixed-detector compile blocker. Two new private offline workspaces replayed the
+unchanged frozen EulerSwap v2 closure (five reportable plus 56 compiler-only
+files, Solidity `0.8.27`, schema `1.2`) with byte-identical profile,
+source-manifest, scan, and candidate-ledger identities, and every candidate
+received a private review decision. See
+[the evaluation](research/PILOT_009_EVALUATION.md) and
+[the COMP-005 plan](COMP_005_PLAN.md).**
 
 ## Goal
 

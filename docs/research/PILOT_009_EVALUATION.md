@@ -1,33 +1,40 @@
 # PILOT-009 Evaluation
 
-Trial date: 2026-08-13
+Trial date: 2026-08-13 (selection, acquisition, freeze, and blocked first scan)
+Replay date: 2026-08-14 (after the `COMP-005` generic repair)
 Target: EulerSwap v2 Ethereum subset (Euler `Euler-Bounty`)
 Pinned commit: `81cf6dc988468fd56f690e6bc0e338a5be02d034`
-Status: **UNSATISFIED — the fixed detector's isolated compiler cannot reproduce
-the target's Foundry auto-remapping, so the frozen closure cannot be compiled
-and no scan or candidate identity exists. EulerSwap is retained as a non-bounty
-research corpus; a product repair and a re-trial are required.**
+Status: **SATISFIED — the fixed detector's repaired isolated compiler replays
+the frozen closure twice, all compared identities match, and every candidate has
+a private review state.**
 
 ## Outcome
 
 The trial selected a genuinely untouched, independent target (EulerSwap v2, not
 OpenZeppelin, Silo, or Olas), verified the exact deployed-source mapping from
 Euler's pinned first-party verification record, acquired the exact pinned
-source and its recursively pinned submodules, enumerated the exact compiler
-closure, and froze it as a clean user-read-only Git-backed checkout with the
-exact compiler pin. Both required private workspaces then failed deterministically
-at the compile stage with the identical unresolved import, before any scan
-record or candidate could be produced.
+source and its recursively pinned submodules, and froze the exact compiler
+closure before any scan. The original fixed detector (`2574b6e`) could not
+compile the closure because its isolated compiler wrote `libs = []` and loaded
+only the target's tracked `remappings.txt`, so the import
+`v4-periphery/src/utils/BaseHook.sol` could not resolve. Both original private
+workspaces failed deterministically at that compile stage and no scan or
+candidate identity existed.
 
-The blocker is a fixed-detector limitation, not a target or mapping failure:
-Contract Holes' isolated bounty compiler stages the approved files into a
-temporary project with `libs = []` and copies only the target's `remappings.txt`.
-The EulerSwap target resolves one import in the reportable closure only through
-Foundry's automatic submodule remapping (its own `foundry.toml` sets
-`libs = ["lib"]`), and that prefix is not present in the tracked `remappings.txt`.
-A standalone offline trial compile that reproduces the automatic remapping
-compiles the identical frozen closure cleanly with Solidity `0.8.27`, so the
-closure itself is pinned and complete.
+The `COMP-005` repair closes that generic gap: the isolated compiler now derives
+only the direct-library remappings that the approved closure's own imports
+require, while keeping `libs = []` and explicit validated remappings
+authoritative. After the repair, two new private workspaces replayed the
+unchanged frozen closure offline. Both scans completed with the same exact
+compiler release, and their profile, source-manifest, scan, and candidate-ledger
+identities are byte-identical. The source manifest still matches the frozen
+pre-scan manifest exactly, so the source and dependency sets are unchanged.
+
+The scan produced candidates in several rules; every candidate was reviewed
+privately against the pinned source and program impact rules and received an
+explicit human decision. No proof, report, export, disclosure, submission,
+chain action, or target contact occurred, and no detector behavior was tuned
+from these labels.
 
 ## Target and source gate
 
@@ -50,7 +57,7 @@ candidate comparison, addresses, paths, and restrictions.
 
 | Item | Value |
 | --- | --- |
-| Scanner | Contract Holes at fixed detector commit `2574b6e` |
+| Scanner | Contract Holes at the `COMP-005`-repaired detector (schema `1.2`) |
 | Solidity compiler | `0.8.27` exact pin, profile and source-manifest schema `1.2` |
 | Reportable Solidity files | 5 (factory, implementation, periphery, protocol-fee config, registry) |
 | Compiler-only dependency files | 56 |
@@ -60,25 +67,19 @@ candidate comparison, addresses, paths, and restrictions.
 
 The closure was enumerated by following the recursive Solidity import graph from
 the five reportable files with the target's remappings and Foundry's automatic
-submodule remappings. A standalone isolated offline trial compile of the exact
-staged 61 files with the automatic remapping reproduced all 61 source units,
-including all five reportable units.
+submodule remappings, and verified by an isolated offline trial compile with the
+automatic remapping. It was not changed by the repair.
 
-## Blocker evidence
+## COMP-005 repair
 
-Both private workspaces (first scan and deterministic replay) failed before any
-scan record with the identical fixed-detector compile error: one import in the
-closure (`v4-periphery/src/utils/BaseHook.sol` from `src/UniswapHook.sol`,
-itself in the closure of the reportable `src/EulerSwap.sol`) cannot be resolved
-because the temporary staging project disables Foundry's automatic submodule
-remapping (`libs = []`) and the target's tracked `remappings.txt` does not map
-that prefix. The same closure compiles offline with Solidity `0.8.27` when the
-automatic remapping is present, so no target source, dependency, compiler, or
-scope change is needed.
-
-The failure is deterministic: the two workspaces produced byte-identical
-schema-`1.2` source manifests and the identical compile diagnostic. No scan
-record, candidate, or review decision exists.
+The generic repair derives `<name>/=lib/<name>/` for an uncovered package import
+only when the imported unit is already declared below that exact direct library
+directory in the approved closure. Explicit validated `remappings.txt` entries
+remain authoritative; relative imports are untouched; `libs = []` stays empty;
+no target configuration is loaded and no undeclared file can enter the
+compiler. The source manifest and profile identities do not change when no
+derived mapping is needed. For this closure the repair adds exactly the single
+`v4-periphery/` prefix mapping that the approved imports require.
 
 ## Results
 
@@ -88,11 +89,21 @@ record, candidate, or review decision exists.
 | Mapping verdict | PASS |
 | Reportable Solidity files | 5 |
 | Compiler-only Solidity files | 56 |
-| Candidates | None; compile blocker, no scan |
-| Rule distribution | None |
-| Rejected / investigating / confirmed | 0 / 0 / 0 |
-| Candidate precision | Undefined; no predictions |
-| Recall | Unknown; no ground truth |
+| Candidates | 25 |
+| Rule distribution | `SOL003`: 1, `SOL005`: 1, `SOL008`: 23 |
+| Rejected / investigating / confirmed | 25 / 0 / 0 |
+| Replay identities | byte-identical profile, manifest, scan, and candidates |
+| Candidate precision | Undefined; every prediction rejected after source review |
+| Recall | Unknown; no independent ground truth |
+
+Every candidate received one private operator-confirmed decision after review
+against the pinned source and the program's impact rules. The rejected families
+are consistent with the scanner's documented conservative boundaries: immutable
+deployment settings and freshly created clones are not attacker-selected
+targets; registry-bonded or factory-deployed pools are bounded targets; the
+swap callback to the caller-selected recipient is the documented flash-swap
+design; and the management `delegatecall` is an immutable deployment trust
+boundary. None was confirmed as an in-scope impact.
 
 ## Comparison
 
@@ -101,33 +112,24 @@ record, candidate, or review decision exists.
 | OpenZeppelin Confidential Contracts | Pass | 22 | 51, all rejected | 0 |
 | Silo operational corpus | Fail; research only | 10 | 81, all rejected | 0 |
 | Olas governance subset | Pass | 2 | 0 | 0 |
-| EulerSwap v2 subset (this trial) | Pass | 5 | none (fixed-detector compile blocker) | 0 |
+| EulerSwap v2 subset (this trial) | Pass | 5 | 25, all rejected | 0 |
 
-The EulerSwap trial is the only one blocked before scanning. It therefore
-provides no generalization or precision evidence, but it does identify a generic
-fixed-detector boundary: Contract Holes' bounty compiler does not reproduce
-Foundry's automatic submodule remapping. This is a new, observed, generic gap,
-parallel to the compiler-pin gap that `COMP-004` closed after `PILOT-008`.
-
-## Recommended next task
-
-Execute [COMP-005](../COMP_005_PLAN.md): derive only the missing direct-library
-remappings required by approved imports, keep `libs = []` and explicit
-remappings authoritative, publish the generic repair, and then run two private
-scans of this same frozen EulerSwap closure. The closure, profile, and freeze are
-already complete. If the narrow repair is rejected, select a different untouched
-target whose tracked `remappings.txt` is self-contained.
+The EulerSwap trial is the first to exercise the repaired isolated compiler
+against a genuinely untouched target that needs a derived direct-library
+remapping. It therefore validates both the repair and the deterministic replay
+gate. As with every prior trial, an all-rejected or quiet result does not show
+that the target is safe or that unknown-bug recall is useful.
 
 ## Limitations
 
-- The trial could not scan, so it yields no precision, recall, or review-effort
-  evidence for this target.
-- The fixed detector cannot compile the frozen closure; this is a scanner
-  boundary, not evidence about the target's safety.
-- Recall remains unknown for every trial target; an all-rejected or blocked
-  trial does not show that a target is safe.
-- Reviewer labels from prior trials are single-reviewer and not independent
-  ground truth.
+- The trial produces no precision or recall evidence: recall is unknown, and
+  every prediction was rejected after source review, so candidate precision is
+  undefined for this target.
+- Reviewer labels are single-reviewer and not independent ground truth.
+- The scanner does not model every program rule; an all-rejected trial does not
+  establish that the target is safe.
+- The `COMP-005` repair reproduces only the direct-library remapping case
+  observed here; it does not implement full Foundry remapping parity.
 - No proof, report, export, disclosure, submission, chain action, RPC, fork,
   or target contact occurred; the target build/test/deploy scripts were never
   executed.

@@ -46,8 +46,8 @@
 - [COMP-004 development plan](COMP_004_PLAN.md) — exact compiler version in
   bounty profiles (complete, including the private pinned Olas replay)
 - [COMP-005 development plan](COMP_005_PLAN.md) — deterministic direct-library
-  remapping repair at the isolated compiler boundary (repair published; frozen
-  PILOT-009 replay in progress)
+  remapping repair at the isolated compiler boundary and the completed frozen
+  PILOT-009 replay
 
 ## Project governance
 
@@ -55,15 +55,14 @@
 - [PRECISION-001 development plan](PRECISION_001_PLAN.md)
 - [PRECISION-002 development plan](PRECISION_002_PLAN.md) — complete at commit
   `2574b6e`. GitHub CI run `31720097982` passed
-- [PILOT-009 development plan](PILOT_009_PLAN.md) — unsatisfied validation of
-  commit `2574b6e` on the EulerSwap v2 Ethereum subset, a genuinely untouched
-  target that is not OpenZeppelin, Silo, or Olas (fixed-detector compile
-  blocker; no scan)
+- [PILOT-009 development plan](PILOT_009_PLAN.md) — completed validation of
+  commit `2574b6e` on the EulerSwap v2 Ethereum subset after the generic
+  `COMP-005` direct-library remapping repair
 - [PILOT-009 target selection](research/PILOT_009_TARGET_SELECTION.md) —
   public pre-acquisition mapping record for the selected EulerSwap v2 subset
-- [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md) — unsatisfied trial
-  outcome: exact closure frozen, fixed detector cannot reproduce the target's
-  automatic submodule remapping
+- [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md) — completed trial:
+  repaired compiler replays the frozen closure twice with matching identities
+  and all candidates are reviewed privately
 - [Next-session starter prompt](NEXT_SESSION_PROMPT.md) — coordinator handoff
   for OpenCode with `opencode-go/deepseek-v4-flash`, followed by independent
   verification
