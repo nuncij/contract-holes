@@ -1,12 +1,20 @@
 # Contract Holes Task Tracker
 
-This is the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
-Keep one task marked **NEXT** while queued work exists and at most one task
-marked **IN PROGRESS**.
+**PROJECT CLOSED — 2026-08-14.** No task is queued, no task is in progress, and
+no further task will be added. Four authorized real-world trials produced 157
+candidates and zero confirmed vulnerabilities against a structural ceiling, so
+development stopped at the signed `1.1.1` release. The decision, the evidence,
+the reusable parts, and the two reopening conditions are recorded in
+[the closeout record](docs/PROJECT_CLOSEOUT.md). Everything below is the
+historical execution record, kept unchanged.
+
+This was the execution view of the [development plan](docs/DEVELOPMENT_PLAN.md).
+The working rule was: keep one task marked **NEXT** while queued work exists and
+at most one task marked **IN PROGRESS**.
 
 Current release: `1.1.1`
 
-Current milestone: **Post-M8 — independent validation rework**
+Final milestone: **Post-M8 — independent validation rework (closed)**
 
 Current position: M0 through M8 are complete. The private GitHub repository has
 passing production CI, verified signed `v1.1.0` and `v1.1.1` releases,
@@ -90,8 +98,18 @@ opened. See
 [the COMP-005 plan](docs/COMP_005_PLAN.md) and
 [the next-session starter prompt](docs/NEXT_SESSION_PROMPT.md).
 
+The project was closed on 2026-08-14, immediately after `COMP-005`. Across four
+authorized real-world trials the workflow scanned 39 reportable files, produced
+157 candidates, and confirmed none. The ceiling is structural rather than a
+matter of sample size or tuning: the detectors recognize local primitives, while
+this project's own frozen historical corpus labels the bug families that current
+bounty programs pay for — share pricing, verification logic, share accounting,
+flash-loan governance, and health-check invariants — as out-of-model. Two
+independent engines evaluated the same evidence and both recommended stopping.
+See [the closeout record](docs/PROJECT_CLOSEOUT.md).
+
 Status legend: `[x]` complete, `[ ]` queued. Priorities are P0 (release blocker),
-P1 (important), and P2 (useful follow-up).
+P1 (important), and P2 (useful follow-up). No entry below will change again.
 
 ## Completed
 

@@ -1,5 +1,15 @@
 # Contract Holes
 
+> **This project is closed.** Development stopped on 2026-08-14 at the signed
+> `1.1.1` release. Four authorized real-world bounty trials produced 157
+> candidates and zero confirmed vulnerabilities, and the reason is structural:
+> the detectors recognize local primitives, while the bug classes that current
+> bounty programs pay for — accounting, pricing, verification logic, governance
+> economics — are labelled out-of-model by this project's own historical corpus.
+> The code works and every gate passes; it is simply not worth another target.
+> Read [the closeout record](docs/PROJECT_CLOSEOUT.md) before reusing or
+> reopening anything here.
+
 `holes` is a fast, evidence-first Solidity security scanner. It is intentionally
 small enough to understand and extend: the first release has no runtime
 dependencies and does not send contract source code to an external service.
@@ -582,11 +592,17 @@ as terminal text, JSON, or SARIF 2.1.0.
 
 ## Roadmap
 
+There is no roadmap. The project is closed; see
+[the closeout record](docs/PROJECT_CLOSEOUT.md) for the decision, the evidence,
+what is worth reusing, and the two conditions under which reopening it would
+make sense.
+
 M0 through M6 produced the signed audit-ready `1.0.0` release. M7 completed a
 human-controlled `1.1.0` bounty research workflow with pinned authorized scope,
 candidate triage, isolated local proofs, private report drafts, historical
 validation, an authorized repository pilot, and an explicit approval gate. It
-will not submit reports or touch live networks. See the
+will not submit reports or touch live networks. M8 applied that workflow to four
+authorized real-world targets and produced no confirmed finding. See the
 [M7 Bounty Hunter Mode plan](docs/BOUNTY_HUNTER_PLAN.md),
 [development plan](docs/DEVELOPMENT_PLAN.md), and [TASKS.md](TASKS.md).
 

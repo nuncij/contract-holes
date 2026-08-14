@@ -93,7 +93,7 @@ derived mapping is needed. For this closure the repair adds exactly the single
 | Rule distribution | `SOL003`: 1, `SOL005`: 1, `SOL008`: 23 |
 | Rejected / investigating / confirmed | 25 / 0 / 0 |
 | Replay identities | byte-identical profile, manifest, scan, and candidates |
-| Candidate precision | Undefined; every prediction rejected after source review |
+| Candidate precision | 0 of 25 under this trial's own reviewer labels; independently established precision remains undefined |
 | Recall | Unknown; no independent ground truth |
 
 Every candidate received one private operator-confirmed decision after review

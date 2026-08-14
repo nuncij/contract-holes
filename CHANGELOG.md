@@ -5,6 +5,24 @@ versioning; public JSON/SARIF schemas have their own compatibility rules.
 
 ## Unreleased
 
+### Closed
+
+- **The project is closed as of 2026-08-14** at the signed `1.1.1` release. Four
+  authorized real-world bounty trials scanned 39 reportable files, produced 157
+  candidates, and confirmed none; no report, export, disclosure, submission,
+  chain action, or target contact ever occurred. The ceiling is structural rather
+  than a sample-size or tuning problem: the detectors recognize local primitives,
+  while the frozen historical corpus labels the families that current bounty
+  programs pay for — share pricing, verification logic, share accounting,
+  flash-loan governance, and health-check invariants — as out-of-model. Two
+  independent engines evaluated the same evidence and both recommended stopping.
+  Added [the closeout record](docs/PROJECT_CLOSEOUT.md) with the decision, the
+  measured evidence, the reusable components, and the two reopening conditions;
+  marked `README.md`, `TASKS.md`, `docs/DEVELOPMENT_PLAN.md`, and
+  `docs/NEXT_SESSION_PROMPT.md` closed. No task is queued and none will be
+  added. Corrected the `PILOT-009` precision row to state 0 of 25 under its own
+  reviewer labels, with independently established precision still undefined.
+
 ### Fixed
 
 - Isolated bounty compiler now derives the direct-library remappings that the

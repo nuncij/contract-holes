@@ -1,5 +1,9 @@
 # Documentation
 
+> **This project is closed as of 2026-08-14.** See
+> [the closeout record](PROJECT_CLOSEOUT.md) for the decision and its evidence.
+> The documents below remain accurate for the final `1.1.1` release.
+
 ## Start here
 
 - [Installation](INSTALLATION.md)
@@ -63,9 +67,11 @@
 - [PILOT-009 evaluation](research/PILOT_009_EVALUATION.md) — completed trial:
   repaired compiler replays the frozen closure twice with matching identities
   and all candidates are reviewed privately
-- [Next-session starter prompt](NEXT_SESSION_PROMPT.md) — coordinator handoff
-  for OpenCode with `opencode-go/deepseek-v4-flash`, followed by independent
-  verification
+- [Project closeout](PROJECT_CLOSEOUT.md) — **read first.** The 2026-08-14
+  decision to stop development, the measured evidence behind it, which
+  components are reusable, and the two reopening conditions
+- [Next-session starter prompt](NEXT_SESSION_PROMPT.md) — closed; no queued work
+  and no handoff remains
 - [Threat model](THREAT_MODEL.md)
 - [Security policy](../SECURITY.md)
 - [Contributing](../CONTRIBUTING.md)

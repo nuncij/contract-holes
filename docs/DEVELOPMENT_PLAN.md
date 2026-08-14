@@ -1,9 +1,16 @@
 # Contract Holes Development Plan
 
 Last updated: 2026-08-14
-Current release: `1.1.1`
-Current milestone: **Post-M8 — independent validation rework**
-Next: **No task is currently queued.** `COMP-005` completed on 2026-08-14:
+Final release: `1.1.1`
+Status: **CLOSED on 2026-08-14.** Development stopped after four authorized
+real-world trials produced 157 candidates and zero confirmed vulnerabilities
+against a structural ceiling. No milestone, task, or roadmap item remains open,
+and no further planning applies. The decision, evidence, reusable components,
+and reopening conditions are in [the closeout record](PROJECT_CLOSEOUT.md).
+Everything below is the historical plan of record.
+
+Final milestone: **Post-M8 — independent validation rework (closed)**
+Last task: **`COMP-005` completed on 2026-08-14:**
 the isolated bounty compiler derives only the direct-library remappings
 required by approved imports while keeping `libs = []` and legacy identities
 unchanged, and the frozen EulerSwap closure replayed twice with matching
